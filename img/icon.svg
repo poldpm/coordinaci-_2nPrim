@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Coordinació 2n">
-  <defs><filter id="sh" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6"/></filter></defs>
-  <rect width="512" height="512" fill="#0F6C86"/>
-  <g transform="rotate(-7 160 256)"><rect x="124" y="173" width="72" height="176" rx="36" fill="#0C4658" opacity="0.35" filter="url(#sh)"/><rect x="124" y="168" width="72" height="176" rx="36" fill="#5A6FE0"/></g>
-  <g><rect x="220" y="173" width="72" height="176" rx="36" fill="#0C4658" opacity="0.35" filter="url(#sh)"/><rect x="220" y="168" width="72" height="176" rx="36" fill="#D5638E"/></g>
-  <g transform="rotate(7 352 256)"><rect x="316" y="173" width="72" height="176" rx="36" fill="#0C4658" opacity="0.35" filter="url(#sh)"/><rect x="316" y="168" width="72" height="176" rx="36" fill="#EE9B4C"/></g>
-</svg>
