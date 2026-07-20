@@ -61,6 +61,7 @@ avaluacio{}      // frases d'avaluació per trimestre
 programacio{}    // programació setmanal + carpeta viatgera (veure §8)
 correus[]        // {id, title, body, date, sent:{tutor:true}, author, createdAt}
 emailReminders{} // opt-in del correu recordatori: { tutor: true }
+comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
 ```
 `normalizeState()` garanteix que totes les claus existeixen.
 
@@ -154,6 +155,18 @@ cicles"** (`CV_VIEW`), navegador de cicle (`CV_IDX`).
 nom estandarditzat.
 
 ## 9. Altres funcions
+- **Comentaris a les entrades** (estil Google): cada targeta renderitzada per
+  `entryCard` (Aspectes generals + subtemes) porta un **botó al costat, FORA de la
+  targeta** (`entryRow` → `.comment-rail`) que desplega un **panell de comentaris**.
+  Es pot **escriure** un comentari, **respondre** en fil, **marcar com a completat**
+  (resolt, s'agrupa a "Completats") i **esborrar** comentaris/respostes. Estat obert
+  del panell: `OPEN_COMMENTS` (Set en memòria). Model: `STATE.comments[entryId]=[fils]`
+  (§5), desacoblat de l'entrada per no trepitjar-la en editar. Funcions:
+  `entryRow/commentPanel/commentThread/commentBubble/threadComposer`.
+  `api.commentAdd/commentReply/commentResolve/commentDelete/commentReplyDelete`.
+  Backend: casos homònims (upsert idempotent per `id`); `deleteEntry` neteja els
+  comentaris de l'entrada. ⚠️ Aquests casos són **NOUS a `doPost`** → cal **nou
+  desplegament del Web App** (§11) perquè el frontend els vegi.
 - **Correus** (secció `correus`): gestor d'enviaments. Cada correu: **assumpte**,
   **cos**, **dia d'enviament** (opcional), i **3 botons "Enviat" per tutor**.
   Botó **copiar el cos** (envien per **Clickedu**, NO Gmail → no hi ha botó Gmail).

@@ -559,6 +559,53 @@ textarea.input{resize:vertical;min-height:74px}
 .entry .foot-actions{margin-top:10px;display:flex;gap:8px}
 .card-tools{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px}
 .card-tools .del,.card-tools .edit-btn{position:static;top:auto;right:auto}
+/* --- Comentaris (estil Google, dins l'app) --- */
+.entry-row{display:flex;gap:8px;align-items:flex-start}
+.entry-main{flex:1;min-width:0;display:grid;gap:8px}
+.comment-rail{flex:0 0 auto;padding-top:6px}
+.comment-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;
+  border:1.5px solid var(--line);background:var(--panel);color:var(--muted);border-radius:12px;box-shadow:var(--shadow-sm);cursor:pointer;transition:.15s}
+.comment-btn:hover{color:var(--teal);border-color:var(--cyan);background:var(--panel-2)}
+.comment-btn.has{color:var(--teal);border-color:var(--cyan)}
+.comment-btn.on{color:#fff;background:var(--teal);border-color:var(--teal)}
+.comment-btn .icon{width:20px;height:20px}
+.comment-btn .cbadge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;background:var(--sun-deep);
+  color:#3a2c00;font-size:.7rem;font-weight:800;border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--panel)}
+.comment-panel{border:1.5px solid var(--line);border-radius:var(--r-lg);background:var(--panel-2);padding:12px;display:grid;gap:10px}
+.cp-head{display:flex;align-items:center;gap:.4em;font-family:var(--font-d);font-weight:600;color:var(--teal-ink);font-size:.95rem}
+.cp-head .icon{width:18px;height:18px}
+.cp-empty{color:var(--muted);font-weight:600;font-size:.88rem}
+.cthread{background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px}
+.cthread.resolved{opacity:.62}
+.cbubble{position:relative;display:grid;gap:3px;padding-right:26px}
+.cbubble.creply{margin-left:16px;padding-left:12px;border-left:2px solid var(--line)}
+.cb-head{display:flex;align-items:center;gap:7px}
+.cb-head .avatar{width:26px;height:26px;font-size:.72rem}
+.cb-head b{font-family:var(--font-d);font-weight:600;font-size:.9rem}
+.cb-date{color:var(--muted);font-weight:700;font-size:.74rem}
+.cb-text{white-space:pre-wrap;font-weight:600;color:#33555f;line-height:1.45;font-size:.92rem}
+.cb-del{position:absolute;top:0;right:0;background:transparent;border:none;color:#c3d6dd;padding:3px;border-radius:7px;cursor:pointer}
+.cb-del:hover{color:var(--cristina);background:#fbeaf1}
+.cb-del .icon{width:15px;height:15px}
+.cthread-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cbtn{display:inline-flex;align-items:center;gap:.35em;border:1.5px solid var(--line);background:var(--panel);color:var(--muted);
+  font-weight:800;font-size:.78rem;padding:.4em .7em;border-radius:9px;cursor:pointer}
+.cbtn .icon{width:14px;height:14px}
+.cbtn:hover{background:var(--panel-2);color:var(--teal)}
+.cbtn.primary{border-color:#27AE60;color:#1f8a4c}
+.cbtn.primary:hover{color:#fff;background:#27AE60;border-color:#27AE60}
+.cthread-info{color:var(--muted);font-weight:700;font-size:.76rem}
+.ccomposer{display:flex;gap:6px;align-items:flex-end}
+.creply-composer{margin-left:16px}
+.cinput{flex:1;min-width:0;resize:none;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);padding:.5em .7em;
+  font-family:var(--font);font-weight:600;font-size:.9rem;color:#33555f;line-height:1.4;max-height:140px}
+.cinput:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(79,195,222,.2)}
+.cpost{flex:0 0 auto;border:none;background:var(--teal);color:#fff;font-weight:800;font-size:.82rem;padding:.55em .9em;border-radius:10px;cursor:pointer}
+.cpost:hover{background:var(--teal-ink)}
+.cp-resolved{display:grid;gap:8px}
+.cp-restoggle{display:inline-flex;align-items:center;gap:.4em;justify-self:start;border:none;background:transparent;color:var(--muted);font-weight:800;font-size:.8rem;cursor:pointer;padding:.2em 0}
+.cp-restoggle .icon{width:14px;height:14px;color:#27AE60}
+.cp-resbox{display:grid;gap:8px}
 .edit-btn{background:transparent;border:none;color:#c3d6dd;padding:4px;border-radius:8px}
 .edit-btn:hover{color:var(--teal);background:var(--panel-2)}
 .entry.editing,.task.editing{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(79,195,222,.25),var(--shadow-sm)}
@@ -1122,7 +1169,7 @@ const api = {
   },
   async addEntry(e){ STATE.entries.unshift(e); await persist('addEntry', e); },
   async updateEntry(e){ const i=STATE.entries.findIndex(x=>x.id===e.id); if(i>-1) STATE.entries[i]=e; await persist('updateEntry', e); },
-  async deleteEntry(id){ STATE.entries=STATE.entries.filter(x=>x.id!==id); await persist('deleteEntry',{id}); },
+  async deleteEntry(id){ STATE.entries=STATE.entries.filter(x=>x.id!==id); if(STATE.comments) delete STATE.comments[id]; await persist('deleteEntry',{id}); },
   async addTask(t){ STATE.tasks.unshift(t); await persist('addTask', t); },
   async updateTask(t){ const i=STATE.tasks.findIndex(x=>x.id===t.id); if(i>-1) STATE.tasks[i]=t; await persist('updateTask', t); },
   async deleteTask(id){ STATE.tasks=STATE.tasks.filter(x=>x.id!==id); await persist('deleteTask',{id}); },
@@ -1218,6 +1265,34 @@ const api = {
     if(on) STATE.emailReminders[ME]=true; else delete STATE.emailReminders[ME];
     await persist('setEmailReminder', {tutor:ME, on:!!on});
   },
+  async commentAdd(entryId, c){
+    STATE.comments = STATE.comments || {};
+    (STATE.comments[entryId] = STATE.comments[entryId] || []).push(c);
+    await persist('commentAdd', {entryId, comment:c});
+  },
+  async commentReply(entryId, commentId, r){
+    STATE.comments = STATE.comments || {};
+    const th = (STATE.comments[entryId]||[]).find(t=>t.id===commentId);
+    if(th){ th.replies = th.replies || []; th.replies.push(r); }
+    await persist('commentReply', {entryId, commentId, reply:r});
+  },
+  async commentResolve(entryId, commentId, on){
+    STATE.comments = STATE.comments || {};
+    const th = (STATE.comments[entryId]||[]).find(t=>t.id===commentId);
+    if(th){ th.resolved=!!on; th.resolvedBy = on?ME:null; th.resolvedAt = on?nowISO():null; }
+    await persist('commentResolve', {entryId, commentId, resolved:!!on, by:ME});
+  },
+  async commentDelete(entryId, commentId){
+    STATE.comments = STATE.comments || {};
+    if(STATE.comments[entryId]) STATE.comments[entryId] = STATE.comments[entryId].filter(t=>t.id!==commentId);
+    await persist('commentDelete', {entryId, commentId});
+  },
+  async commentReplyDelete(entryId, commentId, replyId){
+    STATE.comments = STATE.comments || {};
+    const th = (STATE.comments[entryId]||[]).find(t=>t.id===commentId);
+    if(th && th.replies) th.replies = th.replies.filter(r=>r.id!==replyId);
+    await persist('commentReplyDelete', {entryId, commentId, replyId});
+  },
 };
 let DEMO_COMANDES = [
   {id:'demo-1', name:'2n Comanda material de octubre 2025', url:'#', date:'2025-10-06T09:00:00.000Z'},
@@ -1259,6 +1334,7 @@ function normalizeState(){
   if(!STATE.programacio) STATE.programacio={};
   if(!STATE.correus) STATE.correus=[];
   if(!STATE.emailReminders) STATE.emailReminders={};
+  if(!STATE.comments) STATE.comments={};
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
   (STATE.tasks||[]).forEach(t=>{ t.readBy=t.readBy||[t.author]; t.createdAt=t.createdAt||t.date; t.updatedAt=t.updatedAt||t.createdAt; });
 }
@@ -1788,6 +1864,7 @@ function shade(hex,pct){
    ============================================================ */
 let CURRENT=null, CURRENT_SUB=null;
 let EDITING=null;
+const OPEN_COMMENTS=new Set();   // ids d'entrades amb el panell de comentaris obert
 let CAL_VIEW='llista', CAL_MONTH=null, SCHEDULING=null;
 let KANBAN_GROUP=false;
 let AV_TRI=null, AV_SUBJECT=null;
@@ -3351,7 +3428,7 @@ function renderEntries(S,sec,subId){
     const em=el('div','empty-feed'); em.innerHTML=`<div class="big">🌱</div>Encara no hi ha res aquí. Sigues el primer a escriure!`;
     feed.appendChild(em);
   }
-  list.forEach(e=>feed.appendChild(e.id===EDITING ? entryEditForm(e,sec,subId) : entryCard(e,sec,subId)));
+  list.forEach(e=>feed.appendChild(e.id===EDITING ? entryEditForm(e,sec,subId) : entryRow(e,sec,subId)));
   S.appendChild(feed);
 }
 function entryEditForm(e,sec,subId){
@@ -3484,6 +3561,98 @@ function entryCard(e,sec,subId){
   tools.appendChild(del);
   card.appendChild(tools);
   return card;
+}
+
+/* ---------- COMENTARIS (estil Google, dins l'app) ---------- */
+const CMT_ICON=`<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+/* Fila = targeta d'entrada + botó de comentaris al costat (fora de la targeta) + panell desplegable. */
+function entryRow(e,sec,subId){
+  const row=el('div','entry-row');
+  const main=el('div','entry-main');
+  main.appendChild(entryCard(e,sec,subId));
+  const threads=(STATE.comments&&STATE.comments[e.id])||[];
+  const open=OPEN_COMMENTS.has(e.id);
+  if(open) main.appendChild(commentPanel(e,sec,subId));
+  row.appendChild(main);
+  const rail=el('div','comment-rail');
+  const openCount=threads.filter(t=>!t.resolved).length;
+  const btn=el('button','comment-btn'+(open?' on':'')+(openCount?' has':''));
+  btn.title=open?'Amaga els comentaris':(openCount?openCount+' comentari(s)':'Comenta');
+  btn.innerHTML=CMT_ICON+(openCount?`<span class="cbadge">${openCount}</span>`:'');
+  btn.onclick=()=>{ if(OPEN_COMMENTS.has(e.id)) OPEN_COMMENTS.delete(e.id); else OPEN_COMMENTS.add(e.id); reopen(sec,subId); };
+  rail.appendChild(btn);
+  row.appendChild(rail);
+  return row;
+}
+function commentPanel(e,sec,subId){
+  const panel=el('div','comment-panel');
+  const head=el('div','cp-head'); head.innerHTML=CMT_ICON+' Comentaris'; panel.appendChild(head);
+  const threads=(STATE.comments&&STATE.comments[e.id])||[];
+  const oberts=threads.filter(t=>!t.resolved);
+  const fets=threads.filter(t=>t.resolved);
+  if(!threads.length){ const em=el('div','cp-empty'); em.textContent='Encara no hi ha comentaris. Escriu el primer!'; panel.appendChild(em); }
+  oberts.forEach(t=>panel.appendChild(commentThread(e,t,sec,subId)));
+  panel.appendChild(threadComposer(e,sec,subId,null));
+  if(fets.length){
+    const wrap=el('div','cp-resolved');
+    const tg=el('button','cp-restoggle'); tg.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12l5 5L20 7"/></svg> Completats (${fets.length})`;
+    const box=el('div','cp-resbox'); box.style.display='none';
+    fets.forEach(t=>box.appendChild(commentThread(e,t,sec,subId)));
+    tg.onclick=()=>{ const vis=box.style.display!=='none'; box.style.display=vis?'none':'grid'; tg.classList.toggle('open',!vis); };
+    wrap.appendChild(tg); wrap.appendChild(box); panel.appendChild(wrap);
+  }
+  return panel;
+}
+function commentThread(e,t,sec,subId){
+  const box=el('div','cthread'+(t.resolved?' resolved':''));
+  box.appendChild(commentBubble(e,t,null,sec,subId));
+  (t.replies||[]).forEach(r=>box.appendChild(commentBubble(e,t,r,sec,subId)));
+  const acts=el('div','cthread-acts');
+  const res=el('button','cbtn'+(t.resolved?'':' primary'));
+  res.innerHTML = t.resolved
+    ? `<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v5h5"/></svg> Torna a obrir`
+    : `<svg class="icon" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12l5 5L20 7"/></svg> Marca com a completat`;
+  res.onclick=async()=>{ await api.commentResolve(e.id,t.id,!t.resolved); reopen(sec,subId); };
+  acts.appendChild(res);
+  if(t.resolved && t.resolvedBy){ const info=el('span','cthread-info'); info.textContent='Completat per '+userById(t.resolvedBy).name; acts.appendChild(info); }
+  box.appendChild(acts);
+  if(!t.resolved) box.appendChild(threadComposer(e,sec,subId,t));
+  return box;
+}
+function commentBubble(e,t,reply,sec,subId){
+  const c=reply||t;
+  const b=el('div','cbubble'+(reply?' creply':''));
+  const hd=el('div','cb-head');
+  hd.appendChild(avatarEl(c.author,26));
+  const nm=el('b'); nm.textContent=userById(c.author).name; hd.appendChild(nm);
+  if(c.createdAt){ const dt=el('span','cb-date'); dt.textContent='· '+fmtDate(c.createdAt); hd.appendChild(dt); }
+  b.appendChild(hd);
+  const tx=el('div','cb-text'); tx.textContent=c.text; b.appendChild(tx);
+  const del=el('button','cb-del'); del.title='Esborra';
+  del.innerHTML=`<svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+  del.onclick=()=>askConfirm(reply?'Vols esborrar aquesta resposta?':'Vols esborrar aquest comentari i les seves respostes?', async()=>{
+    if(reply) await api.commentReplyDelete(e.id,t.id,reply.id); else await api.commentDelete(e.id,t.id);
+    reopen(sec,subId);
+  },{confirmLabel:'Esborra'});
+  b.appendChild(del);
+  return b;
+}
+/* Compositor unificat: thread=null → nou comentari; thread=obj → resposta al fil. */
+function threadComposer(e,sec,subId,thread){
+  const wrap=el('div','ccomposer'+(thread?' creply-composer':''));
+  const ta=el('textarea','cinput'); ta.rows=1; ta.placeholder=thread?'Respon…':'Escriu un comentari…';
+  const go=el('button','cpost'); go.textContent=thread?'Respon':'Comenta';
+  const send=async()=>{ const txt=ta.value.trim(); if(!txt){ ta.focus(); return; }
+    const ts=nowISO(); OPEN_COMMENTS.add(e.id);
+    if(thread) await api.commentReply(e.id,thread.id,{id:uid(),author:ME,text:txt,createdAt:ts});
+    else await api.commentAdd(e.id,{id:uid(),author:ME,text:txt,createdAt:ts,resolved:false,replies:[]});
+    reopen(sec,subId);
+  };
+  go.onclick=send;
+  ta.addEventListener('input',()=>{ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,140)+'px'; });
+  ta.addEventListener('keydown',ev=>{ if(ev.key==='Enter'&&(ev.metaKey||ev.ctrlKey)){ ev.preventDefault(); send(); } });
+  wrap.appendChild(ta); wrap.appendChild(go);
+  return wrap;
 }
 
 /* ---------- AGENDA (Calendari v1) ---------- */
