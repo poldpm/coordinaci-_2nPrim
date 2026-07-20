@@ -1,0 +1,11 @@
+# El backend NO ha d'anar mai a GitHub (conté el token de Telegram i és privat).
+Codi_AppsScript.gs
+
+# Configuració local de Claude Code (permisos d'aquesta màquina, no compartir)
+.claude/settings.local.json
+
+# Fitxers temporals
+.DS_Store
+Thumbs.db
+*.log
+/tmp/

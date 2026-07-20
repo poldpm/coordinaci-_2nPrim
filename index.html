@@ -518,6 +518,7 @@ button.prog-note-ico:hover{transform:scale(1.08)}
 .cc-sent{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--line)}
 .cc-sent-lbl{font-weight:800;font-size:.82rem;color:var(--teal-ink)}
 .hcorreu-date{margin-left:auto;font-weight:800;font-size:.76rem;color:var(--cristina);background:color-mix(in srgb,var(--cristina) 15%,#fff);padding:2px 9px;border-radius:999px;white-space:nowrap}
+.hcv-ico{font-size:1.15rem;flex:none;width:26px;text-align:center}
 /* ---------- SECTION VIEW ---------- */#section{margin-top:6px}
 .sec-hero{border-radius:var(--r-lg);padding:20px 22px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
 .sec-hero .t-burst{position:absolute;inset:0}
@@ -1656,6 +1657,7 @@ function renderDash(){
   const cols=$('#dashCols'); if(!cols) return; cols.innerHTML='';
   const a=buildMyTasksPanel(); if(a) cols.appendChild(a);
   const cr=buildCorreusPanel(); if(cr) cols.appendChild(cr);
+  const cv=buildCarpetaPanel(); if(cv) cols.appendChild(cv);
   const w=buildWeekPanel(); if(w) cols.appendChild(w);
   $('#dashBlock').style.display = cols.children.length ? '' : 'none';
 }
@@ -1872,6 +1874,7 @@ const PROG_SUBJECTS=[
   {id:'mates',  name:'Matem\u00e0tiques', color:'#2D9CDB'},
   {id:'catala', name:'Catal\u00e0',       color:'#EB5757'},
   {id:'medi',   name:'Medi',              color:'#27AE60'},
+  {id:'carpeta',name:'Carpeta viatgera',  color:'#8B6F47'},
 ];
 const PROG_MESU=['gen.','feb.','mar\u00e7','abr.','maig','juny','jul.','ag.','set.','oct.','nov.','des.'];
 function progIsoToDate(iso){ const p=String(iso).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
@@ -1923,6 +1926,32 @@ function progCurrentIdx(){
   return PROG_WEEKS_ARR.length-1;
 }
 let PROG_SUBJECT='mates', PROG_WEEK_IDX=progCurrentIdx(), PROG_VIEW='week';
+/* ---- Carpeta viatgera (quinzenal, dimecres) ---- */
+const CV_START='2026-09-16';   // primer dimecres que es dona
+function _cvGrid(){ const out=[]; let d=progIsoToDate(CV_START); const end=progIsoToDate(COURSE_END);
+  while(d<=end){ const iso=progDateToISO(d); if(!progVacOn(iso)) out.push(iso); d=new Date(d); d.setDate(d.getDate()+14); } return out; }
+const CV_GIVES=_cvGrid();
+function cvCollectOf(g){ const d=progIsoToDate(g); d.setDate(d.getDate()+7); return progDateToISO(d); }
+function cvCurrentGive(){ const today=progDateToISO(new Date());
+  for(let i=0;i<CV_GIVES.length;i++){ const next=CV_GIVES[i+1]||'9999'; if(CV_GIVES[i]<=today && today<next) return CV_GIVES[i]; }
+  if(CV_GIVES.length && today<CV_GIVES[0]) return CV_GIVES[0];
+  return CV_GIVES.length?CV_GIVES[CV_GIVES.length-1]:null; }
+function cvHasContent(give){ const c=progCell('carpeta', give); return progCellHasContent(c) || !!(c.title && c.title.trim()); }
+function cvUpcoming(){
+  const now=new Date(); now.setHours(0,0,0,0);
+  const monday=new Date(now); monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+  const sunday=new Date(monday); sunday.setDate(sunday.getDate()+6);
+  const items=[];
+  CV_GIVES.forEach(g=>{
+    const gd=progIsoToDate(g); gd.setHours(0,0,0,0); const gdiff=Math.round((gd-now)/86400000);
+    const giveThisWeek = gd>=monday && gd<=sunday;
+    if(gdiff===0){ items.push({type:'donar', iso:g, give:g, days:0}); }
+    else if(giveThisWeek && gdiff>0 && !cvHasContent(g)){ items.push({type:'programar', iso:g, give:g, days:gdiff}); }
+    const c=cvCollectOf(g); const cd=progIsoToDate(c); cd.setHours(0,0,0,0); const cdiff=Math.round((cd-now)/86400000);
+    if(cdiff===0){ items.push({type:'recollir', iso:c, give:g, days:0}); }
+  });
+  items.sort((a,b)=>a.days-b.days); return items;
+}
 function progCell(subject, key){ const s=(STATE.programacio&&STATE.programacio[subject])||{}; return s[String(key)]||{}; }
 function progNormItem(x){ return {id:x.id||uid(), t:x.t||'', done:(x.done&&typeof x.done==='object')?x.done:{}, c:!!x.c}; }
 function progItemsOf(cell){
@@ -1979,6 +2008,143 @@ async function doProgCarry(subject, fromMonday, items){
   toast('Pendent passat a la setmana seg\u00fcent \u2713');
 }
 
+let CV_IDX=null;
+let CV_VIEW='cycle';
+function cvDateLabel(iso){ const p=String(iso).split('-'); const d=new Date(+p[0],+p[1]-1,+p[2]); return d.toLocaleDateString('ca-ES',{weekday:'short',day:'numeric',month:'short'}); }
+function progItemListEl(subject, key){
+  const wrap=el('div','prog-items');
+  let items = progItemsOf(progCell(subject,key)).map(x=>({id:x.id, t:x.t, done:Object.assign({},x.done||{}), c:!!x.c}));
+  const save=()=>{ const cell=progCell(subject,key); api.progSetCell(subject, key, {items:items, notes:cell.notes||'', link:cell.link||''}).catch(()=>{}); };
+  function render(focus){
+    wrap.innerHTML='';
+    items.forEach((it,i)=>{
+      const row=el('div','pit'+(it.done[ME]?' done':''));
+      const dots=el('div','pit-dots');
+      USERS.forEach(u=>{ const on=!!it.done[u.id]; const d=el('button','pdot'+(on?' on':'')); d.type='button'; d.style.setProperty('--c',u.accent); d.title=u.name; d.innerHTML='<i></i>';
+        d.onclick=()=>{ if(it.done[u.id]) delete it.done[u.id]; else it.done[u.id]=true; render(); save(); }; dots.appendChild(d); });
+      row.appendChild(dots);
+      const inp=el('input','pit-inp'); inp.type='text'; inp.value=it.t; inp.placeholder='Deure\u2026';
+      inp.addEventListener('blur',()=>{ if(it.t!==inp.value){ it.t=inp.value; save(); } });
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); it.t=inp.value; items.splice(i+1,0,{id:uid(),t:'',done:{}}); render(i+1); save(); }
+        else if(e.key==='Backspace'&&inp.value===''&&items.length>1){ e.preventDefault(); items.splice(i,1); render(Math.max(0,i-1)); save(); } });
+      row.appendChild(inp);
+      const del=el('button','pit-del'); del.type='button'; del.innerHTML='\u00d7'; del.title='Elimina'; del.onclick=()=>{ items.splice(i,1); render(); save(); }; row.appendChild(del);
+      wrap.appendChild(row);
+    });
+    const add=el('button','pit-add'); add.type='button'; add.innerHTML='+ Afegeix un deure'; add.onclick=()=>{ items.push({id:uid(),t:'',done:{}}); render(items.length-1); }; wrap.appendChild(add);
+    if(focus!=null){ const ins=wrap.querySelectorAll('.pit-inp'); if(ins[focus]) ins[focus].focus(); }
+  }
+  render();
+  return wrap;
+}
+function renderCarpeta(S, subj){
+  const seg=el('div','prog-seg');
+  const b1=el('button','prog-segbtn'+(CV_VIEW==='cycle'?' on':'')); b1.type='button'; b1.textContent='Aquest cicle';
+  b1.onclick=()=>{ CV_VIEW='cycle'; openSection('programacio'); };
+  const b2=el('button','prog-segbtn'+(CV_VIEW==='all'?' on':'')); b2.type='button'; b2.textContent='Tots els cicles';
+  b2.onclick=()=>{ CV_VIEW='all'; openSection('programacio'); };
+  seg.appendChild(b1); seg.appendChild(b2); S.appendChild(seg);
+  if(CV_VIEW==='all'){ renderCarpetaOverview(S, subj); return; }
+
+  if(CV_IDX==null){ const cg=cvCurrentGive(); CV_IDX=Math.max(0, CV_GIVES.indexOf(cg)); }
+  if(CV_IDX<0) CV_IDX=0; if(CV_IDX>CV_GIVES.length-1) CV_IDX=CV_GIVES.length-1;
+  const curGive=cvCurrentGive();
+  const give=CV_GIVES[CV_IDX]; const collect=cvCollectOf(give);
+
+  const nav=el('div','prog-nav');
+  const prev=el('button','prog-navbtn'); prev.type='button'; prev.innerHTML='\u2039'; prev.disabled=CV_IDX<=0;
+  prev.onclick=()=>{ if(CV_IDX>0){ CV_IDX--; openSection('programacio'); } };
+  const sel=el('select','prog-weeksel');
+  CV_GIVES.forEach((g,idx)=>{ const o=el('option'); o.value=idx; const tt=(progCell('carpeta',g).title||'').trim();
+    o.textContent='Cicle '+(idx+1)+' \u00b7 '+(tt||('dona '+cvDateLabel(g)))+(g===curGive?'  \u2022 ara':''); if(idx===CV_IDX) o.selected=true; sel.appendChild(o); });
+  sel.onchange=()=>{ CV_IDX=+sel.value; openSection('programacio'); };
+  const next=el('button','prog-navbtn'); next.type='button'; next.innerHTML='\u203a'; next.disabled=CV_IDX>=CV_GIVES.length-1;
+  next.onclick=()=>{ if(CV_IDX<CV_GIVES.length-1){ CV_IDX++; openSection('programacio'); } };
+  nav.appendChild(prev); nav.appendChild(sel); nav.appendChild(next); S.appendChild(nav);
+
+  if(give!==curGive){ const jump=el('button','prog-jump'); jump.type='button'; jump.innerHTML='\u21ba Ves al cicle actual';
+    jump.onclick=()=>{ CV_IDX=Math.max(0,CV_GIVES.indexOf(curGive)); openSection('programacio'); }; S.appendChild(jump); }
+
+  const cell=progCell('carpeta', give);
+  const card=el('div','prog-week'+(give===curGive?' now':'')); card.style.setProperty('--c', subj.color);
+  const cap=el('div','prog-week-cap');
+  cap.innerHTML='<b>Cicle '+(CV_IDX+1)+'</b><span>\uD83D\uDCC1 Dona: '+cvDateLabel(give)+' \u2192 Recull: '+cvDateLabel(collect)+(give===curGive?' \u00b7 cicle actual':'')+'</span>';
+  card.appendChild(cap);
+
+  const tWrap=el('div','prog-field'); tWrap.innerHTML='<label>T\u00edtol de la carpeta</label>';
+  const ti=el('input','input'); ti.type='text'; ti.value=cell.title||''; ti.placeholder='Ex.: Carpeta Viatgera 1 \u00b7 La tardor'; ti.style.textAlign='left';
+  ti.addEventListener('blur',()=>{ const c=progCell('carpeta',give); if((c.title||'')!==ti.value){ api.progSetCell('carpeta', give, {title:ti.value}).then(()=>toast('Desat \u2713')).catch(()=>{}); } });
+  tWrap.appendChild(ti); card.appendChild(tWrap);
+
+  const dl=el('div','prog-field'); dl.innerHTML='<label>Deures d\u2019aquesta carpeta</label>';
+  dl.appendChild(progItemListEl('carpeta', give)); card.appendChild(dl);
+
+  const linkWrap=el('div','prog-field'); linkWrap.innerHTML='<label>Document dels deures (Google Doc)</label>';
+  const link=el('input','input'); link.type='url'; link.value=cell.link||''; link.placeholder='Enganxa l\u2019enlla\u00e7 del document de Drive\u2026'; link.style.textAlign='left';
+  link.addEventListener('blur',()=>{ const c=progCell('carpeta',give); if((c.link||'')!==link.value) api.progSetCell('carpeta', give, {items:progItemsOf(c), notes:c.notes||'', link:link.value}).then(()=>toast('Desat \u2713')).catch(()=>{}); });
+  linkWrap.appendChild(link);
+  if(cell.link){ const open=el('a','prog-open'); open.href=cell.link; open.target='_blank'; open.rel='noopener'; open.innerHTML='\u2197 Obre el document'; linkWrap.appendChild(open); }
+  card.appendChild(linkWrap);
+
+  S.appendChild(card);
+}
+function renderCarpetaOverview(S, subj){
+  const curGive=cvCurrentGive();
+  const list=el('div','prog-list');
+  CV_GIVES.forEach((g,idx)=>{
+    const cell=progCell('carpeta', g);
+    const items=progItemsOf(cell).filter(i=>i.t&&String(i.t).trim());
+    const title=(cell.title||'').trim();
+    const isEmpty = !items.length && !title && !cell.link;
+    const collect=cvCollectOf(g);
+    const row=el('div','prog-row'+(g===curGive?' now':'')+(isEmpty && g!==curGive?' empty':'')); row.style.setProperty('--c', subj.color);
+    const main=el('div','prog-row-main'); main.title='Obre el cicle';
+    const wk=el('div','prog-row-wk'); wk.innerHTML='<b>Cicle '+(idx+1)+'</b><small>'+cvDateLabel(g)+' \u2192 '+cvDateLabel(collect)+(g===curGive?' \u00b7 ara':'')+'</small>';
+    main.appendChild(wk);
+    const body=el('div','prog-row-body');
+    const snippet=el('div','prog-row-txt'); snippet.innerHTML = title ? esc(title) : (items.length ? esc(items[0].t.slice(0,60)) : '<i>\u2014</i>');
+    body.appendChild(snippet); main.appendChild(body);
+    main.onclick=()=>{ CV_IDX=idx; CV_VIEW='cycle'; openSection('programacio'); };
+    row.appendChild(main);
+    const side=el('div','prog-row-side'); side.addEventListener('click', e=>e.stopPropagation());
+    if(cell.link){ const lk=el('a','prog-link-ico'); lk.href=cell.link; lk.target='_blank'; lk.rel='noopener'; lk.title='Obre el document';
+      lk.innerHTML='<svg viewBox="0 0 24 24"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-2 2"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l2-2"/></svg>'; side.appendChild(lk); }
+    const dots=el('div','prog-row-dots');
+    USERS.forEach(u=>{
+      const all = items.length>0 && items.every(it=>it.done && it.done[u.id]);
+      const d=el('button','pdot'+(all?' on':'')); d.type='button'; d.style.setProperty('--c', u.accent); d.title=u.name;
+      d.innerHTML='<i></i>';
+      d.onclick=(e)=>{ e.stopPropagation(); if(!items.length){ toast('Aquest cicle no t\u00e9 deures'); return; }
+        const on=!d.classList.contains('on'); const its=progItemsOf(progCell('carpeta',g));
+        its.forEach(it=>{ it.done=it.done||{}; if(on) it.done[u.id]=true; else delete it.done[u.id]; });
+        const c=progCell('carpeta',g); api.progSetCell('carpeta', g, {items:its, notes:c.notes||'', link:c.link||''}).catch(()=>{});
+        d.classList.toggle('on', on); };
+      dots.appendChild(d);
+    });
+    side.appendChild(dots); row.appendChild(side);
+    list.appendChild(row);
+  });
+  S.appendChild(list);
+}
+function buildCarpetaPanel(){
+  const up=cvUpcoming(); if(!up.length) return null;
+  const card=el('div','hpanel');
+  const head=el('div','hpanel-head');
+  head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><h3>Carpeta viatgera</h3><span class="hpanel-count">'+up.length+'</span>';
+  card.appendChild(head);
+  up.forEach(u=>{
+    const row=el('div','hrow');
+    const ico=el('span','hcv-ico'); ico.textContent = u.type==='programar' ? '\uD83D\uDCDD' : (u.type==='donar' ? '\uD83D\uDCE4' : '\uD83D\uDCE5');
+    row.appendChild(ico);
+    const t=el('div','htitle'); const tt=(progCell('carpeta', u.give).title||'').trim();
+    const lbl = u.type==='programar' ? 'Prepara la carpeta d\u2019aquesta setmana' : (u.type==='donar' ? 'Donar la carpeta' : 'Recollir la carpeta');
+    t.textContent = lbl + (tt?' \u00b7 '+tt:''); row.appendChild(t);
+    const when=el('span','hcorreu-date'); when.textContent=(u.days===0?'avui':u.days===1?'dem\u00e0':'d\u2019aqu\u00ed '+u.days+' dies')+' \u00b7 '+cvDateLabel(u.iso); row.appendChild(when);
+    row.onclick=()=>{ PROG_SUBJECT='carpeta'; CV_VIEW='cycle'; CV_IDX=Math.max(0,CV_GIVES.indexOf(u.give)); openSection('programacio'); };
+    card.appendChild(row);
+  });
+  return card;
+}
 function renderProgramacio(S, sec){
   const subj=PROG_SUBJECTS.find(x=>x.id===PROG_SUBJECT)||PROG_SUBJECTS[0];
   const curIdx=progCurrentIdx();
@@ -1988,6 +2154,8 @@ function renderProgramacio(S, sec){
     t.textContent=sb.name; t.style.setProperty('--c', sb.color);
     t.onclick=()=>{ PROG_SUBJECT=sb.id; openSection('programacio'); }; tabs.appendChild(t); });
   S.appendChild(tabs);
+
+  if(PROG_SUBJECT==='carpeta'){ renderCarpeta(S, subj); return; }
 
   // barra de progrés (només setmanes lectives)
   const teaching=PROG_WEEKS_ARR.filter(x=>!x.isVac); const total=teaching.length; let filled=0;
@@ -2252,7 +2420,7 @@ function openSection(id){
   if(id!==CURRENT || CURRENT_SUB) EDITING=null;
   if(id!=='calendari') SCHEDULING=null;
   if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; COMANDA_NEW=false; COMANDA_EDIT=null; }
-  if(id==='programacio' && id!==CURRENT){ PROG_WEEK_IDX=progCurrentIdx(); PROG_VIEW='week'; }
+  if(id==='programacio' && id!==CURRENT){ PROG_WEEK_IDX=progCurrentIdx(); PROG_VIEW='week'; CV_IDX=null; CV_VIEW='cycle'; }
   CURRENT=id; CURRENT_SUB=null; const sec=secById(id);
   $('#home').classList.add('hidden');
   const S=$('#section'); S.classList.remove('hidden'); S.innerHTML='';
