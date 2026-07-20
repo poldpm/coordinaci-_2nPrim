@@ -317,6 +317,17 @@ a{color:var(--teal)}
 .prog-act{display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px}
 .pa-tag{display:inline-flex;align-items:center;gap:5px;background:#e8f4fb;color:#1c6fa0;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
 .pa-mini{color:#2D9CDB;font-weight:800}
+/* --- Programació anual: etiquetes de tipus, sessions i pendents --- */
+.prog-red{display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px}
+.pr-tag{display:inline-flex;align-items:center;gap:5px;background:#fff4e0;color:#a4680d;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
+.pit-k{flex:none;background:color-mix(in srgb, var(--c) 14%, #fff);color:var(--c);border:1px solid color-mix(in srgb, var(--c) 32%, #fff);
+  font-weight:800;font-size:.68rem;letter-spacing:.02em;padding:.2em .5em;border-radius:7px;white-space:nowrap}
+.pit-s{flex:none;background:#eef3f6;color:#4a6b78;font-weight:800;font-size:.68rem;padding:.2em .5em;border-radius:7px;white-space:nowrap}
+.pit-mat{flex:none;background:#eaf6ee;color:#1f7a44;font-weight:700;font-size:.68rem;padding:.2em .5em;border-radius:7px;max-width:15ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pit-pend{flex:none;background:#fff4e0;color:#a4680d;font-weight:800;font-size:.68rem;padding:.2em .5em;border-radius:7px;white-space:nowrap}
+.prog-pla{margin:0;padding-left:18px;color:#33555f;font-weight:600;line-height:1.5}
+.prog-pla li{margin:3px 0}
+@media(max-width:520px){ .pit-mat{display:none} }
 .pf-acts{margin-top:6px;color:#1c6fa0;font-weight:700}
 .pf-acts b{color:#1c6fa0}
 .prog-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--line)}
@@ -2014,6 +2025,12 @@ function progBuildWeeks(){
   return weeks;
 }
 const PROG_WEEKS_ARR = progBuildWeeks();
+/* Programació anual 2026-27 (generada des de programacio_2n_2026-2027.json) */
+const PROG_SEED={"catala":{"2026-09-07":[{"id":"cat-S1-comunica","t":"Comunica: Unitat 1 – Quina gran família! (inici, acollida)","k":"comunica","p":1},{"id":"cat-S1-explicar","t":"Explicar/treballar: Noms propis i noms comuns (majúscules)","k":"explicar"},{"id":"cat-S1-lectura","t":"Lectura: \"El final de les vacances\" (El temps era temps 2, pàg. 4)","k":"lectura","pag":4,"llib":"El temps era temps 2"},{"id":"cat-S1-dictat","t":"Dictat: Dictat 1 · Majúscules, noms propis i comuns","k":"dictat","doc":"Dictat 1 · Majúscules, noms propis i comuns"}],"2026-09-14":[{"id":"cat-S2-comunica","t":"Comunica: Unitat 1 – Quina gran família!","k":"comunica","p":1},{"id":"cat-S2-explicar","t":"Explicar/treballar: La síl·laba tònica","k":"explicar"},{"id":"cat-S2-lectura","t":"Lectura: \"L'avi Vicenç\" (El temps era temps 2, pàg. 6)","k":"lectura","pag":6,"llib":"El temps era temps 2"}],"2026-09-21":[{"id":"cat-S3-comunica","t":"Comunica: Unitat 1 – Quina gran família! (consolidació)","k":"comunica","p":1},{"id":"cat-S3-explicar","t":"Explicar/treballar: Noms propis/comuns + majúscules (repàs)","k":"explicar"},{"id":"cat-S3-lectura","t":"Lectura: \"Mitja llengua\" (El temps era temps 2, pàg. 8)","k":"lectura","pag":8,"llib":"El temps era temps 2"},{"id":"cat-S3-dictat","t":"Dictat: Dictat 1 · Majúscules, noms propis i comuns (repàs)","k":"dictat","doc":"Dictat 1 · Majúscules, noms propis i comuns"}],"2026-09-28":[{"id":"cat-S4-comunica","t":"Comunica: Unitat 2 – Els colors de la tardor (inici)","k":"comunica","p":1},{"id":"cat-S4-explicar","t":"Explicar/treballar: El verb: persones gramaticals","k":"explicar"},{"id":"cat-S4-lectura","t":"Lectura: \"L'elefant d'en Kumar\" (El temps era temps 2, pàg. 10)","k":"lectura","pag":10,"llib":"El temps era temps 2"}],"2026-10-05":[{"id":"cat-S5-comunica","t":"Comunica: Unitat 2 – Els colors de la tardor","k":"comunica","p":1},{"id":"cat-S5-explicar","t":"Explicar/treballar: E oberta i E tancada","k":"explicar"},{"id":"cat-S5-lectura","t":"Lectura: \"Set pollets\" (El temps era temps 2, pàg. 12)","k":"lectura","pag":12,"llib":"El temps era temps 2"},{"id":"cat-S5-dictat","t":"Dictat: Dictat 2 · La e oberta i la e tancada","k":"dictat","doc":"Dictat 2 · La e oberta i la e tancada"}],"2026-10-12":[{"id":"cat-S6-comunica","t":"Comunica: Unitat 2 – Els colors de la tardor","k":"comunica","p":1},{"id":"cat-S6-explicar","t":"Explicar/treballar: El verb: persones gramaticals (repàs)","k":"explicar"},{"id":"cat-S6-lectura","t":"Lectura: \"Dies de fira\" (El temps era temps 2, pàg. 14)","k":"lectura","pag":14,"llib":"El temps era temps 2"}],"2026-10-19":[{"id":"cat-S7-comunica","t":"Comunica: Unitat 2 – Els colors de la tardor (consolidació)","k":"comunica","p":1},{"id":"cat-S7-explicar","t":"Explicar/treballar: E oberta / E tancada (repàs)","k":"explicar"},{"id":"cat-S7-lectura","t":"Lectura: \"La Tenora i en Tamborí\" (El temps era temps 2, pàg. 16)","k":"lectura","pag":16,"llib":"El temps era temps 2"},{"id":"cat-S7-dictat","t":"Dictat: Dictat 2 · La e oberta i la e tancada (repàs)","k":"dictat","doc":"Dictat 2 · La e oberta i la e tancada"}],"2026-10-26":[{"id":"cat-S8-comunica","t":"Comunica: Unitat 3 – Vet aquí que una vegada… (inici)","k":"comunica","p":1},{"id":"cat-S8-explicar","t":"Explicar/treballar: El plural","k":"explicar"},{"id":"cat-S8-lectura","t":"Lectura: \"L'escola de la Marina\" (El temps era temps 2, pàg. 18)","k":"lectura","pag":18,"llib":"El temps era temps 2"},{"id":"cat-S8-dictat","t":"Dictat: Dictat 3 · El plural","k":"dictat","doc":"Dictat 3 · El plural"}],"2026-11-02":[{"id":"cat-S9-comunica","t":"Comunica: Unitat 3 – Vet aquí que una vegada…","k":"comunica","p":1},{"id":"cat-S9-explicar","t":"Explicar/treballar: El plural (-es, -os)","k":"explicar"},{"id":"cat-S9-lectura","t":"Lectura: \"Poemes de tardor\" (El temps era temps 2, pàg. 20)","k":"lectura","pag":20,"llib":"El temps era temps 2"}],"2026-11-09":[{"id":"cat-S10-comunica","t":"Comunica: Unitat 3 – Vet aquí que una vegada…","k":"comunica","p":1},{"id":"cat-S10-explicar","t":"Explicar/treballar: Paraules de la mateixa família","k":"explicar"},{"id":"cat-S10-lectura","t":"Lectura: \"El berenar de les bruixes\" (El temps era temps 2, pàg. 22)","k":"lectura","pag":22,"llib":"El temps era temps 2"}],"2026-11-16":[{"id":"cat-S11-comunica","t":"Comunica: Unitat 3 – Vet aquí que una vegada… (consolidació)","k":"comunica","p":1},{"id":"cat-S11-explicar","t":"Explicar/treballar: El plural (repàs) + paraules de la mateixa família","k":"explicar"},{"id":"cat-S11-lectura","t":"Lectura: \"El camell agraït\" (El temps era temps 2, pàg. 24)","k":"lectura","pag":24,"llib":"El temps era temps 2"},{"id":"cat-S11-dictat","t":"Dictat: Dictat 3 · El plural (repàs)","k":"dictat","doc":"Dictat 3 · El plural"}],"2026-11-23":[{"id":"cat-S12-comunica","t":"Comunica: Unitat 3 – Vet aquí que una vegada… (tancament)","k":"comunica","p":1},{"id":"cat-S12-explicar","t":"Explicar/treballar: Repàs Unitat 3","k":"explicar"},{"id":"cat-S12-lectura","t":"Lectura: \"Les meves joguines\" (El temps era temps 2, pàg. 26)","k":"lectura","pag":26,"llib":"El temps era temps 2"}],"2026-11-30":[{"id":"cat-S13-comunica","t":"Comunica: Repàs 1r trimestre (Unitats 1–3)","k":"comunica","p":1},{"id":"cat-S13-explicar","t":"Explicar/treballar: Sons [k]: c i qu (ca, co, cu / que, qui)","k":"explicar"},{"id":"cat-S13-lectura","t":"Lectura: \"Música, mestra!\" (El temps era temps 2, pàg. 28)","k":"lectura","pag":28,"llib":"El temps era temps 2"},{"id":"cat-S13-dictat","t":"Dictat: Dictat 4 · So [k]: c i qu","k":"dictat","doc":"Dictat 4 · So [k]: c i qu"}],"2026-12-07":[{"id":"cat-S14-comunica","t":"Comunica: Repàs / comprensió","k":"comunica","p":1},{"id":"cat-S14-explicar","t":"Explicar/treballar: Repàs de continguts del trimestre","k":"explicar"},{"id":"cat-S14-lectura","t":"Lectura: \"El Jardí dels Pintors\" (El temps era temps 2, pàg. 30)","k":"lectura","pag":30,"llib":"El temps era temps 2"}],"2026-12-14":[{"id":"cat-S15-comunica","t":"Comunica: Comprensió i expressió (Nadal)","k":"comunica","p":1},{"id":"cat-S15-explicar","t":"Explicar/treballar: Sons [k] c/qu (repàs) + repàs global 1r trim.","k":"explicar"},{"id":"cat-S15-lectura","t":"Lectura: \"Coses de família\" (El temps era temps 2, pàg. 32)","k":"lectura","pag":32,"llib":"El temps era temps 2"},{"id":"cat-S15-dictat","t":"Dictat: Dictat 4 · So [k]: c i qu (repàs)","k":"dictat","doc":"Dictat 4 · So [k]: c i qu"}],"2026-12-21":[{"id":"cat-S16-comunica","t":"Comunica: Activitat lúdica de llengua (Nadal)","k":"comunica","p":1},{"id":"cat-S16-lectura","t":"Lectura: \"El poble del llac\" (El temps era temps 2, pàg. 34)","k":"lectura","pag":34,"llib":"El temps era temps 2"}],"2027-01-04":[{"id":"cat-S17-comunica","t":"Comunica: Unitat 4 – Ens comuniquem! (presentació)","k":"comunica","p":1},{"id":"cat-S17-lectura","t":"Lectura: \"Les plantes de l'àvia\" (El temps era temps 2, pàg. 36)","k":"lectura","pag":36,"llib":"El temps era temps 2"}],"2027-01-11":[{"id":"cat-S18-comunica","t":"Comunica: Unitat 4 – Ens comuniquem!","k":"comunica","p":1},{"id":"cat-S18-explicar","t":"Explicar/treballar: Sinònims i antònims","k":"explicar"},{"id":"cat-S18-lectura","t":"Lectura: \"Una casa encantada\" (El temps era temps 2, pàg. 38)","k":"lectura","pag":38,"llib":"El temps era temps 2"}],"2027-01-18":[{"id":"cat-S19-comunica","t":"Comunica: Unitat 4 – Ens comuniquem!","k":"comunica","p":1},{"id":"cat-S19-explicar","t":"Explicar/treballar: La B i la V","k":"explicar"},{"id":"cat-S19-lectura","t":"Lectura: \"El gegant Menjaferro\" (El temps era temps 2, pàg. 40)","k":"lectura","pag":40,"llib":"El temps era temps 2"},{"id":"cat-S19-dictat","t":"Dictat: Dictat 7 · La b i la v","k":"dictat","doc":"Dictat 7 · La b i la v"}],"2027-01-25":[{"id":"cat-S20-comunica","t":"Comunica: Unitat 4 – Ens comuniquem! (consolidació)","k":"comunica","p":1},{"id":"cat-S20-explicar","t":"Explicar/treballar: La B i la V (repàs) + sinònims/antònims","k":"explicar"},{"id":"cat-S20-lectura","t":"Lectura: \"La sorpresa de la Perla\" (El temps era temps 2, pàg. 42)","k":"lectura","pag":42,"llib":"El temps era temps 2"},{"id":"cat-S20-dictat","t":"Dictat: Dictat 7 · La b i la v (repàs)","k":"dictat","doc":"Dictat 7 · La b i la v"}],"2027-02-01":[{"id":"cat-S21-comunica","t":"Comunica: Unitat 5 – Cases per totes bandes (inici)","k":"comunica","p":1},{"id":"cat-S21-explicar","t":"Explicar/treballar: Els adjectius","k":"explicar"},{"id":"cat-S21-lectura","t":"Lectura: \"Un dia especial\" (El temps era temps 2, pàg. 44)","k":"lectura","pag":44,"llib":"El temps era temps 2"}],"2027-02-08":[{"id":"cat-S22-comunica","t":"Comunica: Unitat 5 – Cases per totes bandes","k":"comunica","p":1},{"id":"cat-S22-explicar","t":"Explicar/treballar: Ús de R i RR","k":"explicar"},{"id":"cat-S22-lectura","t":"Lectura: \"La dent d'en Guillem\" (El temps era temps 2, pàg. 46)","k":"lectura","pag":46,"llib":"El temps era temps 2"},{"id":"cat-S22-dictat","t":"Dictat: Dictat 8 · La r i la rr","k":"dictat","doc":"Dictat 8 · La r i la rr"}],"2027-02-15":[{"id":"cat-S23-comunica","t":"Comunica: Unitat 5 – Cases per totes bandes","k":"comunica","p":1},{"id":"cat-S23-explicar","t":"Explicar/treballar: Els adjectius (concordança)","k":"explicar"},{"id":"cat-S23-lectura","t":"Lectura: \"Quatre vaixells\" (El temps era temps 2, pàg. 48)","k":"lectura","pag":48,"llib":"El temps era temps 2"}],"2027-02-22":[{"id":"cat-S24-comunica","t":"Comunica: Unitat 5 – Cases per totes bandes (consolidació)","k":"comunica","p":1},{"id":"cat-S24-explicar","t":"Explicar/treballar: Ús de R i RR (repàs)","k":"explicar"},{"id":"cat-S24-lectura","t":"Lectura: \"Animals fenomenals\" (El temps era temps 2, pàg. 50)","k":"lectura","pag":50,"llib":"El temps era temps 2"},{"id":"cat-S24-dictat","t":"Dictat: Dictat 8 · La r i la rr (repàs)","k":"dictat","doc":"Dictat 8 · La r i la rr"}],"2027-03-01":[{"id":"cat-S25-comunica","t":"Comunica: Unitat 6 – L'hora del pati (inici)","k":"comunica","p":1},{"id":"cat-S25-explicar","t":"Explicar/treballar: Sons [g]: g i gu (ga, go, gu / gue, gui) + determinants possessius","k":"explicar"},{"id":"cat-S25-lectura","t":"Lectura: \"La pilota de la Daniela\" (El temps era temps 2, pàg. 54)","k":"lectura","pag":54,"llib":"El temps era temps 2"},{"id":"cat-S25-dictat","t":"Dictat: Dictat 5 · So [g]: g i gu","k":"dictat","doc":"Dictat 5 · So [g]: g i gu"}],"2027-03-08":[{"id":"cat-S26-comunica","t":"Comunica: Unitat 6 – L'hora del pati","k":"comunica","p":1},{"id":"cat-S26-explicar","t":"Explicar/treballar: La G i la J (ge, gi / ja, jo, ju)","k":"explicar"},{"id":"cat-S26-lectura","t":"Lectura: \"La reina de la muntanya\" (El temps era temps 2, pàg. 56)","k":"lectura","pag":56,"llib":"El temps era temps 2"},{"id":"cat-S26-dictat","t":"Dictat: Dictat 6 · La g i la j","k":"dictat","doc":"Dictat 6 · La g i la j"}],"2027-03-15":[{"id":"cat-S27-comunica","t":"Comunica: Unitat 6 – L'hora del pati (consolidació) + repàs 2n trim.","k":"comunica","p":1},{"id":"cat-S27-explicar","t":"Explicar/treballar: g/gu i g/j (repàs) — GU i GÜ","k":"explicar"},{"id":"cat-S27-lectura","t":"Lectura: \"Celebrar la primavera\" (El temps era temps 2, pàg. 58)","k":"lectura","pag":58,"llib":"El temps era temps 2"},{"id":"cat-S27-dictat","t":"Dictat: Dictat 6 · La g i la j (repàs; alternar amb Dictat 5)","k":"dictat","doc":"Dictat 6 · La g i la j"}],"2027-03-29":[{"id":"cat-S28-comunica","t":"Comunica: Unitat 7 – Endevina, endevinalla… (inici)","k":"comunica","p":1},{"id":"cat-S28-explicar","t":"Explicar/treballar: La polisèmia","k":"explicar"},{"id":"cat-S28-lectura","t":"Lectura: \"Quina hora és?\" (El temps era temps 2, pàg. 60)","k":"lectura","pag":60,"llib":"El temps era temps 2"}],"2027-04-05":[{"id":"cat-S29-comunica","t":"Comunica: Unitat 7 – Endevina, endevinalla…","k":"comunica","p":1},{"id":"cat-S29-explicar","t":"Explicar/treballar: El verb i els complements","k":"explicar"},{"id":"cat-S29-lectura","t":"Lectura: \"Pescadora d'estels\" (El temps era temps 2, pàg. 64)","k":"lectura","pag":64,"llib":"El temps era temps 2"}],"2027-04-12":[{"id":"cat-S30-comunica","t":"Comunica: Unitat 7 – Endevina, endevinalla… (consolidació)","k":"comunica","p":1},{"id":"cat-S30-explicar","t":"Explicar/treballar: La polisèmia + verb i complements (repàs)","k":"explicar"},{"id":"cat-S30-lectura","t":"Lectura: \"Un diumenge de sort\" (El temps era temps 2, pàg. 68)","k":"lectura","pag":68,"llib":"El temps era temps 2"}],"2027-04-19":[{"id":"cat-S31-comunica","t":"Comunica: Unitat 8 – Som com som (inici)","k":"comunica","p":1},{"id":"cat-S31-explicar","t":"Explicar/treballar: Frases fetes i refranys","k":"explicar"},{"id":"cat-S31-lectura","t":"Lectura: \"Poemes de primavera\" (El temps era temps 2, pàg. 70)","k":"lectura","pag":70,"llib":"El temps era temps 2"}],"2027-04-26":[{"id":"cat-S32-comunica","t":"Comunica: Unitat 8 – Som com som","k":"comunica","p":1},{"id":"cat-S32-explicar","t":"Explicar/treballar: La S sorda i la S sonora (s, ss, c, ç, z)","k":"explicar"},{"id":"cat-S32-lectura","t":"Lectura: \"Menjar-se la lluna\" (El temps era temps 2, pàg. 74)","k":"lectura","pag":74,"llib":"El temps era temps 2"},{"id":"cat-S32-dictat","t":"Dictat: Dictat 9 · La s sorda i la s sonora","k":"dictat","doc":"Dictat 9 · La s sorda i la s sonora"}],"2027-05-03":[{"id":"cat-S33-comunica","t":"Comunica: Unitat 8 – Som com som","k":"comunica","p":1},{"id":"cat-S33-explicar","t":"Explicar/treballar: S sorda / S sonora (repàs)","k":"explicar"},{"id":"cat-S33-lectura","t":"Lectura: \"El Valent\" (El temps era temps 2, pàg. 76)","k":"lectura","pag":76,"llib":"El temps era temps 2"},{"id":"cat-S33-dictat","t":"Dictat: Dictat 9 · La s sorda i la s sonora (repàs)","k":"dictat","doc":"Dictat 9 · La s sorda i la s sonora"}],"2027-05-10":[{"id":"cat-S34-comunica","t":"Comunica: Unitat 8 – Som com som (consolidació)","k":"comunica","p":1},{"id":"cat-S34-explicar","t":"Explicar/treballar: Frases fetes i refranys (repàs)","k":"explicar"},{"id":"cat-S34-lectura","t":"Lectura: \"Terratrèmol\" (El temps era temps 2, pàg. 78)","k":"lectura","pag":78,"llib":"El temps era temps 2"}],"2027-05-17":[{"id":"cat-S35-comunica","t":"Comunica: Unitat 9 – Vacances a la vista! (inici)","k":"comunica","p":1},{"id":"cat-S35-explicar","t":"Explicar/treballar: Ús de X i IX (+ La definició)","k":"explicar"},{"id":"cat-S35-lectura","t":"Lectura: \"La Graciosa\" (El temps era temps 2, pàg. 80)","k":"lectura","pag":80,"llib":"El temps era temps 2"},{"id":"cat-S35-dictat","t":"Dictat: Dictat 10 · Ús de x, ix, tx, ig","k":"dictat","doc":"Dictat 10 · Ús de x, ix, tx, ig"}],"2027-05-24":[{"id":"cat-S36-comunica","t":"Comunica: Unitat 9 – Vacances a la vista!","k":"comunica","p":1},{"id":"cat-S36-explicar","t":"Explicar/treballar: Ús de TX i IG (+ Precisió lèxica)","k":"explicar"},{"id":"cat-S36-lectura","t":"Lectura: \"Xarranca\" (El temps era temps 2, pàg. 84)","k":"lectura","pag":84,"llib":"El temps era temps 2"},{"id":"cat-S36-dictat","t":"Dictat: Dictat 10 · Ús de x, ix, tx, ig (repàs)","k":"dictat","doc":"Dictat 10 · Ús de x, ix, tx, ig"}],"2027-05-31":[{"id":"cat-S37-comunica","t":"Comunica: Unitat 9 – Vacances a la vista! (consolidació)","k":"comunica","p":1},{"id":"cat-S37-explicar","t":"Explicar/treballar: La definició / precisió lèxica (repàs)","k":"explicar"},{"id":"cat-S37-lectura","t":"Lectura: \"Solució d'emergència\" (El temps era temps 2, pàg. 88)","k":"lectura","pag":88,"llib":"El temps era temps 2"}],"2027-06-07":[{"id":"cat-S38-comunica","t":"Comunica: Annex – L'ordre de les lletres (l'abecedari) + repàs de curs","k":"comunica","p":1},{"id":"cat-S38-explicar","t":"Explicar/treballar: Ordre alfabètic","k":"explicar"},{"id":"cat-S38-lectura","t":"Lectura: \"Per a tots els gustos\" (El temps era temps 2, pàg. 90)","k":"lectura","pag":90,"llib":"El temps era temps 2"},{"id":"cat-S38-dictat","t":"Dictat: Repàs · tria el dictat de la norma menys consolidada","k":"dictat","doc":"Repàs · tria el dictat de la norma menys consolidada"}],"2027-06-14":[{"id":"cat-S39-comunica","t":"Comunica: Repàs final i jocs de llengua","k":"comunica","p":1},{"id":"cat-S39-explicar","t":"Explicar/treballar: Repàs global de curs","k":"explicar"},{"id":"cat-S39-lectura1","t":"Lectura: \"Una pirata amb mala sort\" (El temps era temps 2, pàg. 92)","k":"lectura","pag":92,"llib":"El temps era temps 2"},{"id":"cat-S39-lectura2","t":"Lectura: \"El primer dia de vacances\" (El temps era temps 2, pàg. 94)","k":"lectura","pag":94,"llib":"El temps era temps 2"},{"id":"cat-S39-dictat","t":"Dictat: Dictat de síntesi (opcional)","k":"dictat","doc":"Dictat de síntesi"}]},"mates":{"2026-09-07":[{"id":"mat-S1-llibre","t":"Llibre Mates: pàg. 5–7 (Unitat 1 – Els nombres de dues xifres)","k":"llibre_mates","un":"Unitat 1","pgs":"5–7","tema":"Els nombres de dues xifres"},{"id":"mat-S1-explicar","t":"Explicar/treballar: Lectura i escriptura de nombres de dues xifres","k":"explicar"}],"2026-09-14":[{"id":"mat-S2-llibre","t":"Llibre Mates: pàg. 8–10 (Unitat 1 – Els nombres de dues xifres)","k":"llibre_mates","un":"Unitat 1","pgs":"8–10","tema":"Els nombres de dues xifres"},{"id":"mat-S2-explicar","t":"Explicar/treballar: Comparació i ordenació; desena i unitat","k":"explicar"}],"2026-09-21":[{"id":"mat-S3-llibre","t":"Llibre Mates: pàg. 11–13 (Unitat 1 – La suma i la resta sense portar-ne)","k":"llibre_mates","un":"Unitat 1","pgs":"11–13","tema":"La suma i la resta sense portar-ne"},{"id":"mat-S3-explicar","t":"Explicar/treballar: Suma i resta sense portar-ne","k":"explicar"}],"2026-09-28":[{"id":"mat-S4-llibre","t":"Llibre Mates: pàg. 14–16 (Unitat 1 – La suma portant-ne)","k":"llibre_mates","un":"Unitat 1","pgs":"14–16","tema":"La suma portant-ne"},{"id":"mat-S4-explicar","t":"Explicar/treballar: La suma portant-ne","k":"explicar"}],"2026-10-05":[{"id":"mat-S5-llibre","t":"Llibre Mates: pàg. 17–18 (Unitat 1 – La multiplicació i la suma)","k":"llibre_mates","un":"Unitat 1","pgs":"17–18","tema":"La multiplicació i la suma"},{"id":"mat-S5-explicar","t":"Explicar/treballar: La multiplicació com a suma repetida","k":"explicar"}],"2026-10-12":[{"id":"mat-S6-llibre","t":"Llibre Mates: pàg. 19–20 (Unitat 1 – Repàs Unitat 1)","k":"llibre_mates","un":"Unitat 1","pgs":"19–20","tema":"Repàs Unitat 1"},{"id":"mat-S6-explicar","t":"Explicar/treballar: Repàs Unitat 1 + problemes","k":"explicar"}],"2026-10-19":[{"id":"mat-S7-llibre","t":"Llibre Mates: pàg. 21–23 (Unitat 2 – Els nombres fins al 500 / La centena)","k":"llibre_mates","un":"Unitat 2","pgs":"21–23","tema":"Els nombres fins al 500 / La centena"},{"id":"mat-S7-explicar","t":"Explicar/treballar: La centena; lectura i escriptura fins al 500","k":"explicar"}],"2026-10-26":[{"id":"mat-S8-llibre","t":"Llibre Mates: pàg. 24–26 (Unitat 2 – Els nombres fins al 500)","k":"llibre_mates","un":"Unitat 2","pgs":"24–26","tema":"Els nombres fins al 500"},{"id":"mat-S8-explicar","t":"Explicar/treballar: Descomposició i comparació fins al 500","k":"explicar"}],"2026-11-02":[{"id":"mat-S9-llibre","t":"Llibre Mates: pàg. 27–28 (Unitat 2 – La taula del 2)","k":"llibre_mates","un":"Unitat 2","pgs":"27–28","tema":"La taula del 2"},{"id":"mat-S9-explicar","t":"Explicar/treballar: La taula de multiplicar del 2","k":"explicar"}],"2026-11-09":[{"id":"mat-S10-llibre","t":"Llibre Mates: pàg. 29–30 (Unitat 2 – La taula del 3)","k":"llibre_mates","un":"Unitat 2","pgs":"29–30","tema":"La taula del 3"},{"id":"mat-S10-explicar","t":"Explicar/treballar: La taula de multiplicar del 3","k":"explicar"}],"2026-11-16":[{"id":"mat-S11-llibre","t":"Llibre Mates: pàg. 31–32 (Unitat 3 – Els nombres fins al 999)","k":"llibre_mates","un":"Unitat 3","pgs":"31–32","tema":"Els nombres fins al 999"},{"id":"mat-S11-explicar","t":"Explicar/treballar: Lectura i escriptura de nombres fins al 999","k":"explicar"}],"2026-11-23":[{"id":"mat-S12-llibre","t":"Llibre Mates: pàg. 33–34 (Unitat 3 – La taula del 4)","k":"llibre_mates","un":"Unitat 3","pgs":"33–34","tema":"La taula del 4"},{"id":"mat-S12-explicar","t":"Explicar/treballar: La taula de multiplicar del 4","k":"explicar"}],"2026-11-30":[{"id":"mat-S13-llibre","t":"Llibre Mates: pàg. 35–36 (Unitat 3 – La taula del 5)","k":"llibre_mates","un":"Unitat 3","pgs":"35–36","tema":"La taula del 5"},{"id":"mat-S13-explicar","t":"Explicar/treballar: La taula de multiplicar del 5","k":"explicar"}],"2026-12-07":[{"id":"mat-S14-llibre","t":"Llibre Mates: Repàs taules del 2, 3, 4 i 5 (Unitat 3)","k":"llibre_mates","un":"Unitat 3","pgs":"repàs","tema":"Repàs taules del 2, 3, 4 i 5"},{"id":"mat-S14-explicar","t":"Explicar/treballar: Càlcul mental amb les taules apreses","k":"explicar"}],"2026-12-14":[{"id":"mat-S15-llibre","t":"Llibre Mates: Repàs 1r trimestre","k":"llibre_mates","un":"—","pgs":"repàs","tema":"Repàs 1r trimestre"},{"id":"mat-S15-explicar","t":"Explicar/treballar: Nombres fins al 999, sumes i restes, taules; problemes","k":"explicar"}],"2026-12-21":[{"id":"mat-S16-llibre","t":"Llibre Mates: Jocs de càlcul / repàs lúdic","k":"llibre_mates","un":"—","pgs":"jocs","tema":"Jocs de càlcul / repàs lúdic"},{"id":"mat-S16-explicar","t":"Explicar/treballar: Sense pàgines noves","k":"explicar"}],"2027-01-04":[{"id":"mat-S17-llibre","t":"Llibre Mates: pàg. 37 (Unitat 4 – La suma i la resta de tres xifres (introducció))","k":"llibre_mates","un":"Unitat 4","pgs":"37","tema":"La suma i la resta de tres xifres (introducció)"},{"id":"mat-S17-explicar","t":"Explicar/treballar: Presentació de la unitat","k":"explicar"}],"2027-01-11":[{"id":"mat-S18-llibre","t":"Llibre Mates: pàg. 38–40 (Unitat 4 – La suma portant-ne)","k":"llibre_mates","un":"Unitat 4","pgs":"38–40","tema":"La suma portant-ne"},{"id":"mat-S18-explicar","t":"Explicar/treballar: Suma de tres xifres portant-ne","k":"explicar"}],"2027-01-18":[{"id":"mat-S19-llibre","t":"Llibre Mates: pàg. 41–42 (Unitat 4 – La resta sense portar-ne)","k":"llibre_mates","un":"Unitat 4","pgs":"41–42","tema":"La resta sense portar-ne"},{"id":"mat-S19-explicar","t":"Explicar/treballar: Resta de tres xifres sense portar-ne","k":"explicar"}],"2027-01-25":[{"id":"mat-S20-llibre","t":"Llibre Mates: pàg. 43–44 (Unitat 4 – Les taules de l'1 i del 10)","k":"llibre_mates","un":"Unitat 4","pgs":"43–44","tema":"Les taules de l'1 i del 10"},{"id":"mat-S20-explicar","t":"Explicar/treballar: Les taules de l'1 i del 10","k":"explicar"}],"2027-02-01":[{"id":"mat-S21-llibre","t":"Llibre Mates: pàg. 45–47 (Unitat 5 – La resta portant-ne / desagrupant)","k":"llibre_mates","un":"Unitat 5","pgs":"45–47","tema":"La resta portant-ne / desagrupant"},{"id":"mat-S21-explicar","t":"Explicar/treballar: La resta portant-ne (desagrupant)","k":"explicar"}],"2027-02-08":[{"id":"mat-S22-llibre","t":"Llibre Mates: pàg. 48–50 (Unitat 5 – La resta abreujada; operacions)","k":"llibre_mates","un":"Unitat 5","pgs":"48–50","tema":"La resta abreujada; operacions"},{"id":"mat-S22-explicar","t":"Explicar/treballar: La resta abreujada","k":"explicar"}],"2027-02-15":[{"id":"mat-S23-llibre","t":"Llibre Mates: pàg. 51–52 (Unitat 5 – Operacions i problemes)","k":"llibre_mates","un":"Unitat 5","pgs":"51–52","tema":"Operacions i problemes"},{"id":"mat-S23-explicar","t":"Explicar/treballar: Problemes de suma i resta portant-ne","k":"explicar"}],"2027-02-22":[{"id":"mat-S24-llibre","t":"Llibre Mates: pàg. 53–55 (Unitat 6 – La multiplicació / taules del 6 i del 7)","k":"llibre_mates","un":"Unitat 6","pgs":"53–55","tema":"La multiplicació / taules del 6 i del 7"},{"id":"mat-S24-explicar","t":"Explicar/treballar: Les taules del 6 i del 7","k":"explicar"}],"2027-03-01":[{"id":"mat-S25-llibre","t":"Llibre Mates: pàg. 56–57 (Unitat 6 – Les taules del 8 i del 9)","k":"llibre_mates","un":"Unitat 6","pgs":"56–57","tema":"Les taules del 8 i del 9"},{"id":"mat-S25-explicar","t":"Explicar/treballar: Les taules del 8 i del 9","k":"explicar"}],"2027-03-08":[{"id":"mat-S26-llibre","t":"Llibre Mates: pàg. 58–60 (Unitat 6 – Operacions i problemes)","k":"llibre_mates","un":"Unitat 6","pgs":"58–60","tema":"Operacions i problemes"},{"id":"mat-S26-explicar","t":"Explicar/treballar: Multiplicacions i problemes","k":"explicar"}],"2027-03-15":[{"id":"mat-S27-llibre","t":"Llibre Mates: pàg. 61–62 (Unitat 6 – Problemes de sumar, restar i multiplicar + repàs 2n trim.)","k":"llibre_mates","un":"Unitat 6","pgs":"61–62","tema":"Problemes de sumar, restar i multiplicar + repàs 2n trim."},{"id":"mat-S27-explicar","t":"Explicar/treballar: Problemes combinats","k":"explicar"}],"2027-03-29":[{"id":"mat-S28-llibre","t":"Llibre Mates: pàg. 63–65 (Unitat 7 – Geometria / Línies)","k":"llibre_mates","un":"Unitat 7","pgs":"63–65","tema":"Geometria / Línies"},{"id":"mat-S28-explicar","t":"Explicar/treballar: Línies (rectes, corbes, obertes, tancades)","k":"explicar"}],"2027-04-05":[{"id":"mat-S29-llibre","t":"Llibre Mates: pàg. 66–68 (Unitat 7 – Figures planes)","k":"llibre_mates","un":"Unitat 7","pgs":"66–68","tema":"Figures planes"},{"id":"mat-S29-explicar","t":"Explicar/treballar: Figures planes (triangle, quadrat, rectangle, cercle)","k":"explicar"}],"2027-04-12":[{"id":"mat-S30-llibre","t":"Llibre Mates: pàg. 69–71 (Unitat 7 – Simetries)","k":"llibre_mates","un":"Unitat 7","pgs":"69–71","tema":"Simetries"},{"id":"mat-S30-explicar","t":"Explicar/treballar: Simetries","k":"explicar"}],"2027-04-19":[{"id":"mat-S31-llibre","t":"Llibre Mates: pàg. 72–74 (Unitat 7 – Cossos geomètrics)","k":"llibre_mates","un":"Unitat 7","pgs":"72–74","tema":"Cossos geomètrics"},{"id":"mat-S31-explicar","t":"Explicar/treballar: Cossos geomètrics (cub, esfera, cilindre, prisma)","k":"explicar"}],"2027-04-26":[{"id":"mat-S32-llibre","t":"Llibre Mates: pàg. 75–78 (Unitat 8 – La meitat i la quarta part)","k":"llibre_mates","un":"Unitat 8","pgs":"75–78","tema":"La meitat i la quarta part"},{"id":"mat-S32-explicar","t":"Explicar/treballar: La meitat i la quarta part","k":"explicar"}],"2027-05-03":[{"id":"mat-S33-llibre","t":"Llibre Mates: pàg. 79–82 (Unitat 8 – El rellotge)","k":"llibre_mates","un":"Unitat 8","pgs":"79–82","tema":"El rellotge"},{"id":"mat-S33-explicar","t":"Explicar/treballar: Les hores i les mitges hores; el rellotge","k":"explicar"}],"2027-05-10":[{"id":"mat-S34-llibre","t":"Llibre Mates: pàg. 83–86 (Unitat 8 – El calendari i les parts del dia)","k":"llibre_mates","un":"Unitat 8","pgs":"83–86","tema":"El calendari i les parts del dia"},{"id":"mat-S34-explicar","t":"Explicar/treballar: El calendari; les parts del dia","k":"explicar"}],"2027-05-17":[{"id":"mat-S35-llibre","t":"Llibre Mates: pàg. 87–89 (Unitat 8 – Bitllets i cèntims d'euro; problemes)","k":"llibre_mates","un":"Unitat 8","pgs":"87–89","tema":"Bitllets i cèntims d'euro; problemes"},{"id":"mat-S35-explicar","t":"Explicar/treballar: Diners; problemes","k":"explicar"}],"2027-05-24":[{"id":"mat-S36-llibre","t":"Llibre Mates: pàg. 90–92 (Unitat 8 – Taules, gràfics i pictogrames)","k":"llibre_mates","un":"Unitat 8","pgs":"90–92","tema":"Taules, gràfics i pictogrames"},{"id":"mat-S36-explicar","t":"Explicar/treballar: Representació de dades","k":"explicar"}],"2027-05-31":[{"id":"mat-S37-llibre","t":"Llibre Mates: pàg. 93–96 (Unitat 9 – Longitud: centímetre, metre i quilòmetre)","k":"llibre_mates","un":"Unitat 9","pgs":"93–96","tema":"Longitud: centímetre, metre i quilòmetre"},{"id":"mat-S37-explicar","t":"Explicar/treballar: Mesures de longitud; problemes","k":"explicar"}],"2027-06-07":[{"id":"mat-S38-llibre","t":"Llibre Mates: pàg. 97–100 (Unitat 9 – Pes: quilogram, mig i quart de quilo)","k":"llibre_mates","un":"Unitat 9","pgs":"97–100","tema":"Pes: quilogram, mig i quart de quilo"},{"id":"mat-S38-explicar","t":"Explicar/treballar: Mesures de pes; problemes","k":"explicar"}],"2027-06-14":[{"id":"mat-S39-llibre","t":"Llibre Mates: pàg. 101–final (Unitat 9 – Capacitat: litre, mig i quart de litre + repàs de curs)","k":"llibre_mates","un":"Unitat 9","pgs":"101–final","tema":"Capacitat: litre, mig i quart de litre + repàs de curs"},{"id":"mat-S39-explicar","t":"Explicar/treballar: Mesures de capacitat; problemes; repàs final","k":"explicar"}]}};
+const PROG_MEDI_PROJ=[{"key":"proj-cos","nom":"El cos humà","tri":1,"ini":"2026-09-08","fi":"2026-12-18","ref":"fins al desembre","pla":["Introduir el tema demanant què diferencia en Mel d'un nen → funcions vitals (relació, reproducció, nutrició).","Ensenyar les funcions de relació amb un vídeo un cop explicades, per afiançar."],"items":[{"id":"medi-cos-01","t":"Funció de relació — els sentits","s":2},{"id":"medi-cos-02","t":"La vista i il·lusions òptiques","s":2},{"id":"medi-cos-03","t":"El gust","s":2},{"id":"medi-cos-04","t":"El tacte + joc 'endevina la caixa'","s":2},{"id":"medi-cos-05","t":"L'oïda + joc 'endevina els sorolls'","s":2},{"id":"medi-cos-06","t":"L'olfacte + pots d'olors","s":2},{"id":"medi-cos-07","t":"Aparell respiratori","s":2,"mat":"Vídeo: https://youtu.be/wB8dKyKW7Q0?si=stXSKvDK_y95M4-g"},{"id":"medi-cos-08","t":"Aparell locomotor","s":2,"mat":"Esquelet"},{"id":"medi-cos-09","t":"Funció vital: nutrició — aparell digestiu","s":4},{"id":"medi-cos-10","t":"Xerrada de la infermera (alimentació)","s":1,"nota":"Sessions no especificades al document (posat 1)"},{"id":"medi-cos-11","t":"Funció de reproducció — etapes de la vida","s":1,"nota":"desembre"}]},{"key":"proj-temps","nom":"El pas del temps","tri":2,"ini":"2027-01-08","fi":"2027-03-19","ref":"fins a Setmana Santa (final de març)","pla":[],"items":[{"id":"medi-temps-01","t":"Arbre genealògic + línia del temps","s":4},{"id":"medi-temps-02","t":"Les famílies","s":1},{"id":"medi-temps-03","t":"L'escola en el passat","s":1},{"id":"medi-temps-04","t":"Gimcana Joan Mercader","s":1},{"id":"medi-temps-05","t":"El pas del temps dels objectes + exposició","s":2}]},{"key":"proj-ciutat","nom":"La ciutat","tri":3,"ini":"2027-03-30","fi":"2027-06-18","ref":"fins a final de curs","pla":[],"items":[{"id":"medi-ciutat-01","t":"Els transports","p":1,"mat":"Sortida a Catalunya en Miniatura","nota":"Sessions a concretar"},{"id":"medi-ciutat-02","t":"El barri (comerç, carrer, poble/ciutat, tipus de cases) + excursió d'un dia","s":2,"mat":"Excursió d'un dia","nota":"Excursió d'un dia + 2 sessions"},{"id":"medi-ciutat-03","t":"Els paisatges: litoral, interior, muntanya; el curs d'un riu","p":1,"nota":"Sessions a concretar"},{"id":"medi-ciutat-04","t":"Àlbum de cromos (història de la ciutat, monuments i personatges)","p":1,"nota":"Sessions a concretar"},{"id":"medi-ciutat-05","t":"El reciclatge","p":1,"mat":"Agents Cívics / agents verds","nota":"Sessions a concretar"}]}];
+const PROG_REDUIDES={"2026-12-21":2,"2027-01-04":1};
+const PROG_MEDI_SESS_SETM=2;
+
 function progWeekLabel(w){ const m=w.mondayDate, f=w.friday;
   if(m.getMonth()===f.getMonth()) return m.getDate()+'\u2013'+f.getDate()+' '+PROG_MESU[m.getMonth()];
   return m.getDate()+' '+PROG_MESU[m.getMonth()]+' \u2013 '+f.getDate()+' '+PROG_MESU[f.getMonth()];
@@ -2032,6 +2049,7 @@ function progCurrentIdx(){
   return PROG_WEEKS_ARR.length-1;
 }
 let PROG_SUBJECT='mates', PROG_WEEK_IDX=progCurrentIdx(), PROG_VIEW='week';
+let MEDI_VIEW='projectes';   // Medi: 'projectes' (per defecte) o 'setmanes'
 /* ---- Carpeta viatgera (quinzenal, dimecres) ---- */
 const CV_START='2026-09-16';   // primer dimecres que es dona
 function _cvGrid(){ const out=[]; let d=progIsoToDate(CV_START); const end=progIsoToDate(COURSE_END);
@@ -2059,13 +2077,76 @@ function cvUpcoming(){
   items.sort((a,b)=>a.days-b.days); return items;
 }
 function progCell(subject, key){ const s=(STATE.programacio&&STATE.programacio[subject])||{}; return s[String(key)]||{}; }
-function progNormItem(x){ return {id:x.id||uid(), t:x.t||'', done:(x.done&&typeof x.done==='object')?x.done:{}, c:!!x.c}; }
+/* camps extra de la programació anual: tipus + dades del llibre/dictat/sessions */
+const PROG_ITEM_EXTRA=['k','pag','llib','doc','un','pgs','tema','p','s','mat','nota'];
+function progNormItem(x){
+  const o={id:x.id||uid(), t:x.t||'', done:(x.done&&typeof x.done==='object')?x.done:{}, c:!!x.c};
+  PROG_ITEM_EXTRA.forEach(f=>{ if(x[f]!==undefined && x[f]!==null) o[f]=x[f]; });
+  return o;
+}
 function progItemsOf(cell){
   if(cell && cell.items && cell.items.length) return cell.items.map(progNormItem);
   if(cell && cell.pla && cell.pla.trim()) return cell.pla.split('\n').filter(s=>s.trim()).map(s=>progNormItem({t:s}));
   return [];
 }
 function progPlanFilled(cell){ return progItemsOf(cell).some(i=>i.t && String(i.t).trim()); }
+/* ---- Sembra de la programació anual 2026-27 ----
+   Es MOSTRA quan una setmana/projecte encara no té res desat al full. En el moment
+   que algú toca un punt o edita un text, la cel·la es desa sencera (materialització). */
+function progSeedItems(subject, key){
+  if(subject==='medi' && typeof PROG_MEDI_PROJ!=='undefined'){
+    const p=PROG_MEDI_PROJ.find(x=>x.key===String(key));
+    if(p) return p.items.map(progNormItem);
+  }
+  const s=(typeof PROG_SEED!=='undefined' && PROG_SEED[subject]) ? PROG_SEED[subject][String(key)] : null;
+  return s ? s.map(progNormItem) : null;
+}
+/* Ítems a mostrar: els desats si n'hi ha; si no, la sembra */
+function progItemsView(subject, key){
+  const stored=progItemsOf(progCell(subject,key));
+  if(stored.length) return stored;
+  return progSeedItems(subject,key) || [];
+}
+function progPlanFilledAt(subject, key){ return progItemsView(subject,key).some(i=>i.t && String(i.t).trim()); }
+/* Abans de reprogramar cal desar la sembra, si no reapareixeria a la setmana buidada */
+async function progMaterializeSeed(subject){
+  if(typeof PROG_SEED==='undefined' || !PROG_SEED[subject]) return;
+  const old=(STATE.programacio&&STATE.programacio[subject])||{};
+  const map=Object.assign({}, old); let changed=false;
+  progTeachingMondays().forEach(k=>{
+    const cur=map[k];
+    if(cur && cur.items && cur.items.length) return;
+    const seed=progSeedItems(subject,k);
+    if(!seed || !seed.length) return;
+    map[k]=Object.assign({}, cur||{}, {items:seed}); changed=true;
+  });
+  if(changed) await api.progSetSubject(subject, map);
+}
+/* Tipus de tasca de la programació anual */
+const PROG_TIPUS={
+  comunica:    {n:'Comunica', c:'#EB5757'},
+  explicar:    {n:'Explicar', c:'#9B51E0'},
+  lectura:     {n:'Lectura',  c:'#2D9CDB'},
+  dictat:      {n:'Dictat',   c:'#F2994A'},
+  llibre_mates:{n:'Llibre',   c:'#2D9CDB'},
+};
+/* Etiquetes d'un ítem: tipus, sessions i "a concretar" */
+function progItemTags(it){
+  const f=document.createDocumentFragment();
+  const ti=it.k && PROG_TIPUS[it.k];
+  if(ti){ const s=el('span','pit-k'); s.textContent=ti.n; s.style.setProperty('--c',ti.c);
+    if(it.doc) s.title='Full de dictat: '+it.doc;
+    else if(it.un) s.title=it.un+(it.tema?' · '+it.tema:'');
+    else if(it.llib) s.title=it.llib+(it.pag!=null?' · pàg. '+it.pag:'');
+    f.appendChild(s); }
+  if(it.s!=null){ const s=el('span','pit-s'); s.textContent=it.s+(it.s===1?' sessió':' sessions'); f.appendChild(s); }
+  if(it.mat){ const s=el('span','pit-mat'); s.textContent='📎 '+it.mat; f.appendChild(s); }
+  if(it.p){ const s=el('span','pit-pend');
+    s.textContent='⏳ a concretar';
+    s.title = it.k==='comunica' ? 'Pendent el rang de pàgines del llibre en paper' : (it.nota||'Sessions pendents de concretar');
+    f.appendChild(s); }
+  return f;
+}
 function progItemDone(it){ return USERS.every(u=>it.done && it.done[u.id]); }
 function progItemDoneBy(it, tutor){ return !!(it && it.done && it.done[tutor]); }
 function progTeachingMondays(){ return PROG_WEEKS_ARR.filter(w=>!w.isVac).map(w=>w.monday); }
@@ -2119,7 +2200,7 @@ let CV_VIEW='cycle';
 function cvDateLabel(iso){ const p=String(iso).split('-'); const d=new Date(+p[0],+p[1]-1,+p[2]); return d.toLocaleDateString('ca-ES',{weekday:'short',day:'numeric',month:'short'}); }
 function progItemListEl(subject, key){
   const wrap=el('div','prog-items');
-  let items = progItemsOf(progCell(subject,key)).map(x=>({id:x.id, t:x.t, done:Object.assign({},x.done||{}), c:!!x.c}));
+  let items = progItemsView(subject,key).map(x=>Object.assign({}, x, {done:Object.assign({},x.done||{})}));
   const save=()=>{ const cell=progCell(subject,key); api.progSetCell(subject, key, {items:items, notes:cell.notes||'', link:cell.link||''}).catch(()=>{}); };
   function render(focus){
     wrap.innerHTML='';
@@ -2129,6 +2210,7 @@ function progItemListEl(subject, key){
       USERS.forEach(u=>{ const on=!!it.done[u.id]; const d=el('button','pdot'+(on?' on':'')); d.type='button'; d.style.setProperty('--c',u.accent); d.title=u.name; d.innerHTML='<i></i>';
         d.onclick=()=>{ if(it.done[u.id]) delete it.done[u.id]; else it.done[u.id]=true; render(); save(); }; dots.appendChild(d); });
       row.appendChild(dots);
+      row.appendChild(progItemTags(it));
       const inp=el('input','pit-inp'); inp.type='text'; inp.value=it.t; inp.placeholder='Deure\u2026';
       inp.addEventListener('blur',()=>{ if(it.t!==inp.value){ it.t=inp.value; save(); } });
       inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); it.t=inp.value; items.splice(i+1,0,{id:uid(),t:'',done:{}}); render(i+1); save(); }
@@ -2263,9 +2345,19 @@ function renderProgramacio(S, sec){
 
   if(PROG_SUBJECT==='carpeta'){ renderCarpeta(S, subj); return; }
 
+  if(PROG_SUBJECT==='medi'){
+    const mseg=el('div','prog-seg');
+    const mp=el('button','prog-segbtn'+(MEDI_VIEW==='projectes'?' on':'')); mp.type='button'; mp.textContent='Projectes';
+    mp.onclick=()=>{ MEDI_VIEW='projectes'; openSection('programacio'); };
+    const mw=el('button','prog-segbtn'+(MEDI_VIEW==='setmanes'?' on':'')); mw.type='button'; mw.textContent='Setmanes';
+    mw.onclick=()=>{ MEDI_VIEW='setmanes'; openSection('programacio'); };
+    mseg.appendChild(mp); mseg.appendChild(mw); S.appendChild(mseg);
+    if(MEDI_VIEW==='projectes'){ renderMediProjectes(S, subj); return; }
+  }
+
   // barra de progrés (només setmanes lectives)
   const teaching=PROG_WEEKS_ARR.filter(x=>!x.isVac); const total=teaching.length; let filled=0;
-  teaching.forEach(ww=>{ const c=progCell(PROG_SUBJECT, ww.monday); if(progPlanFilled(c)) filled++; });
+  teaching.forEach(ww=>{ if(progPlanFilledAt(PROG_SUBJECT, ww.monday)) filled++; });
   const prog=el('div','prog-progress'); prog.style.setProperty('--c', subj.color);
   prog.innerHTML='<div class="pp-bar"><span style="width:'+(total?Math.round(filled/total*100):0)+'%"></span></div>'
     +'<div class="pp-txt"><b>'+filled+'</b> / '+total+' setmanes programades</div>';
@@ -2312,11 +2404,16 @@ function renderProgramacio(S, sec){
   card.appendChild(cap);
   const warn=progWeekWarn(w);
   if(warn.length){ const wb=el('div','prog-fest'); wb.innerHTML=warn.map(x=>'<span class="pf-tag">\u26D4 '+esc(x)+'</span>').join(''); card.appendChild(wb); }
+  if(typeof PROG_REDUIDES!=='undefined' && PROG_REDUIDES[w.monday]!=null){
+    const d=PROG_REDUIDES[w.monday]; const rb=el('div','prog-red');
+    rb.innerHTML='<span class="pr-tag">\u2702\uFE0F Setmana redu\u00EFda \u00B7 '+d+(d===1?' dia lectiu':' dies lectius')+'</span>';
+    card.appendChild(rb);
+  }
   if(w.activitats && w.activitats.length){ const ab=el('div','prog-act'); ab.innerHTML=w.activitats.map(x=>'<span class="pa-tag">\uD83D\uDCCC '+esc(x)+'</span>').join(''); card.appendChild(ab); }
 
   const plaWrap=el('div','prog-field'); plaWrap.innerHTML='<label>Qu\u00e8 s\u2019ha de fer aquesta setmana</label>';
   const listEl=el('div','prog-items'); plaWrap.appendChild(listEl); card.appendChild(plaWrap);
-  let items = progItemsOf(cell).map(x=>({t:x.t||'', done:Object.assign({}, x.done||{}), c:!!x.c}));
+  let items = progItemsView(PROG_SUBJECT, w.monday).map(x=>Object.assign({}, x, {done:Object.assign({}, x.done||{})}));
 
   const saveCell=()=>{ api.progSetCell(PROG_SUBJECT, w.monday, {items:items, notes:notes.value, link:link.value}).then(()=>toast('Desat \u2713')).catch(()=>{}); };
   function renderItems(focusIdx){
@@ -2333,9 +2430,10 @@ function renderProgramacio(S, sec){
       });
       rowi.appendChild(dwrap);
       if(it.c){ const cf=el('span','pit-c'); cf.title='Ve d\u2019una setmana anterior'; cf.textContent='\u21a9'; rowi.appendChild(cf); }
+      rowi.appendChild(progItemTags(it));
       const inp=el('input','pit-inp'); inp.type='text'; inp.value=it.t; inp.placeholder='Tasca\u2026';
       inp.addEventListener('blur', ()=>{ if(it.t!==inp.value){ it.t=inp.value; saveCell(); } });
-      inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); it.t=inp.value; items.splice(i+1,0,{t:'',done:{}}); renderItems(i+1); saveCell(); }
+      inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); it.t=inp.value; items.splice(i+1,0,{id:uid(),t:'',done:{}}); renderItems(i+1); saveCell(); }
         else if(e.key==='Backspace' && inp.value==='' && items.length>1){ e.preventDefault(); items.splice(i,1); renderItems(Math.max(0,i-1)); saveCell(); } });
       rowi.appendChild(inp);
       const del=el('button','pit-del'); del.type='button'; del.title='Elimina'; del.innerHTML='\u00d7';
@@ -2344,7 +2442,7 @@ function renderProgramacio(S, sec){
       listEl.appendChild(rowi);
     });
     const add=el('button','pit-add'); add.type='button'; add.innerHTML='+ Afegeix una tasca';
-    add.onclick=()=>{ items.push({t:'',done:{}}); renderItems(items.length-1); };
+    add.onclick=()=>{ items.push({id:uid(),t:'',done:{}}); renderItems(items.length-1); };
     listEl.appendChild(add);
     if(focusIdx!=null){ const inps=listEl.querySelectorAll('.pit-inp'); if(inps[focusIdx]) inps[focusIdx].focus(); }
   }
@@ -2372,21 +2470,20 @@ function renderProgramacio(S, sec){
     const pending=items.filter(it=>!progItemDoneBy(it, ME) && String(it.t).trim());
     if(!pending.length){ toast('No hi ha cap tasca pendent'); return; }
     askConfirm(pending.length+(pending.length===1?' tasca pendent passar\u00e0':' tasques pendents passaran')+' a la setmana seg\u00fcent de '+subj.name+'. Les fetes es queden aqu\u00ed.',
-      ()=>doProgCarry(PROG_SUBJECT, w.monday, items),
+      ()=>progMaterializeSeed(PROG_SUBJECT).then(()=>doProgCarry(PROG_SUBJECT, w.monday, items)),
       {title:'Passar el pendent?', confirmLabel:'Passa'});
   };
   const shift=el('button','prog-shiftbtn'); shift.type='button'; shift.innerHTML='\u21aa Setmana sencera no feta';
   shift.onclick=()=>{
-    const lastCell=((STATE.programacio&&STATE.programacio[PROG_SUBJECT])||{})[T[T.length-1]];
-    const willDrop=progCellHasContent(lastCell);
+    const willDrop=progPlanFilledAt(PROG_SUBJECT, T[T.length-1]);
     askConfirm('El contingut d\u2019aquesta setmana i de les seg\u00fcents (de '+subj.name+') es mour\u00e0 una setmana endavant, saltant vacances. Aquesta setmana quedar\u00e0 lliure.'+(willDrop?' \u26A0\uFE0F El contingut de l\u2019\u00faltima setmana lectiva es perdr\u00e0.':''),
-      ()=>doProgShift(PROG_SUBJECT, w.monday, +1),
+      ()=>progMaterializeSeed(PROG_SUBJECT).then(()=>doProgShift(PROG_SUBJECT, w.monday, +1)),
       {title:'Desplaçar la programaci\u00f3?', confirmLabel:'Despla\u00e7a'});
   };
   const back=el('button','prog-shiftbtn back'); back.type='button'; back.innerHTML='\u21a9 Recupera una setmana';
   back.onclick=()=>{
     askConfirm('El contingut de les setmanes seg\u00fcents (de '+subj.name+') s\u2019avan\u00e7ar\u00e0 una setmana i tornar\u00e0 a omplir aquesta.',
-      ()=>doProgShift(PROG_SUBJECT, w.monday, -1),
+      ()=>progMaterializeSeed(PROG_SUBJECT).then(()=>doProgShift(PROG_SUBJECT, w.monday, -1)),
       {title:'Recuperar una setmana?', confirmLabel:'Recupera'});
   };
   acts.appendChild(carry); acts.appendChild(shift); acts.appendChild(back);
@@ -2438,6 +2535,49 @@ function openProfileMenu(){
   function onEsc(e){ if(e.key==='Escape') close(); }
   scrim.onclick=close; document.addEventListener('keydown', onEsc);
 }
+/* ---------- MEDI per projectes i sessions ----------
+   Reutilitza el magatzem `programacio` amb claus de projecte ('proj-…') en lloc de
+   dilluns, igual que fa la Carpeta viatgera amb dates. */
+function progMediDateLabel(iso){ const d=progIsoToDate(iso); return d.getDate()+' '+PROG_MESU[d.getMonth()]; }
+function renderMediProjectes(S, subj){
+  if(typeof PROG_MEDI_PROJ==='undefined'){ return; }
+  const today=progDateToISO(new Date());
+  PROG_MEDI_PROJ.forEach(p=>{
+    const actiu = today>=p.ini && today<=p.fi;
+    const items = progItemsView('medi', p.key);
+    const card=el('div','prog-week'+(actiu?' now':'')); card.style.setProperty('--c', subj.color);
+    const cap=el('div','prog-week-cap');
+    cap.innerHTML='<b>'+esc(p.nom)+'</b><span>'+progMediDateLabel(p.ini)+' → '+progMediDateLabel(p.fi)
+      +(p.tri?(' · '+(['','1r','2n','3r'][p.tri]||p.tri)+' trimestre'):'')+(actiu?' · en curs':'')+'</span>';
+    card.appendChild(cap);
+
+    const totS=items.reduce((n,i)=>n+(i.s||0),0);
+    const pend=items.filter(i=>i.p).length;
+    const meta=el('div','prog-act');
+    meta.innerHTML='<span class="pa-tag">🧩 '+items.length+' activitats</span>'
+      +'<span class="pa-tag">🕒 '+totS+' sessions'+(pend?(' + '+pend+' a concretar'):'')+'</span>'
+      +'<span class="pa-tag">📅 '+(typeof PROG_MEDI_SESS_SETM!=='undefined'?PROG_MEDI_SESS_SETM:2)+' sessions/setmana</span>';
+    card.appendChild(meta);
+
+    if(p.pla && p.pla.length){
+      const pw=el('div','prog-field'); pw.innerHTML='<label>Plantejament</label>';
+      const ul=el('ul','prog-pla'); p.pla.forEach(x=>{ const li=el('li'); li.textContent=x; ul.appendChild(li); });
+      pw.appendChild(ul); card.appendChild(pw);
+    }
+
+    const dl=el('div','prog-field'); dl.innerHTML='<label>Activitats</label>';
+    dl.appendChild(progItemListEl('medi', p.key)); card.appendChild(dl);
+
+    const cell=progCell('medi', p.key);
+    const notesWrap=el('div','prog-field'); notesWrap.innerHTML='<label>Notes del projecte</label>';
+    const notes=el('textarea','prog-ta'); notes.value=cell.notes||''; notes.placeholder='Material, sortides, com repartir les sessions…';
+    notes.addEventListener('blur', ()=>{ const c=progCell('medi',p.key);
+      if((c.notes||'')!==notes.value) api.progSetCell('medi', p.key, {items:progItemsView('medi',p.key), notes:notes.value, link:c.link||''}).then(()=>toast('Desat ✓')).catch(()=>{}); });
+    notesWrap.appendChild(notes); card.appendChild(notesWrap);
+
+    S.appendChild(card);
+  });
+}
 function renderProgOverview(S, subj, curIdx){
   const list=el('div','prog-list');
   PROG_WEEKS_ARR.forEach((w,idx)=>{
@@ -2450,7 +2590,7 @@ function renderProgOverview(S, subj, curIdx){
       row.appendChild(main); list.appendChild(row); return;
     }
     const cell=progCell(PROG_SUBJECT, w.monday);
-    const itemsList=progItemsOf(cell).filter(i=>i.t&&String(i.t).trim());
+    const itemsList=progItemsView(PROG_SUBJECT, w.monday).filter(i=>i.t&&String(i.t).trim());
     const hasPla=itemsList.length>0;
     const hasNotes=!!(cell.notes && cell.notes.trim());
     const isEmpty=!hasPla && !hasNotes && !cell.link;

@@ -1,0 +1,2681 @@
+{
+  "curs": "2026-2027",
+  "escola": "Escola Vedruna Escorial (Vic)",
+  "nivell": "2n de Primària",
+  "linies": [
+    "2nA",
+    "2nB",
+    "2nC"
+  ],
+  "calendari": {
+    "inici": "2026-09-08",
+    "final": "2027-06-18",
+    "vacances": [
+      {
+        "nom": "Nadal",
+        "inici": "2026-12-23",
+        "final": "2027-01-07"
+      },
+      {
+        "nom": "Setmana Santa",
+        "inici": "2027-03-22",
+        "final": "2027-03-29"
+      }
+    ],
+    "festius": [
+      {
+        "data": "2026-09-11",
+        "nom": "Diada"
+      },
+      {
+        "data": "2026-10-12",
+        "nom": "Festiu"
+      },
+      {
+        "data": "2026-12-08",
+        "nom": "Immaculada"
+      }
+    ],
+    "setmanes_lectives": 39,
+    "setmanes": [
+      {
+        "num": 1,
+        "inici": "2026-09-08",
+        "final": "2026-09-10",
+        "dies_lectius": 3,
+        "etiqueta": "8–10 set",
+        "reduida": false,
+        "festius": [
+          {
+            "data": "2026-09-11",
+            "nom": "Diada"
+          }
+        ]
+      },
+      {
+        "num": 2,
+        "inici": "2026-09-14",
+        "final": "2026-09-18",
+        "dies_lectius": 5,
+        "etiqueta": "14–18 set",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 3,
+        "inici": "2026-09-21",
+        "final": "2026-09-25",
+        "dies_lectius": 5,
+        "etiqueta": "21–25 set",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 4,
+        "inici": "2026-09-28",
+        "final": "2026-10-02",
+        "dies_lectius": 5,
+        "etiqueta": "28 set – 2 oct",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 5,
+        "inici": "2026-10-05",
+        "final": "2026-10-09",
+        "dies_lectius": 5,
+        "etiqueta": "5–9 oct",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 6,
+        "inici": "2026-10-13",
+        "final": "2026-10-16",
+        "dies_lectius": 4,
+        "etiqueta": "13–16 oct",
+        "reduida": false,
+        "festius": [
+          {
+            "data": "2026-10-12",
+            "nom": "Festiu"
+          }
+        ]
+      },
+      {
+        "num": 7,
+        "inici": "2026-10-19",
+        "final": "2026-10-23",
+        "dies_lectius": 5,
+        "etiqueta": "19–23 oct",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 8,
+        "inici": "2026-10-26",
+        "final": "2026-10-30",
+        "dies_lectius": 5,
+        "etiqueta": "26–30 oct",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 9,
+        "inici": "2026-11-02",
+        "final": "2026-11-06",
+        "dies_lectius": 5,
+        "etiqueta": "2–6 nov",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 10,
+        "inici": "2026-11-09",
+        "final": "2026-11-13",
+        "dies_lectius": 5,
+        "etiqueta": "9–13 nov",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 11,
+        "inici": "2026-11-16",
+        "final": "2026-11-20",
+        "dies_lectius": 5,
+        "etiqueta": "16–20 nov",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 12,
+        "inici": "2026-11-23",
+        "final": "2026-11-27",
+        "dies_lectius": 5,
+        "etiqueta": "23–27 nov",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 13,
+        "inici": "2026-11-30",
+        "final": "2026-12-04",
+        "dies_lectius": 5,
+        "etiqueta": "30 nov – 4 des",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 14,
+        "inici": "2026-12-07",
+        "final": "2026-12-11",
+        "dies_lectius": 4,
+        "etiqueta": "7–11 des",
+        "reduida": false,
+        "festius": [
+          {
+            "data": "2026-12-08",
+            "nom": "Immaculada"
+          }
+        ]
+      },
+      {
+        "num": 15,
+        "inici": "2026-12-14",
+        "final": "2026-12-18",
+        "dies_lectius": 5,
+        "etiqueta": "14–18 des",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 16,
+        "inici": "2026-12-21",
+        "final": "2026-12-22",
+        "dies_lectius": 2,
+        "etiqueta": "21–22 des",
+        "reduida": true,
+        "festius": []
+      },
+      {
+        "num": 17,
+        "inici": "2027-01-08",
+        "final": "2027-01-08",
+        "dies_lectius": 1,
+        "etiqueta": "8–8 gen",
+        "reduida": true,
+        "festius": []
+      },
+      {
+        "num": 18,
+        "inici": "2027-01-11",
+        "final": "2027-01-15",
+        "dies_lectius": 5,
+        "etiqueta": "11–15 gen",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 19,
+        "inici": "2027-01-18",
+        "final": "2027-01-22",
+        "dies_lectius": 5,
+        "etiqueta": "18–22 gen",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 20,
+        "inici": "2027-01-25",
+        "final": "2027-01-29",
+        "dies_lectius": 5,
+        "etiqueta": "25–29 gen",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 21,
+        "inici": "2027-02-01",
+        "final": "2027-02-05",
+        "dies_lectius": 5,
+        "etiqueta": "1–5 febr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 22,
+        "inici": "2027-02-08",
+        "final": "2027-02-12",
+        "dies_lectius": 5,
+        "etiqueta": "8–12 febr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 23,
+        "inici": "2027-02-15",
+        "final": "2027-02-19",
+        "dies_lectius": 5,
+        "etiqueta": "15–19 febr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 24,
+        "inici": "2027-02-22",
+        "final": "2027-02-26",
+        "dies_lectius": 5,
+        "etiqueta": "22–26 febr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 25,
+        "inici": "2027-03-01",
+        "final": "2027-03-05",
+        "dies_lectius": 5,
+        "etiqueta": "1–5 març",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 26,
+        "inici": "2027-03-08",
+        "final": "2027-03-12",
+        "dies_lectius": 5,
+        "etiqueta": "8–12 març",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 27,
+        "inici": "2027-03-15",
+        "final": "2027-03-19",
+        "dies_lectius": 5,
+        "etiqueta": "15–19 març",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 28,
+        "inici": "2027-03-30",
+        "final": "2027-04-02",
+        "dies_lectius": 4,
+        "etiqueta": "30 març – 2 abr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 29,
+        "inici": "2027-04-05",
+        "final": "2027-04-09",
+        "dies_lectius": 5,
+        "etiqueta": "5–9 abr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 30,
+        "inici": "2027-04-12",
+        "final": "2027-04-16",
+        "dies_lectius": 5,
+        "etiqueta": "12–16 abr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 31,
+        "inici": "2027-04-19",
+        "final": "2027-04-23",
+        "dies_lectius": 5,
+        "etiqueta": "19–23 abr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 32,
+        "inici": "2027-04-26",
+        "final": "2027-04-30",
+        "dies_lectius": 5,
+        "etiqueta": "26–30 abr",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 33,
+        "inici": "2027-05-03",
+        "final": "2027-05-07",
+        "dies_lectius": 5,
+        "etiqueta": "3–7 maig",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 34,
+        "inici": "2027-05-10",
+        "final": "2027-05-14",
+        "dies_lectius": 5,
+        "etiqueta": "10–14 maig",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 35,
+        "inici": "2027-05-17",
+        "final": "2027-05-21",
+        "dies_lectius": 5,
+        "etiqueta": "17–21 maig",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 36,
+        "inici": "2027-05-24",
+        "final": "2027-05-28",
+        "dies_lectius": 5,
+        "etiqueta": "24–28 maig",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 37,
+        "inici": "2027-05-31",
+        "final": "2027-06-04",
+        "dies_lectius": 5,
+        "etiqueta": "31 maig – 4 juny",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 38,
+        "inici": "2027-06-07",
+        "final": "2027-06-11",
+        "dies_lectius": 5,
+        "etiqueta": "7–11 juny",
+        "reduida": false,
+        "festius": []
+      },
+      {
+        "num": 39,
+        "inici": "2027-06-14",
+        "final": "2027-06-18",
+        "dies_lectius": 5,
+        "etiqueta": "14–18 juny",
+        "reduida": false,
+        "festius": []
+      }
+    ]
+  },
+  "assignatures": {
+    "catala": {
+      "nom": "Llengua catalana",
+      "format": "setmanal",
+      "materials": [
+        "Comunica 2 (Barcanova)",
+        "El temps era temps 2 (Animallibres)",
+        "Dictats (carpeta Drive)"
+      ],
+      "avis": "Les tasques 'Comunica' no porten pàgina: el llibre digital és per activitats. Pendents els rangs de pàgina en paper.",
+      "setmanes": [
+        {
+          "setmana": 1,
+          "etiqueta": "8–10 set",
+          "tasques": [
+            {
+              "id": "cat-S1-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 1 – Quina gran família! (inici, acollida)",
+              "completada": false
+            },
+            {
+              "id": "cat-S1-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Noms propis i noms comuns (majúscules)",
+              "completada": false
+            },
+            {
+              "id": "cat-S1-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El final de les vacances\" (El temps era temps 2, pàg. 4)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 4
+            },
+            {
+              "id": "cat-S1-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 1 · Majúscules, noms propis i comuns",
+              "completada": false,
+              "document_dictat": "Dictat 1 · Majúscules, noms propis i comuns"
+            }
+          ]
+        },
+        {
+          "setmana": 2,
+          "etiqueta": "14–18 set",
+          "tasques": [
+            {
+              "id": "cat-S2-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 1 – Quina gran família!",
+              "completada": false
+            },
+            {
+              "id": "cat-S2-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La síl·laba tònica",
+              "completada": false
+            },
+            {
+              "id": "cat-S2-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"L'avi Vicenç\" (El temps era temps 2, pàg. 6)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 6
+            }
+          ]
+        },
+        {
+          "setmana": 3,
+          "etiqueta": "21–25 set",
+          "tasques": [
+            {
+              "id": "cat-S3-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 1 – Quina gran família! (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S3-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Noms propis/comuns + majúscules (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S3-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Mitja llengua\" (El temps era temps 2, pàg. 8)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 8
+            },
+            {
+              "id": "cat-S3-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 1 · Majúscules, noms propis i comuns (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 1 · Majúscules, noms propis i comuns"
+            }
+          ]
+        },
+        {
+          "setmana": 4,
+          "etiqueta": "28 set – 2 oct",
+          "tasques": [
+            {
+              "id": "cat-S4-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 2 – Els colors de la tardor (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S4-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El verb: persones gramaticals",
+              "completada": false
+            },
+            {
+              "id": "cat-S4-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"L'elefant d'en Kumar\" (El temps era temps 2, pàg. 10)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 10
+            }
+          ]
+        },
+        {
+          "setmana": 5,
+          "etiqueta": "5–9 oct",
+          "tasques": [
+            {
+              "id": "cat-S5-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 2 – Els colors de la tardor",
+              "completada": false
+            },
+            {
+              "id": "cat-S5-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: E oberta i E tancada",
+              "completada": false
+            },
+            {
+              "id": "cat-S5-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Set pollets\" (El temps era temps 2, pàg. 12)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 12
+            },
+            {
+              "id": "cat-S5-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 2 · La e oberta i la e tancada",
+              "completada": false,
+              "document_dictat": "Dictat 2 · La e oberta i la e tancada"
+            }
+          ]
+        },
+        {
+          "setmana": 6,
+          "etiqueta": "13–16 oct",
+          "tasques": [
+            {
+              "id": "cat-S6-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 2 – Els colors de la tardor",
+              "completada": false
+            },
+            {
+              "id": "cat-S6-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El verb: persones gramaticals (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S6-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Dies de fira\" (El temps era temps 2, pàg. 14)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 14
+            }
+          ]
+        },
+        {
+          "setmana": 7,
+          "etiqueta": "19–23 oct",
+          "tasques": [
+            {
+              "id": "cat-S7-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 2 – Els colors de la tardor (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S7-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: E oberta / E tancada (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S7-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La Tenora i en Tamborí\" (El temps era temps 2, pàg. 16)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 16
+            },
+            {
+              "id": "cat-S7-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 2 · La e oberta i la e tancada (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 2 · La e oberta i la e tancada"
+            }
+          ]
+        },
+        {
+          "setmana": 8,
+          "etiqueta": "26–30 oct",
+          "tasques": [
+            {
+              "id": "cat-S8-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 3 – Vet aquí que una vegada… (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S8-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El plural",
+              "completada": false
+            },
+            {
+              "id": "cat-S8-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"L'escola de la Marina\" (El temps era temps 2, pàg. 18)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 18
+            },
+            {
+              "id": "cat-S8-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 3 · El plural",
+              "completada": false,
+              "document_dictat": "Dictat 3 · El plural"
+            }
+          ]
+        },
+        {
+          "setmana": 9,
+          "etiqueta": "2–6 nov",
+          "tasques": [
+            {
+              "id": "cat-S9-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 3 – Vet aquí que una vegada…",
+              "completada": false
+            },
+            {
+              "id": "cat-S9-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El plural (-es, -os)",
+              "completada": false
+            },
+            {
+              "id": "cat-S9-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Poemes de tardor\" (El temps era temps 2, pàg. 20)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 20
+            }
+          ]
+        },
+        {
+          "setmana": 10,
+          "etiqueta": "9–13 nov",
+          "tasques": [
+            {
+              "id": "cat-S10-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 3 – Vet aquí que una vegada…",
+              "completada": false
+            },
+            {
+              "id": "cat-S10-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Paraules de la mateixa família",
+              "completada": false
+            },
+            {
+              "id": "cat-S10-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El berenar de les bruixes\" (El temps era temps 2, pàg. 22)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 22
+            }
+          ]
+        },
+        {
+          "setmana": 11,
+          "etiqueta": "16–20 nov",
+          "tasques": [
+            {
+              "id": "cat-S11-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 3 – Vet aquí que una vegada… (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S11-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El plural (repàs) + paraules de la mateixa família",
+              "completada": false
+            },
+            {
+              "id": "cat-S11-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El camell agraït\" (El temps era temps 2, pàg. 24)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 24
+            },
+            {
+              "id": "cat-S11-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 3 · El plural (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 3 · El plural"
+            }
+          ]
+        },
+        {
+          "setmana": 12,
+          "etiqueta": "23–27 nov",
+          "tasques": [
+            {
+              "id": "cat-S12-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 3 – Vet aquí que una vegada… (tancament)",
+              "completada": false
+            },
+            {
+              "id": "cat-S12-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Repàs Unitat 3",
+              "completada": false
+            },
+            {
+              "id": "cat-S12-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Les meves joguines\" (El temps era temps 2, pàg. 26)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 26
+            }
+          ]
+        },
+        {
+          "setmana": 13,
+          "etiqueta": "30 nov – 4 des",
+          "tasques": [
+            {
+              "id": "cat-S13-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Repàs 1r trimestre (Unitats 1–3)",
+              "completada": false
+            },
+            {
+              "id": "cat-S13-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Sons [k]: c i qu (ca, co, cu / que, qui)",
+              "completada": false
+            },
+            {
+              "id": "cat-S13-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Música, mestra!\" (El temps era temps 2, pàg. 28)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 28
+            },
+            {
+              "id": "cat-S13-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 4 · So [k]: c i qu",
+              "completada": false,
+              "document_dictat": "Dictat 4 · So [k]: c i qu"
+            }
+          ]
+        },
+        {
+          "setmana": 14,
+          "etiqueta": "7–11 des",
+          "tasques": [
+            {
+              "id": "cat-S14-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Repàs / comprensió",
+              "completada": false
+            },
+            {
+              "id": "cat-S14-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Repàs de continguts del trimestre",
+              "completada": false
+            },
+            {
+              "id": "cat-S14-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El Jardí dels Pintors\" (El temps era temps 2, pàg. 30)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 30
+            }
+          ]
+        },
+        {
+          "setmana": 15,
+          "etiqueta": "14–18 des",
+          "tasques": [
+            {
+              "id": "cat-S15-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Comprensió i expressió (Nadal)",
+              "completada": false
+            },
+            {
+              "id": "cat-S15-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Sons [k] c/qu (repàs) + repàs global 1r trim.",
+              "completada": false
+            },
+            {
+              "id": "cat-S15-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Coses de família\" (El temps era temps 2, pàg. 32)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 32
+            },
+            {
+              "id": "cat-S15-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 4 · So [k]: c i qu (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 4 · So [k]: c i qu"
+            }
+          ]
+        },
+        {
+          "setmana": 16,
+          "etiqueta": "21–22 des",
+          "tasques": [
+            {
+              "id": "cat-S16-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Activitat lúdica de llengua (Nadal)",
+              "completada": false
+            },
+            {
+              "id": "cat-S16-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El poble del llac\" (El temps era temps 2, pàg. 34)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 34
+            }
+          ]
+        },
+        {
+          "setmana": 17,
+          "etiqueta": "8–8 gen",
+          "tasques": [
+            {
+              "id": "cat-S17-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 4 – Ens comuniquem! (presentació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S17-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Les plantes de l'àvia\" (El temps era temps 2, pàg. 36)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 36
+            }
+          ]
+        },
+        {
+          "setmana": 18,
+          "etiqueta": "11–15 gen",
+          "tasques": [
+            {
+              "id": "cat-S18-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 4 – Ens comuniquem!",
+              "completada": false
+            },
+            {
+              "id": "cat-S18-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Sinònims i antònims",
+              "completada": false
+            },
+            {
+              "id": "cat-S18-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Una casa encantada\" (El temps era temps 2, pàg. 38)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 38
+            }
+          ]
+        },
+        {
+          "setmana": 19,
+          "etiqueta": "18–22 gen",
+          "tasques": [
+            {
+              "id": "cat-S19-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 4 – Ens comuniquem!",
+              "completada": false
+            },
+            {
+              "id": "cat-S19-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La B i la V",
+              "completada": false
+            },
+            {
+              "id": "cat-S19-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El gegant Menjaferro\" (El temps era temps 2, pàg. 40)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 40
+            },
+            {
+              "id": "cat-S19-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 7 · La b i la v",
+              "completada": false,
+              "document_dictat": "Dictat 7 · La b i la v"
+            }
+          ]
+        },
+        {
+          "setmana": 20,
+          "etiqueta": "25–29 gen",
+          "tasques": [
+            {
+              "id": "cat-S20-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 4 – Ens comuniquem! (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S20-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La B i la V (repàs) + sinònims/antònims",
+              "completada": false
+            },
+            {
+              "id": "cat-S20-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La sorpresa de la Perla\" (El temps era temps 2, pàg. 42)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 42
+            },
+            {
+              "id": "cat-S20-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 7 · La b i la v (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 7 · La b i la v"
+            }
+          ]
+        },
+        {
+          "setmana": 21,
+          "etiqueta": "1–5 febr",
+          "tasques": [
+            {
+              "id": "cat-S21-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 5 – Cases per totes bandes (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S21-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Els adjectius",
+              "completada": false
+            },
+            {
+              "id": "cat-S21-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Un dia especial\" (El temps era temps 2, pàg. 44)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 44
+            }
+          ]
+        },
+        {
+          "setmana": 22,
+          "etiqueta": "8–12 febr",
+          "tasques": [
+            {
+              "id": "cat-S22-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 5 – Cases per totes bandes",
+              "completada": false
+            },
+            {
+              "id": "cat-S22-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Ús de R i RR",
+              "completada": false
+            },
+            {
+              "id": "cat-S22-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La dent d'en Guillem\" (El temps era temps 2, pàg. 46)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 46
+            },
+            {
+              "id": "cat-S22-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 8 · La r i la rr",
+              "completada": false,
+              "document_dictat": "Dictat 8 · La r i la rr"
+            }
+          ]
+        },
+        {
+          "setmana": 23,
+          "etiqueta": "15–19 febr",
+          "tasques": [
+            {
+              "id": "cat-S23-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 5 – Cases per totes bandes",
+              "completada": false
+            },
+            {
+              "id": "cat-S23-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Els adjectius (concordança)",
+              "completada": false
+            },
+            {
+              "id": "cat-S23-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Quatre vaixells\" (El temps era temps 2, pàg. 48)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 48
+            }
+          ]
+        },
+        {
+          "setmana": 24,
+          "etiqueta": "22–26 febr",
+          "tasques": [
+            {
+              "id": "cat-S24-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 5 – Cases per totes bandes (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S24-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Ús de R i RR (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S24-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Animals fenomenals\" (El temps era temps 2, pàg. 50)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 50
+            },
+            {
+              "id": "cat-S24-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 8 · La r i la rr (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 8 · La r i la rr"
+            }
+          ]
+        },
+        {
+          "setmana": 25,
+          "etiqueta": "1–5 març",
+          "tasques": [
+            {
+              "id": "cat-S25-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 6 – L'hora del pati (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S25-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Sons [g]: g i gu (ga, go, gu / gue, gui) + determinants possessius",
+              "completada": false
+            },
+            {
+              "id": "cat-S25-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La pilota de la Daniela\" (El temps era temps 2, pàg. 54)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 54
+            },
+            {
+              "id": "cat-S25-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 5 · So [g]: g i gu",
+              "completada": false,
+              "document_dictat": "Dictat 5 · So [g]: g i gu"
+            }
+          ]
+        },
+        {
+          "setmana": 26,
+          "etiqueta": "8–12 març",
+          "tasques": [
+            {
+              "id": "cat-S26-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 6 – L'hora del pati",
+              "completada": false
+            },
+            {
+              "id": "cat-S26-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La G i la J (ge, gi / ja, jo, ju)",
+              "completada": false
+            },
+            {
+              "id": "cat-S26-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La reina de la muntanya\" (El temps era temps 2, pàg. 56)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 56
+            },
+            {
+              "id": "cat-S26-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 6 · La g i la j",
+              "completada": false,
+              "document_dictat": "Dictat 6 · La g i la j"
+            }
+          ]
+        },
+        {
+          "setmana": 27,
+          "etiqueta": "15–19 març",
+          "tasques": [
+            {
+              "id": "cat-S27-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 6 – L'hora del pati (consolidació) + repàs 2n trim.",
+              "completada": false
+            },
+            {
+              "id": "cat-S27-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: g/gu i g/j (repàs) — GU i GÜ",
+              "completada": false
+            },
+            {
+              "id": "cat-S27-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Celebrar la primavera\" (El temps era temps 2, pàg. 58)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 58
+            },
+            {
+              "id": "cat-S27-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 6 · La g i la j (repàs; alternar amb Dictat 5)",
+              "completada": false,
+              "document_dictat": "Dictat 6 · La g i la j"
+            }
+          ]
+        },
+        {
+          "setmana": 28,
+          "etiqueta": "30 març – 2 abr",
+          "tasques": [
+            {
+              "id": "cat-S28-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 7 – Endevina, endevinalla… (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S28-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La polisèmia",
+              "completada": false
+            },
+            {
+              "id": "cat-S28-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Quina hora és?\" (El temps era temps 2, pàg. 60)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 60
+            }
+          ]
+        },
+        {
+          "setmana": 29,
+          "etiqueta": "5–9 abr",
+          "tasques": [
+            {
+              "id": "cat-S29-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 7 – Endevina, endevinalla…",
+              "completada": false
+            },
+            {
+              "id": "cat-S29-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El verb i els complements",
+              "completada": false
+            },
+            {
+              "id": "cat-S29-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Pescadora d'estels\" (El temps era temps 2, pàg. 64)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 64
+            }
+          ]
+        },
+        {
+          "setmana": 30,
+          "etiqueta": "12–16 abr",
+          "tasques": [
+            {
+              "id": "cat-S30-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 7 – Endevina, endevinalla… (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S30-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La polisèmia + verb i complements (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S30-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Un diumenge de sort\" (El temps era temps 2, pàg. 68)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 68
+            }
+          ]
+        },
+        {
+          "setmana": 31,
+          "etiqueta": "19–23 abr",
+          "tasques": [
+            {
+              "id": "cat-S31-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 8 – Som com som (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S31-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Frases fetes i refranys",
+              "completada": false
+            },
+            {
+              "id": "cat-S31-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Poemes de primavera\" (El temps era temps 2, pàg. 70)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 70
+            }
+          ]
+        },
+        {
+          "setmana": 32,
+          "etiqueta": "26–30 abr",
+          "tasques": [
+            {
+              "id": "cat-S32-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 8 – Som com som",
+              "completada": false
+            },
+            {
+              "id": "cat-S32-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La S sorda i la S sonora (s, ss, c, ç, z)",
+              "completada": false
+            },
+            {
+              "id": "cat-S32-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Menjar-se la lluna\" (El temps era temps 2, pàg. 74)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 74
+            },
+            {
+              "id": "cat-S32-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 9 · La s sorda i la s sonora",
+              "completada": false,
+              "document_dictat": "Dictat 9 · La s sorda i la s sonora"
+            }
+          ]
+        },
+        {
+          "setmana": 33,
+          "etiqueta": "3–7 maig",
+          "tasques": [
+            {
+              "id": "cat-S33-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 8 – Som com som",
+              "completada": false
+            },
+            {
+              "id": "cat-S33-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: S sorda / S sonora (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S33-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"El Valent\" (El temps era temps 2, pàg. 76)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 76
+            },
+            {
+              "id": "cat-S33-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 9 · La s sorda i la s sonora (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 9 · La s sorda i la s sonora"
+            }
+          ]
+        },
+        {
+          "setmana": 34,
+          "etiqueta": "10–14 maig",
+          "tasques": [
+            {
+              "id": "cat-S34-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 8 – Som com som (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S34-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Frases fetes i refranys (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S34-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Terratrèmol\" (El temps era temps 2, pàg. 78)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 78
+            }
+          ]
+        },
+        {
+          "setmana": 35,
+          "etiqueta": "17–21 maig",
+          "tasques": [
+            {
+              "id": "cat-S35-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 9 – Vacances a la vista! (inici)",
+              "completada": false
+            },
+            {
+              "id": "cat-S35-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Ús de X i IX (+ La definició)",
+              "completada": false
+            },
+            {
+              "id": "cat-S35-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"La Graciosa\" (El temps era temps 2, pàg. 80)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 80
+            },
+            {
+              "id": "cat-S35-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 10 · Ús de x, ix, tx, ig",
+              "completada": false,
+              "document_dictat": "Dictat 10 · Ús de x, ix, tx, ig"
+            }
+          ]
+        },
+        {
+          "setmana": 36,
+          "etiqueta": "24–28 maig",
+          "tasques": [
+            {
+              "id": "cat-S36-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 9 – Vacances a la vista!",
+              "completada": false
+            },
+            {
+              "id": "cat-S36-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Ús de TX i IG (+ Precisió lèxica)",
+              "completada": false
+            },
+            {
+              "id": "cat-S36-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Xarranca\" (El temps era temps 2, pàg. 84)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 84
+            },
+            {
+              "id": "cat-S36-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat 10 · Ús de x, ix, tx, ig (repàs)",
+              "completada": false,
+              "document_dictat": "Dictat 10 · Ús de x, ix, tx, ig"
+            }
+          ]
+        },
+        {
+          "setmana": 37,
+          "etiqueta": "31 maig – 4 juny",
+          "tasques": [
+            {
+              "id": "cat-S37-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Unitat 9 – Vacances a la vista! (consolidació)",
+              "completada": false
+            },
+            {
+              "id": "cat-S37-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La definició / precisió lèxica (repàs)",
+              "completada": false
+            },
+            {
+              "id": "cat-S37-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Solució d'emergència\" (El temps era temps 2, pàg. 88)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 88
+            }
+          ]
+        },
+        {
+          "setmana": 38,
+          "etiqueta": "7–11 juny",
+          "tasques": [
+            {
+              "id": "cat-S38-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Annex – L'ordre de les lletres (l'abecedari) + repàs de curs",
+              "completada": false
+            },
+            {
+              "id": "cat-S38-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Ordre alfabètic",
+              "completada": false
+            },
+            {
+              "id": "cat-S38-lectura",
+              "tipus": "lectura",
+              "text": "Lectura: \"Per a tots els gustos\" (El temps era temps 2, pàg. 90)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 90
+            },
+            {
+              "id": "cat-S38-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Repàs · tria el dictat de la norma menys consolidada",
+              "completada": false,
+              "document_dictat": "Repàs · tria el dictat de la norma menys consolidada"
+            }
+          ]
+        },
+        {
+          "setmana": 39,
+          "etiqueta": "14–18 juny",
+          "tasques": [
+            {
+              "id": "cat-S39-comunica",
+              "tipus": "comunica",
+              "text": "Comunica: Repàs final i jocs de llengua",
+              "completada": false
+            },
+            {
+              "id": "cat-S39-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Repàs global de curs",
+              "completada": false
+            },
+            {
+              "id": "cat-S39-lectura1",
+              "tipus": "lectura",
+              "text": "Lectura: \"Una pirata amb mala sort\" (El temps era temps 2, pàg. 92)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 92
+            },
+            {
+              "id": "cat-S39-lectura2",
+              "tipus": "lectura",
+              "text": "Lectura: \"El primer dia de vacances\" (El temps era temps 2, pàg. 94)",
+              "completada": false,
+              "llibre": "El temps era temps 2",
+              "pagina": 94
+            },
+            {
+              "id": "cat-S39-dictat",
+              "tipus": "dictat",
+              "text": "Dictat: Dictat de síntesi (opcional)",
+              "completada": false,
+              "document_dictat": "Dictat de síntesi"
+            }
+          ]
+        }
+      ],
+      "dictats": [
+        {
+          "num": 1,
+          "document": "Dictat 1 · Majúscules, noms propis i comuns",
+          "norma": "Majúscules, noms propis i comuns",
+          "es_fa": [
+            "S1",
+            "S3"
+          ]
+        },
+        {
+          "num": 2,
+          "document": "Dictat 2 · La e oberta i la e tancada",
+          "norma": "La e oberta i la e tancada",
+          "es_fa": [
+            "S5",
+            "S7"
+          ]
+        },
+        {
+          "num": 3,
+          "document": "Dictat 3 · El plural",
+          "norma": "El plural",
+          "es_fa": [
+            "S8",
+            "S11"
+          ]
+        },
+        {
+          "num": 4,
+          "document": "Dictat 4 · So [k]: c i qu",
+          "norma": "So [k]: c i qu",
+          "es_fa": [
+            "S13",
+            "S15"
+          ]
+        },
+        {
+          "num": 5,
+          "document": "Dictat 5 · So [g]: g i gu",
+          "norma": "So [g]: g i gu",
+          "es_fa": [
+            "S25",
+            "S27"
+          ]
+        },
+        {
+          "num": 6,
+          "document": "Dictat 6 · La g i la j",
+          "norma": "La g i la j",
+          "es_fa": [
+            "S26",
+            "S27"
+          ]
+        },
+        {
+          "num": 7,
+          "document": "Dictat 7 · La b i la v",
+          "norma": "La b i la v",
+          "es_fa": [
+            "S19",
+            "S20"
+          ]
+        },
+        {
+          "num": 8,
+          "document": "Dictat 8 · La r i la rr",
+          "norma": "La r i la rr",
+          "es_fa": [
+            "S22",
+            "S24"
+          ]
+        },
+        {
+          "num": 9,
+          "document": "Dictat 9 · La s sorda i la s sonora",
+          "norma": "La s sorda i la s sonora (s, ss, c, ç, z)",
+          "es_fa": [
+            "S32",
+            "S33"
+          ]
+        },
+        {
+          "num": 10,
+          "document": "Dictat 10 · Ús de x, ix, tx, ig",
+          "norma": "Ús de x, ix, tx, ig",
+          "es_fa": [
+            "S35",
+            "S36"
+          ]
+        }
+      ]
+    },
+    "matematiques": {
+      "nom": "Matemàtiques",
+      "format": "setmanal",
+      "materials": [
+        "Més Món Matemàtic 2 (Barcanova)"
+      ],
+      "avis": "Pàgines d'inici i temes = reals (índex). El tall de pàgines per setmana és proposta de ritme. Pàgina final U9 aproximada.",
+      "setmanes": [
+        {
+          "setmana": 1,
+          "etiqueta": "8–10 set",
+          "tasques": [
+            {
+              "id": "mat-S1-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 5–7 (Unitat 1 – Els nombres de dues xifres)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "5–7",
+              "tema": "Els nombres de dues xifres"
+            },
+            {
+              "id": "mat-S1-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Lectura i escriptura de nombres de dues xifres",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 2,
+          "etiqueta": "14–18 set",
+          "tasques": [
+            {
+              "id": "mat-S2-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 8–10 (Unitat 1 – Els nombres de dues xifres)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "8–10",
+              "tema": "Els nombres de dues xifres"
+            },
+            {
+              "id": "mat-S2-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Comparació i ordenació; desena i unitat",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 3,
+          "etiqueta": "21–25 set",
+          "tasques": [
+            {
+              "id": "mat-S3-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 11–13 (Unitat 1 – La suma i la resta sense portar-ne)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "11–13",
+              "tema": "La suma i la resta sense portar-ne"
+            },
+            {
+              "id": "mat-S3-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Suma i resta sense portar-ne",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 4,
+          "etiqueta": "28 set – 2 oct",
+          "tasques": [
+            {
+              "id": "mat-S4-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 14–16 (Unitat 1 – La suma portant-ne)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "14–16",
+              "tema": "La suma portant-ne"
+            },
+            {
+              "id": "mat-S4-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La suma portant-ne",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 5,
+          "etiqueta": "5–9 oct",
+          "tasques": [
+            {
+              "id": "mat-S5-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 17–18 (Unitat 1 – La multiplicació i la suma)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "17–18",
+              "tema": "La multiplicació i la suma"
+            },
+            {
+              "id": "mat-S5-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La multiplicació com a suma repetida",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 6,
+          "etiqueta": "13–16 oct",
+          "tasques": [
+            {
+              "id": "mat-S6-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 19–20 (Unitat 1 – Repàs Unitat 1)",
+              "completada": false,
+              "unitat": "Unitat 1",
+              "pagines": "19–20",
+              "tema": "Repàs Unitat 1"
+            },
+            {
+              "id": "mat-S6-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Repàs Unitat 1 + problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 7,
+          "etiqueta": "19–23 oct",
+          "tasques": [
+            {
+              "id": "mat-S7-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 21–23 (Unitat 2 – Els nombres fins al 500 / La centena)",
+              "completada": false,
+              "unitat": "Unitat 2",
+              "pagines": "21–23",
+              "tema": "Els nombres fins al 500 / La centena"
+            },
+            {
+              "id": "mat-S7-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La centena; lectura i escriptura fins al 500",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 8,
+          "etiqueta": "26–30 oct",
+          "tasques": [
+            {
+              "id": "mat-S8-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 24–26 (Unitat 2 – Els nombres fins al 500)",
+              "completada": false,
+              "unitat": "Unitat 2",
+              "pagines": "24–26",
+              "tema": "Els nombres fins al 500"
+            },
+            {
+              "id": "mat-S8-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Descomposició i comparació fins al 500",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 9,
+          "etiqueta": "2–6 nov",
+          "tasques": [
+            {
+              "id": "mat-S9-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 27–28 (Unitat 2 – La taula del 2)",
+              "completada": false,
+              "unitat": "Unitat 2",
+              "pagines": "27–28",
+              "tema": "La taula del 2"
+            },
+            {
+              "id": "mat-S9-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La taula de multiplicar del 2",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 10,
+          "etiqueta": "9–13 nov",
+          "tasques": [
+            {
+              "id": "mat-S10-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 29–30 (Unitat 2 – La taula del 3)",
+              "completada": false,
+              "unitat": "Unitat 2",
+              "pagines": "29–30",
+              "tema": "La taula del 3"
+            },
+            {
+              "id": "mat-S10-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La taula de multiplicar del 3",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 11,
+          "etiqueta": "16–20 nov",
+          "tasques": [
+            {
+              "id": "mat-S11-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 31–32 (Unitat 3 – Els nombres fins al 999)",
+              "completada": false,
+              "unitat": "Unitat 3",
+              "pagines": "31–32",
+              "tema": "Els nombres fins al 999"
+            },
+            {
+              "id": "mat-S11-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Lectura i escriptura de nombres fins al 999",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 12,
+          "etiqueta": "23–27 nov",
+          "tasques": [
+            {
+              "id": "mat-S12-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 33–34 (Unitat 3 – La taula del 4)",
+              "completada": false,
+              "unitat": "Unitat 3",
+              "pagines": "33–34",
+              "tema": "La taula del 4"
+            },
+            {
+              "id": "mat-S12-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La taula de multiplicar del 4",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 13,
+          "etiqueta": "30 nov – 4 des",
+          "tasques": [
+            {
+              "id": "mat-S13-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 35–36 (Unitat 3 – La taula del 5)",
+              "completada": false,
+              "unitat": "Unitat 3",
+              "pagines": "35–36",
+              "tema": "La taula del 5"
+            },
+            {
+              "id": "mat-S13-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La taula de multiplicar del 5",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 14,
+          "etiqueta": "7–11 des",
+          "tasques": [
+            {
+              "id": "mat-S14-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: Repàs taules del 2, 3, 4 i 5 (Unitat 3)",
+              "completada": false,
+              "unitat": "Unitat 3",
+              "pagines": "repàs",
+              "tema": "Repàs taules del 2, 3, 4 i 5"
+            },
+            {
+              "id": "mat-S14-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Càlcul mental amb les taules apreses",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 15,
+          "etiqueta": "14–18 des",
+          "tasques": [
+            {
+              "id": "mat-S15-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: Repàs 1r trimestre",
+              "completada": false,
+              "unitat": "—",
+              "pagines": "repàs",
+              "tema": "Repàs 1r trimestre"
+            },
+            {
+              "id": "mat-S15-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Nombres fins al 999, sumes i restes, taules; problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 16,
+          "etiqueta": "21–22 des",
+          "tasques": [
+            {
+              "id": "mat-S16-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: Jocs de càlcul / repàs lúdic",
+              "completada": false,
+              "unitat": "—",
+              "pagines": "jocs",
+              "tema": "Jocs de càlcul / repàs lúdic"
+            },
+            {
+              "id": "mat-S16-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Sense pàgines noves",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 17,
+          "etiqueta": "8–8 gen",
+          "tasques": [
+            {
+              "id": "mat-S17-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 37 (Unitat 4 – La suma i la resta de tres xifres (introducció))",
+              "completada": false,
+              "unitat": "Unitat 4",
+              "pagines": "37",
+              "tema": "La suma i la resta de tres xifres (introducció)"
+            },
+            {
+              "id": "mat-S17-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Presentació de la unitat",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 18,
+          "etiqueta": "11–15 gen",
+          "tasques": [
+            {
+              "id": "mat-S18-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 38–40 (Unitat 4 – La suma portant-ne)",
+              "completada": false,
+              "unitat": "Unitat 4",
+              "pagines": "38–40",
+              "tema": "La suma portant-ne"
+            },
+            {
+              "id": "mat-S18-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Suma de tres xifres portant-ne",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 19,
+          "etiqueta": "18–22 gen",
+          "tasques": [
+            {
+              "id": "mat-S19-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 41–42 (Unitat 4 – La resta sense portar-ne)",
+              "completada": false,
+              "unitat": "Unitat 4",
+              "pagines": "41–42",
+              "tema": "La resta sense portar-ne"
+            },
+            {
+              "id": "mat-S19-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Resta de tres xifres sense portar-ne",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 20,
+          "etiqueta": "25–29 gen",
+          "tasques": [
+            {
+              "id": "mat-S20-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 43–44 (Unitat 4 – Les taules de l'1 i del 10)",
+              "completada": false,
+              "unitat": "Unitat 4",
+              "pagines": "43–44",
+              "tema": "Les taules de l'1 i del 10"
+            },
+            {
+              "id": "mat-S20-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Les taules de l'1 i del 10",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 21,
+          "etiqueta": "1–5 febr",
+          "tasques": [
+            {
+              "id": "mat-S21-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 45–47 (Unitat 5 – La resta portant-ne / desagrupant)",
+              "completada": false,
+              "unitat": "Unitat 5",
+              "pagines": "45–47",
+              "tema": "La resta portant-ne / desagrupant"
+            },
+            {
+              "id": "mat-S21-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La resta portant-ne (desagrupant)",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 22,
+          "etiqueta": "8–12 febr",
+          "tasques": [
+            {
+              "id": "mat-S22-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 48–50 (Unitat 5 – La resta abreujada; operacions)",
+              "completada": false,
+              "unitat": "Unitat 5",
+              "pagines": "48–50",
+              "tema": "La resta abreujada; operacions"
+            },
+            {
+              "id": "mat-S22-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La resta abreujada",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 23,
+          "etiqueta": "15–19 febr",
+          "tasques": [
+            {
+              "id": "mat-S23-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 51–52 (Unitat 5 – Operacions i problemes)",
+              "completada": false,
+              "unitat": "Unitat 5",
+              "pagines": "51–52",
+              "tema": "Operacions i problemes"
+            },
+            {
+              "id": "mat-S23-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Problemes de suma i resta portant-ne",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 24,
+          "etiqueta": "22–26 febr",
+          "tasques": [
+            {
+              "id": "mat-S24-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 53–55 (Unitat 6 – La multiplicació / taules del 6 i del 7)",
+              "completada": false,
+              "unitat": "Unitat 6",
+              "pagines": "53–55",
+              "tema": "La multiplicació / taules del 6 i del 7"
+            },
+            {
+              "id": "mat-S24-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Les taules del 6 i del 7",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 25,
+          "etiqueta": "1–5 març",
+          "tasques": [
+            {
+              "id": "mat-S25-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 56–57 (Unitat 6 – Les taules del 8 i del 9)",
+              "completada": false,
+              "unitat": "Unitat 6",
+              "pagines": "56–57",
+              "tema": "Les taules del 8 i del 9"
+            },
+            {
+              "id": "mat-S25-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Les taules del 8 i del 9",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 26,
+          "etiqueta": "8–12 març",
+          "tasques": [
+            {
+              "id": "mat-S26-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 58–60 (Unitat 6 – Operacions i problemes)",
+              "completada": false,
+              "unitat": "Unitat 6",
+              "pagines": "58–60",
+              "tema": "Operacions i problemes"
+            },
+            {
+              "id": "mat-S26-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Multiplicacions i problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 27,
+          "etiqueta": "15–19 març",
+          "tasques": [
+            {
+              "id": "mat-S27-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 61–62 (Unitat 6 – Problemes de sumar, restar i multiplicar + repàs 2n trim.)",
+              "completada": false,
+              "unitat": "Unitat 6",
+              "pagines": "61–62",
+              "tema": "Problemes de sumar, restar i multiplicar + repàs 2n trim."
+            },
+            {
+              "id": "mat-S27-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Problemes combinats",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 28,
+          "etiqueta": "30 març – 2 abr",
+          "tasques": [
+            {
+              "id": "mat-S28-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 63–65 (Unitat 7 – Geometria / Línies)",
+              "completada": false,
+              "unitat": "Unitat 7",
+              "pagines": "63–65",
+              "tema": "Geometria / Línies"
+            },
+            {
+              "id": "mat-S28-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Línies (rectes, corbes, obertes, tancades)",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 29,
+          "etiqueta": "5–9 abr",
+          "tasques": [
+            {
+              "id": "mat-S29-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 66–68 (Unitat 7 – Figures planes)",
+              "completada": false,
+              "unitat": "Unitat 7",
+              "pagines": "66–68",
+              "tema": "Figures planes"
+            },
+            {
+              "id": "mat-S29-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Figures planes (triangle, quadrat, rectangle, cercle)",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 30,
+          "etiqueta": "12–16 abr",
+          "tasques": [
+            {
+              "id": "mat-S30-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 69–71 (Unitat 7 – Simetries)",
+              "completada": false,
+              "unitat": "Unitat 7",
+              "pagines": "69–71",
+              "tema": "Simetries"
+            },
+            {
+              "id": "mat-S30-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Simetries",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 31,
+          "etiqueta": "19–23 abr",
+          "tasques": [
+            {
+              "id": "mat-S31-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 72–74 (Unitat 7 – Cossos geomètrics)",
+              "completada": false,
+              "unitat": "Unitat 7",
+              "pagines": "72–74",
+              "tema": "Cossos geomètrics"
+            },
+            {
+              "id": "mat-S31-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Cossos geomètrics (cub, esfera, cilindre, prisma)",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 32,
+          "etiqueta": "26–30 abr",
+          "tasques": [
+            {
+              "id": "mat-S32-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 75–78 (Unitat 8 – La meitat i la quarta part)",
+              "completada": false,
+              "unitat": "Unitat 8",
+              "pagines": "75–78",
+              "tema": "La meitat i la quarta part"
+            },
+            {
+              "id": "mat-S32-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: La meitat i la quarta part",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 33,
+          "etiqueta": "3–7 maig",
+          "tasques": [
+            {
+              "id": "mat-S33-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 79–82 (Unitat 8 – El rellotge)",
+              "completada": false,
+              "unitat": "Unitat 8",
+              "pagines": "79–82",
+              "tema": "El rellotge"
+            },
+            {
+              "id": "mat-S33-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Les hores i les mitges hores; el rellotge",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 34,
+          "etiqueta": "10–14 maig",
+          "tasques": [
+            {
+              "id": "mat-S34-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 83–86 (Unitat 8 – El calendari i les parts del dia)",
+              "completada": false,
+              "unitat": "Unitat 8",
+              "pagines": "83–86",
+              "tema": "El calendari i les parts del dia"
+            },
+            {
+              "id": "mat-S34-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: El calendari; les parts del dia",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 35,
+          "etiqueta": "17–21 maig",
+          "tasques": [
+            {
+              "id": "mat-S35-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 87–89 (Unitat 8 – Bitllets i cèntims d'euro; problemes)",
+              "completada": false,
+              "unitat": "Unitat 8",
+              "pagines": "87–89",
+              "tema": "Bitllets i cèntims d'euro; problemes"
+            },
+            {
+              "id": "mat-S35-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Diners; problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 36,
+          "etiqueta": "24–28 maig",
+          "tasques": [
+            {
+              "id": "mat-S36-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 90–92 (Unitat 8 – Taules, gràfics i pictogrames)",
+              "completada": false,
+              "unitat": "Unitat 8",
+              "pagines": "90–92",
+              "tema": "Taules, gràfics i pictogrames"
+            },
+            {
+              "id": "mat-S36-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Representació de dades",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 37,
+          "etiqueta": "31 maig – 4 juny",
+          "tasques": [
+            {
+              "id": "mat-S37-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 93–96 (Unitat 9 – Longitud: centímetre, metre i quilòmetre)",
+              "completada": false,
+              "unitat": "Unitat 9",
+              "pagines": "93–96",
+              "tema": "Longitud: centímetre, metre i quilòmetre"
+            },
+            {
+              "id": "mat-S37-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Mesures de longitud; problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 38,
+          "etiqueta": "7–11 juny",
+          "tasques": [
+            {
+              "id": "mat-S38-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 97–100 (Unitat 9 – Pes: quilogram, mig i quart de quilo)",
+              "completada": false,
+              "unitat": "Unitat 9",
+              "pagines": "97–100",
+              "tema": "Pes: quilogram, mig i quart de quilo"
+            },
+            {
+              "id": "mat-S38-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Mesures de pes; problemes",
+              "completada": false
+            }
+          ]
+        },
+        {
+          "setmana": 39,
+          "etiqueta": "14–18 juny",
+          "tasques": [
+            {
+              "id": "mat-S39-llibre",
+              "tipus": "llibre_mates",
+              "text": "Llibre Mates: pàg. 101–final (Unitat 9 – Capacitat: litre, mig i quart de litre + repàs de curs)",
+              "completada": false,
+              "unitat": "Unitat 9",
+              "pagines": "101–final",
+              "tema": "Capacitat: litre, mig i quart de litre + repàs de curs"
+            },
+            {
+              "id": "mat-S39-explicar",
+              "tipus": "explicar",
+              "text": "Explicar/treballar: Mesures de capacitat; problemes; repàs final",
+              "completada": false
+            }
+          ]
+        }
+      ]
+    },
+    "medi": {
+      "nom": "Coneixement del Medi",
+      "avis": "Per projectes propis. Finestres de dates = mapatge dels talls del document al calendari. Sessions de 'La ciutat' majoritàriament a concretar.",
+      "format": "projectes_sessions",
+      "sessions_per_setmana": 2,
+      "projectes": [
+        {
+          "nom": "El cos humà",
+          "trimestre": 1,
+          "finestra": {
+            "inici": "2026-09-08",
+            "final": "2026-12-18",
+            "referencia_document": "fins al desembre"
+          },
+          "plantejament": [
+            "Introduir el tema demanant què diferencia en Mel d'un nen → funcions vitals (relació, reproducció, nutrició).",
+            "Ensenyar les funcions de relació amb un vídeo un cop explicades, per afiançar."
+          ],
+          "sessions": [
+            {
+              "id": "medi-cos-01",
+              "activitat": "Funció de relació — els sentits",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-02",
+              "activitat": "La vista i il·lusions òptiques",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-03",
+              "activitat": "El gust",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-04",
+              "activitat": "El tacte + joc 'endevina la caixa'",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-05",
+              "activitat": "L'oïda + joc 'endevina els sorolls'",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-06",
+              "activitat": "L'olfacte + pots d'olors",
+              "sessions": 2,
+              "material": null
+            },
+            {
+              "id": "medi-cos-07",
+              "activitat": "Aparell respiratori",
+              "sessions": 2,
+              "material": "Vídeo: https://youtu.be/wB8dKyKW7Q0?si=stXSKvDK_y95M4-g"
+            },
+            {
+              "id": "medi-cos-08",
+              "activitat": "Aparell locomotor",
+              "sessions": 2,
+              "material": "Esquelet"
+            },
+            {
+              "id": "medi-cos-09",
+              "activitat": "Funció vital: nutrició — aparell digestiu",
+              "sessions": 4,
+              "material": null
+            },
+            {
+              "id": "medi-cos-10",
+              "activitat": "Xerrada de la infermera (alimentació)",
+              "sessions": 1,
+              "material": null,
+              "nota": "Sessions no especificades al document (posat 1)"
+            },
+            {
+              "id": "medi-cos-11",
+              "activitat": "Funció de reproducció — etapes de la vida",
+              "sessions": 1,
+              "material": null,
+              "nota": "desembre"
+            }
+          ]
+        },
+        {
+          "nom": "El pas del temps",
+          "trimestre": 2,
+          "finestra": {
+            "inici": "2027-01-08",
+            "final": "2027-03-19",
+            "referencia_document": "fins a Setmana Santa (final de març)"
+          },
+          "plantejament": [],
+          "sessions": [
+            {
+              "id": "medi-temps-01",
+              "activitat": "Arbre genealògic + línia del temps",
+              "sessions": 4,
+              "material": null
+            },
+            {
+              "id": "medi-temps-02",
+              "activitat": "Les famílies",
+              "sessions": 1,
+              "material": null
+            },
+            {
+              "id": "medi-temps-03",
+              "activitat": "L'escola en el passat",
+              "sessions": 1,
+              "material": null
+            },
+            {
+              "id": "medi-temps-04",
+              "activitat": "Gimcana Joan Mercader",
+              "sessions": 1,
+              "material": null
+            },
+            {
+              "id": "medi-temps-05",
+              "activitat": "El pas del temps dels objectes + exposició",
+              "sessions": 2,
+              "material": null
+            }
+          ]
+        },
+        {
+          "nom": "La ciutat",
+          "trimestre": 3,
+          "finestra": {
+            "inici": "2027-03-30",
+            "final": "2027-06-18",
+            "referencia_document": "fins a final de curs"
+          },
+          "plantejament": [],
+          "sessions": [
+            {
+              "id": "medi-ciutat-01",
+              "activitat": "Els transports",
+              "sessions": null,
+              "material": "Sortida a Catalunya en Miniatura",
+              "nota": "Sessions a concretar"
+            },
+            {
+              "id": "medi-ciutat-02",
+              "activitat": "El barri (comerç, carrer, poble/ciutat, tipus de cases) + excursió d'un dia",
+              "sessions": 2,
+              "material": "Excursió d'un dia",
+              "nota": "Excursió d'un dia + 2 sessions"
+            },
+            {
+              "id": "medi-ciutat-03",
+              "activitat": "Els paisatges: litoral, interior, muntanya; el curs d'un riu",
+              "sessions": null,
+              "material": null,
+              "nota": "Sessions a concretar"
+            },
+            {
+              "id": "medi-ciutat-04",
+              "activitat": "Àlbum de cromos (història de la ciutat, monuments i personatges)",
+              "sessions": null,
+              "material": null,
+              "nota": "Sessions a concretar"
+            },
+            {
+              "id": "medi-ciutat-05",
+              "activitat": "El reciclatge",
+              "sessions": null,
+              "material": "Agents Cívics / agents verds",
+              "nota": "Sessions a concretar"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

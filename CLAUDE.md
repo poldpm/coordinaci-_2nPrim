@@ -136,6 +136,28 @@ totes), festius ⛔ i sortides 📌, buides atenuades.
 Backend: casos `progSetCell` (camps condicionals, no s'esborren entre ells),
 `progSetDone`, `progSetSubject`.
 
+### Programació anual 2026-27 (sembra incrustada)
+Les dades reals de Català, Mates i Medi viuen a `dades/programacio_2n_2026-2027.json`
+(font de veritat) i s'incrusten a `index.html` com a constants generades:
+`PROG_SEED` (català/mates per dilluns), `PROG_MEDI_PROJ` (3 projectes),
+`PROG_REDUIDES` (S16/S17, **tal com ho marca el JSON**, no calculat).
+Regenerar: `node scripts/gen_prog_seed.js dades/programacio_2n_2026-2027.json <sortida>`
+i substituir el bloc a `index.html`.
+- **No hi ha botó d'importació.** `progItemsView(subject,key)` mostra els ítems desats i,
+  si no n'hi ha, la sembra. Quan algú toca un punt o un text, la cel·la es desa sencera
+  (**materialització mandrosa**). `progMaterializeSeed(subject)` es crida **abans** de
+  qualsevol reprogramació (carry/shift), si no la sembra reapareixeria a la setmana buidada.
+- **Ítem ampliat:** `{id, t, done{}, c}` + `PROG_ITEM_EXTRA` = `k`(tipus), `pag`, `llib`,
+  `doc`(dictat), `un`, `pgs`, `tema`, `p`(pendent), `s`(sessions), `mat`, `nota`.
+  L'`id` ve del JSON i és la clau estable → `progNormItem` els conserva i la vista setmanal
+  ja NO els perd (abans sí: bug arreglat).
+- `completada` del JSON → es mapa al model de l'app `done:{tutor:true}` (3 punts per tutor).
+- **Medi té dues vistes** (`MEDI_VIEW`): *Projectes* (per defecte, `renderMediProjectes`,
+  claus `proj-cos|proj-temps|proj-ciutat` dins `programacio.medi`) i *Setmanes* (la de sempre).
+  Les claus de projecte i les de dilluns conviuen; `progComputeShift` ja preserva les no-data.
+- **Pendents (no inventar res):** les 39 tasques `comunica` (sense pàgina) i les 4 activitats
+  de *La ciutat* amb `sessions:null` porten `p:1` → etiqueta "⏳ a concretar".
+
 ### Carpeta viatgera (dins Programació, pestanya "Carpeta viatgera")
 Deures quinzenals que es donen els **dimecres**. `CV_START='2026-09-16'`; es dona
 cada **14 dies** (`_cvGrid()`, salta vacances → **18 cicles**); es **recull** el
