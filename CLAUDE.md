@@ -167,6 +167,11 @@ nom estandarditzat.
   Backend: casos homònims (upsert idempotent per `id`); `deleteEntry` neteja els
   comentaris de l'entrada. ⚠️ Aquests casos són **NOUS a `doPost`** → cal **nou
   desplegament del Web App** (§11) perquè el frontend els vegi.
+  **Novetats a la portada:** cada comentari/resposta té `seenBy[]` (qui l'ha vist).
+  `novItems()` genera una targeta `kind:'comment'` per cada entrada amb comentaris
+  no vistos per ME (i no escrits per ME). Es marquen vistos en obrir el panell,
+  clicar la targeta o "Llegida" (`api.commentSeen(entryId)` → backend `commentSeen`,
+  unió idempotent per tutor). El botó lateral mostra un punt groc si n'hi ha de nous.
 - **Correus** (secció `correus`): gestor d'enviaments. Cada correu: **assumpte**,
   **cos**, **dia d'enviament** (opcional), i **3 botons "Enviat" per tutor**.
   Botó **copiar el cos** (envien per **Clickedu**, NO Gmail → no hi ha botó Gmail).

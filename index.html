@@ -568,7 +568,9 @@ textarea.input{resize:vertical;min-height:74px}
 .comment-btn:hover{color:var(--teal);border-color:var(--cyan);background:var(--panel-2)}
 .comment-btn.has{color:var(--teal);border-color:var(--cyan)}
 .comment-btn.on{color:#fff;background:var(--teal);border-color:var(--teal)}
+.comment-btn.unseen{color:var(--teal);border-color:var(--sun-deep);box-shadow:0 0 0 3px rgba(244,206,94,.28),var(--shadow-sm)}
 .comment-btn .icon{width:20px;height:20px}
+.comment-btn .cnew{position:absolute;top:-5px;left:-5px;width:11px;height:11px;border-radius:50%;background:var(--sun-deep);box-shadow:0 0 0 2px var(--panel)}
 .comment-btn .cbadge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;background:var(--sun-deep);
   color:#3a2c00;font-size:.7rem;font-weight:800;border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--panel)}
 .comment-panel{border:1.5px solid var(--line);border-radius:var(--r-lg);background:var(--panel-2);padding:12px;display:grid;gap:10px}
@@ -1293,6 +1295,14 @@ const api = {
     if(th && th.replies) th.replies = th.replies.filter(r=>r.id!==replyId);
     await persist('commentReplyDelete', {entryId, commentId, replyId});
   },
+  async commentSeen(entryId){
+    STATE.comments = STATE.comments || {};
+    (STATE.comments[entryId]||[]).forEach(t=>{
+      t.seenBy = t.seenBy || []; if(!t.seenBy.includes(ME)) t.seenBy.push(ME);
+      (t.replies||[]).forEach(r=>{ r.seenBy = r.seenBy || []; if(!r.seenBy.includes(ME)) r.seenBy.push(ME); });
+    });
+    await persist('commentSeen', {entryId, tutor:ME});
+  },
 };
 let DEMO_COMANDES = [
   {id:'demo-1', name:'2n Comanda material de octubre 2025', url:'#', date:'2025-10-06T09:00:00.000Z'},
@@ -1675,6 +1685,21 @@ function novItems(){
   STATE.tasks.forEach(t=>{ if(!(t.readBy||[]).includes(ME))
     out.push({kind:'task',ref:t,id:t.id,section:'tasques',title:t.title,snippet:t.desc,author:t.author,
       updatedAt:t.updatedAt||t.date,edited:isEdited(t)}); });
+  Object.keys(STATE.comments||{}).forEach(entryId=>{
+    const entry=STATE.entries.find(e=>e.id===entryId); if(!entry) return;
+    const units=[];
+    (STATE.comments[entryId]||[]).forEach(t=>{
+      if(t.author!==ME && !(t.seenBy||[]).includes(ME)) units.push({author:t.author,text:t.text,createdAt:t.createdAt});
+      (t.replies||[]).forEach(r=>{ if(r.author!==ME && !(r.seenBy||[]).includes(ME)) units.push({author:r.author,text:r.text,createdAt:r.createdAt}); });
+    });
+    if(!units.length) return;
+    units.sort((a,b)=> new Date(b.createdAt||0)-new Date(a.createdAt||0));
+    const latest=units[0];
+    out.push({kind:'comment',ref:entry,id:entry.id,section:entry.section,
+      title: entry.title || stripHtml(entry.body||'').slice(0,50),
+      snippet: latest.text, author: latest.author,
+      updatedAt: latest.createdAt || entry.updatedAt || entry.date, edited:false, count:units.length});
+  });
   out.sort((a,b)=> new Date(b.updatedAt)-new Date(a.updatedAt));
   return out;
 }
@@ -1760,8 +1785,8 @@ function renderNovetats(){
     const rem=list.length-1;
     const hint=el('div','deck-hint');
     hint.textContent = rem===1
-      ? 'Queda 1 entrada més per llegir!'
-      : `Queden ${rem} entrades més per llegir!`;
+      ? 'Queda 1 novetat més!'
+      : `Queden ${rem} novetats més!`;
     wrap.appendChild(hint);
   }
 }
@@ -1771,6 +1796,7 @@ function buildNovCard(nov){
   const tag=el('span','chip sec-tag'); tag.style.background=sec.color+'22'; tag.style.color=sec.color;
   let label = sec.name;
   if(nov.kind==='task') label='Tasca · '+sec.name;
+  else if(nov.kind==='comment'){ label='💬 Comentari · '+sec.name; if(nov.ref.subtheme){ const sub=STATE.subthemes.find(s=>s.id===nov.ref.subtheme); if(sub) label='💬 Comentari · '+sec.name+' · '+sub.name; } }
   else if(nov.ref.subtheme){ const sub=STATE.subthemes.find(s=>s.id===nov.ref.subtheme); if(sub) label=sec.name+' · '+sub.name; }
   tag.textContent=label;
   c.appendChild(tag);
@@ -1787,7 +1813,7 @@ function buildNovCard(nov){
   rb.onclick=(ev)=>{ ev.stopPropagation(); markNovRead(nov,c); };
   foot.appendChild(rb);
   c.appendChild(foot);
-  c.onclick=(ev)=>{ if(ev.target.closest('.read-btn'))return; openAndFlash(nov.id); };
+  c.onclick=(ev)=>{ if(ev.target.closest('.read-btn'))return; if(nov.kind==='comment'){ OPEN_COMMENTS.add(nov.id); api.commentSeen(nov.id); } openAndFlash(nov.id); };
   return c;
 }
 function markNovRead(nov,card){
@@ -1797,8 +1823,11 @@ function markNovRead(nov,card){
     {duration:340,easing:'cubic-bezier(.4,0,.2,1)'}
   );
   const done=async()=>{
-    nov.ref.readBy=[...(nov.ref.readBy||[]),ME];
-    if(nov.kind==='task') await api.updateTask(nov.ref); else await api.updateEntry(nov.ref);
+    if(nov.kind==='comment'){ await api.commentSeen(nov.id); }
+    else {
+      nov.ref.readBy=[...(nov.ref.readBy||[]),ME];
+      if(nov.kind==='task') await api.updateTask(nov.ref); else await api.updateEntry(nov.ref);
+    }
     renderNovetats(); renderBento();
   };
   anim.onfinish=done; anim.oncancel=done;
@@ -3565,6 +3594,12 @@ function entryCard(e,sec,subId){
 
 /* ---------- COMENTARIS (estil Google, dins l'app) ---------- */
 const CMT_ICON=`<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+/* Comentaris/respostes d'una entrada que ME encara no ha vist (i no ha escrit) */
+function entryHasUnseenComments(entryId){
+  return ((STATE.comments&&STATE.comments[entryId])||[]).some(t=>
+    (t.author!==ME && !(t.seenBy||[]).includes(ME)) ||
+    (t.replies||[]).some(r=> r.author!==ME && !(r.seenBy||[]).includes(ME)));
+}
 /* Fila = targeta d'entrada + botó de comentaris al costat (fora de la targeta) + panell desplegable. */
 function entryRow(e,sec,subId){
   const row=el('div','entry-row');
@@ -3576,10 +3611,15 @@ function entryRow(e,sec,subId){
   row.appendChild(main);
   const rail=el('div','comment-rail');
   const openCount=threads.filter(t=>!t.resolved).length;
-  const btn=el('button','comment-btn'+(open?' on':'')+(openCount?' has':''));
-  btn.title=open?'Amaga els comentaris':(openCount?openCount+' comentari(s)':'Comenta');
-  btn.innerHTML=CMT_ICON+(openCount?`<span class="cbadge">${openCount}</span>`:'');
-  btn.onclick=()=>{ if(OPEN_COMMENTS.has(e.id)) OPEN_COMMENTS.delete(e.id); else OPEN_COMMENTS.add(e.id); reopen(sec,subId); };
+  const unseen=entryHasUnseenComments(e.id);
+  const btn=el('button','comment-btn'+(open?' on':'')+(openCount?' has':'')+(unseen?' unseen':''));
+  btn.title=open?'Amaga els comentaris':(unseen?'Comentaris nous':(openCount?openCount+' comentari(s)':'Comenta'));
+  btn.innerHTML=CMT_ICON+(openCount?`<span class="cbadge">${openCount}</span>`:'')+(unseen?'<span class="cnew"></span>':'');
+  btn.onclick=()=>{
+    if(OPEN_COMMENTS.has(e.id)){ OPEN_COMMENTS.delete(e.id); }
+    else { OPEN_COMMENTS.add(e.id); if(entryHasUnseenComments(e.id)) api.commentSeen(e.id); }
+    reopen(sec,subId);
+  };
   rail.appendChild(btn);
   row.appendChild(rail);
   return row;
@@ -3644,8 +3684,8 @@ function threadComposer(e,sec,subId,thread){
   const go=el('button','cpost'); go.textContent=thread?'Respon':'Comenta';
   const send=async()=>{ const txt=ta.value.trim(); if(!txt){ ta.focus(); return; }
     const ts=nowISO(); OPEN_COMMENTS.add(e.id);
-    if(thread) await api.commentReply(e.id,thread.id,{id:uid(),author:ME,text:txt,createdAt:ts});
-    else await api.commentAdd(e.id,{id:uid(),author:ME,text:txt,createdAt:ts,resolved:false,replies:[]});
+    if(thread) await api.commentReply(e.id,thread.id,{id:uid(),author:ME,text:txt,createdAt:ts,seenBy:[ME]});
+    else await api.commentAdd(e.id,{id:uid(),author:ME,text:txt,createdAt:ts,resolved:false,replies:[],seenBy:[ME]});
     reopen(sec,subId);
   };
   go.onclick=send;
