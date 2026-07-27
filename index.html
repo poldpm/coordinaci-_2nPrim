@@ -876,6 +876,12 @@ textarea.input{resize:vertical;min-height:74px}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.25}
 .cal-chip:hover{filter:brightness(1.06)}
 .cal-more{font-weight:800;font-size:.66rem;color:var(--muted);padding-left:3px}
+.cal-hol-cell{background:#eef1f3;border-color:#dfe4e7}
+.cal-hol-cell .cal-num{color:#7c8a92}
+.cal-hol{background:#9aa6ad;color:#fff;font-weight:800;font-size:.66rem;text-align:left;padding:.22em .4em;border-radius:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+.cal-tarda-cell{background:#f6f4ef}
+.cal-hol.tarda{background:#e4ded2;color:#6a5f45}
 @media(max-width:620px){
   .cal-cell{min-height:70px;border-radius:9px;padding:4px}
   .cal-grid{gap:4px}
@@ -3917,7 +3923,19 @@ function renderAgenda(S,sec){
 function calLegend(){
   const wrap=el('div','cal-legend');
   GROUPS.forEach(g=>{ const it=el('span','leg-item'); it.innerHTML=`<span class="leg-dot" style="background:${g.color}"></span>${g.name}`; wrap.appendChild(it); });
+  const fest=el('span','leg-item'); fest.innerHTML=`<span class="leg-dot" style="background:#9aa6ad"></span>Festiu / vacances`; wrap.appendChild(fest);
   return wrap;
+}
+/* Festius escolars (derivats de les constants de Programació, NO es desen al full):
+   festiu oficial, lliure disposició, festa local, vacances (rang) i tarda no lectiva. */
+function schoolDayInfo(iso){
+  if(typeof PROG_VACANCES!=='undefined'){ const v=PROG_VACANCES.find(x=> iso>=x.from && iso<=x.to); if(v) return {t:'vac', name:v.name}; }
+  if(typeof PROG_FESTIUS!=='undefined'){ const f=PROG_FESTIUS.find(x=>x.date===iso);
+    if(f){ if(f.kind==='lliure') return {t:'lliure', name:'Lliure disposició'};
+      if(f.kind==='local') return {t:'local', name:f.name};
+      return {t:'festiu', name:f.name}; } }
+  if(typeof PROG_TARDES!=='undefined'){ const tr=PROG_TARDES.find(x=>x.date===iso); if(tr) return {t:'tarda', name:tr.name}; }
+  return null;
 }
 function renderAgendaList(S,sec){
   const feed=el('div','feed');
@@ -3954,8 +3972,13 @@ function renderMonthGrid(S,sec){
   const events=STATE.entries.filter(e=>e.section==='calendari'&&e.eventDate);
   for(let day=1;day<=dim;day++){
     const dstr=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const cell=el('div','cal-cell'+(dstr===todayStr?' today':''));
+    const hol=schoolDayInfo(dstr);
+    const cell=el('div','cal-cell'+(dstr===todayStr?' today':'')+(hol?(hol.t==='tarda'?' cal-tarda-cell':' cal-hol-cell'):''));
     const num=el('div','cal-num'); num.textContent=day; cell.appendChild(num);
+    if(hol){ const hc=el('div','cal-hol'+(hol.t==='tarda'?' tarda':''));
+      hc.textContent=(hol.t==='tarda'?'🌓 ':'')+hol.name+(hol.t==='tarda'?' (tarda)':'');
+      hc.title=hol.t==='festiu'?('Festiu · '+hol.name):hol.name;
+      cell.appendChild(hc); }
     const evs=events.filter(e=>e.eventDate===dstr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
     evs.slice(0,3).forEach(ev=>{
       const chip=el('button','cal-chip'); chip.style.background=groupById(ev.group).color;
