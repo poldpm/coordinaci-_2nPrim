@@ -320,6 +320,8 @@ a{color:var(--teal)}
 /* --- Programació anual: etiquetes de tipus, sessions i pendents --- */
 .prog-red{display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px}
 .pr-tag{display:inline-flex;align-items:center;gap:5px;background:#fff4e0;color:#a4680d;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
+.prog-tarda{display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px}
+.ptl-tag{display:inline-flex;align-items:center;gap:5px;background:#eef0f5;color:#55607a;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
 .pit-k{flex:none;background:color-mix(in srgb, var(--c) 14%, #fff);color:var(--c);border:1px solid color-mix(in srgb, var(--c) 32%, #fff);
   font-weight:800;font-size:.68rem;letter-spacing:.02em;padding:.2em .5em;border-radius:7px;white-space:nowrap}
 .pit-s{flex:none;background:#eef3f6;color:#4a6b78;font-weight:800;font-size:.68rem;padding:.2em .5em;border-radius:7px;white-space:nowrap}
@@ -1977,8 +1979,13 @@ const PROG_FESTIUS=[
   {date:'2027-05-17', name:'Festa local de Vic', kind:'local'},
 ];
 const PROG_VACANCES=[
-  {from:'2026-12-23', to:'2027-01-07', name:'Vacances de Nadal'},
-  {from:'2027-03-22', to:'2027-03-29', name:'Setmana Santa'},
+  {from:'2026-12-22', to:'2027-01-06', name:'Vacances de Nadal'},   // torn el 7 gen (calendari oficial)
+  {from:'2027-03-22', to:'2027-03-29', name:'Setmana Santa'},        // Div. Sant 26 + Dl. Pasqua 29; torn el 30
+];
+/* Tardes no lectives (mig dia) — calendari oficial Vic 2026-27 */
+const PROG_TARDES=[
+  {date:'2027-03-19', name:'Mercat del Ram'},
+  {date:'2027-06-21', name:'Últim dia de curs'},
 ];
 /* Sortides i activitats (curs 2026-27) */
 const PROG_ACTIVITATS=[
@@ -2052,6 +2059,19 @@ function progWeekWarn(w){ const parts=[];
     else parts.push('\u26d4 Festiu \u00b7 '+f.name);
   });
   return parts;
+}
+/* Tardes no lectives (mig dia) que cauen en aquesta setmana; l'\u00faltim dia de curs
+   (fora de la graella de setmanes) s'ensenya a la darrera setmana lectiva. */
+function progWeekTardes(w){
+  if(typeof PROG_TARDES==='undefined') return [];
+  const mon=w.mondayDate, fri=new Date(mon); fri.setDate(fri.getDate()+4);
+  const lastN=progTeachingMondays().length;
+  const out=[];
+  PROG_TARDES.forEach(t=>{ const d=progIsoToDate(t.date);
+    if((d>=mon && d<=fri) || (d>progIsoToDate(COURSE_END) && w.teachingN===lastN))
+      out.push(t.name+' \u00b7 '+d.getDate()+' '+PROG_MESU[d.getMonth()]);
+  });
+  return out;
 }
 function progCurrentIdx(){
   const tISO=progDateToISO(progMondayOf(new Date()));
@@ -2417,11 +2437,13 @@ function renderProgramacio(S, sec){
   const warn=progWeekWarn(w);
   if(warn.length){ const wb=el('div','prog-fest'); wb.innerHTML=warn.map(x=>'<span class="pf-tag">'+esc(x)+'</span>').join(''); card.appendChild(wb); }
   if(typeof PROG_REDUIDES!=='undefined' && PROG_REDUIDES[w.monday]!=null){
-    const d=PROG_REDUIDES[w.monday]; const rb=el('div','prog-red');
+    const d=Math.max(0, 5-(w.vacDays||0)-((w.festius&&w.festius.length)||0)); const rb=el('div','prog-red');
     rb.innerHTML='<span class="pr-tag">\u2702\uFE0F Setmana redu\u00EFda \u00B7 '+d+(d===1?' dia lectiu':' dies lectius')+'</span>';
     card.appendChild(rb);
   }
   if(w.activitats && w.activitats.length){ const ab=el('div','prog-act'); ab.innerHTML=w.activitats.map(x=>'<span class="pa-tag">\uD83D\uDCCC '+esc(x)+'</span>').join(''); card.appendChild(ab); }
+  const tardes=progWeekTardes(w);
+  if(tardes.length){ const tb=el('div','prog-tarda'); tb.innerHTML=tardes.map(x=>'<span class="ptl-tag">\uD83C\uDF13 Tarda no lectiva \u00B7 '+esc(x)+'</span>').join(''); card.appendChild(tb); }
 
   const plaWrap=el('div','prog-field'); plaWrap.innerHTML='<label>Qu\u00e8 s\u2019ha de fer aquesta setmana</label>';
   const listEl=el('div','prog-items'); plaWrap.appendChild(listEl); card.appendChild(plaWrap);

@@ -117,9 +117,14 @@ Secció `programacio`. Assignatures a `PROG_SUBJECTS`: **mates** `#2D9CDB`,
   local** (17 maig). `progWeekWarn(w)` etiqueta cada dia amb el seu emoji (⛔ festiu /
   🎈 lliure disposició / 📍 festa local) i el text ja porta l'emoji (els renderitzadors
   no n'afegeixen cap). Són dies solts → **no canvien** el nombre de setmanes (segueixen 39).
-- **Vacances** (`PROG_VACANCES`): Nadal 23 des→7 gen, Setmana Santa 22→29 març.
-  Les setmanes 100% vacances no compten i no porten número lectiu → surten **39
-  setmanes lectives**.
+- **Vacances** (`PROG_VACANCES`, calendari OFICIAL): Nadal **22 des→6 gen** (torn el 7),
+  Setmana Santa 22→29 març (torn el 30). Les setmanes 100% vacances no compten → **39
+  setmanes lectives**. L'etiqueta "✂️ Setmana reduïda" (a `PROG_REDUIDES`, S16/S17)
+  mostra els dies lectius **calculats del calendari** (`5-vacDays-festius`), no un número fix:
+  S16=1 dia (dl 21), S17=2 dies (torn el 7 gen).
+- **Tardes no lectives** (`PROG_TARDES`, mig dia, NO treuen dia lectiu): Mercat del Ram
+  19 març (S27) i últim dia de curs 21 juny (s'ensenya a S39, fora de la graella).
+  `progWeekTardes(w)` → etiqueta 🌓.
 - **Sortides** (`PROG_ACTIVITATS`): Colònies, Teatre anglès, Sentits, Agents
   cívics, RobotiC, MEV, Laboratori Lectura, Catalunya Miniatura (FLIC/pessebres/
   natació EXCLOSOS). Es mostren com a etiqueta 📌 a la seva setmana.
@@ -260,11 +265,11 @@ reinstal·lar la PWA per veure els canvis.
 ## 13. Pendent / futur (idees ja parlades)
 - **Drive per a la carpeta viatgera:** auto-llistar/crear els Google Docs de cada
   cicle (com Comandes).
-- **Calendari de l'escola:** ✅ FET — lliure disposició de Vic i festa local ja
-  són a `PROG_FESTIUS` (§8). Pendents del calendari oficial, per si es volen afegir:
-  Nadal comença **22 des** (l'app té 23), últim dia de curs **21 juny** (l'app 18),
-  i les **tardes no lectives** (19 març Mercat del Ram, 21 juny). Confirmar la lletra
-  de classe (2nA/B/C).
+- **Calendari de l'escola:** ✅ FET del tot segons el calendari OFICIAL 2026-27
+  (lliure disposició, festa local, Nadal 22 des→7 gen, tardes no lectives 19 març i
+  21 juny). El curs segueix acabant el **18 juny** a la programació (39 setmanes); el
+  21 juny és l'últim dia administratiu (tarda no lectiva), es mostra com a nota a S39,
+  no com a 40a setmana. Pendent: confirmar la lletra de classe (2nA/B/C).
 - **Omplir la programació** amb els continguts reals quan es tinguin.
 - (Opcional) fer el "fet" de tasques granular per eliminar el xoc rar de §7.
 
