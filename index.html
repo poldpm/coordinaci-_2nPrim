@@ -1967,6 +1967,14 @@ const PROG_FESTIUS=[
   {date:'2026-09-11', name:'Diada de Catalunya'},
   {date:'2026-10-12', name:'Festa Nacional'},
   {date:'2026-12-08', name:'La Immaculada'},
+  // Dies de lliure disposició (calendari oficial Vedruna Escorial Vic 2026-27)
+  {date:'2026-11-02', name:'Lliure disposició', kind:'lliure'},
+  {date:'2026-12-07', name:'Lliure disposició', kind:'lliure'},
+  {date:'2027-02-08', name:'Lliure disposició', kind:'lliure'},
+  {date:'2027-04-30', name:'Lliure disposició', kind:'lliure'},
+  {date:'2027-05-14', name:'Lliure disposició', kind:'lliure'},
+  // Festa local de Vic
+  {date:'2027-05-17', name:'Festa local de Vic', kind:'local'},
 ];
 const PROG_VACANCES=[
   {from:'2026-12-23', to:'2027-01-07', name:'Vacances de Nadal'},
@@ -2037,8 +2045,12 @@ function progWeekLabel(w){ const m=w.mondayDate, f=w.friday;
 }
 function progWeekTitle(w){ return w.isVac ? w.vacName : ('Setmana '+w.teachingN); }
 function progWeekWarn(w){ const parts=[];
-  if(w.vacDays>0 && !w.isVac && w.vacName) parts.push(w.vacName+' (uns dies)');
-  w.festius.forEach(f=>parts.push('Festiu \u00b7 '+f.name));
+  if(w.vacDays>0 && !w.isVac && w.vacName) parts.push('\ud83c\udfd6\ufe0f '+w.vacName+' (uns dies)');
+  w.festius.forEach(f=>{
+    if(f.kind==='lliure') parts.push('\ud83c\udf88 Lliure disposici\u00f3');
+    else if(f.kind==='local') parts.push('\ud83d\udccd '+(f.name||'Festa local'));
+    else parts.push('\u26d4 Festiu \u00b7 '+f.name);
+  });
   return parts;
 }
 function progCurrentIdx(){
@@ -2403,7 +2415,7 @@ function renderProgramacio(S, sec){
   cap.innerHTML='<b>Setmana '+w.teachingN+'</b><span>'+progWeekLabel(w)+(PROG_WEEK_IDX===curIdx?' \u00b7 aquesta setmana':'')+'</span>';
   card.appendChild(cap);
   const warn=progWeekWarn(w);
-  if(warn.length){ const wb=el('div','prog-fest'); wb.innerHTML=warn.map(x=>'<span class="pf-tag">\u26D4 '+esc(x)+'</span>').join(''); card.appendChild(wb); }
+  if(warn.length){ const wb=el('div','prog-fest'); wb.innerHTML=warn.map(x=>'<span class="pf-tag">'+esc(x)+'</span>').join(''); card.appendChild(wb); }
   if(typeof PROG_REDUIDES!=='undefined' && PROG_REDUIDES[w.monday]!=null){
     const d=PROG_REDUIDES[w.monday]; const rb=el('div','prog-red');
     rb.innerHTML='<span class="pr-tag">\u2702\uFE0F Setmana redu\u00EFda \u00B7 '+d+(d===1?' dia lectiu':' dies lectius')+'</span>';
