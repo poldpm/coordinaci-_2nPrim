@@ -43,9 +43,10 @@ Config al principi de `index.html` (objecte `CONFIG`):
 ## 4. Fitxers del repositori
 ```
 index.html               ← tot el frontend (l'app)
+sw.js                    ← service worker (cau: HTML xarxa-primer, assets cau-primer). Va a GitHub.
 manifest.webmanifest     ← PWA
 .nojekyll                ← perquè GitHub Pages no "processi" res
-img/                     ← favicons + icones (3 pals / 3 franges)
+img/                     ← favicons + icones (3 pals) + logo.webp (hero, extern, ~182 KB)
 Codi_AppsScript.gs       ← BACKEND. NO va MAI a GitHub (veure §10). Local + Apps Script.
 CLAUDE.md                ← aquest fitxer
 .gitignore               ← exclou Codi_AppsScript.gs de git
@@ -229,9 +230,10 @@ Al final de `Codi_AppsScript.gs`. **Res d'això surt a la web ni a GitHub.**
 
 ## 11. Desplegament (IMPORTANT)
 Dos destins separats:
-1. **Web → GitHub Pages:** pujar NOMÉS `index.html`, `manifest.webmanifest`,
+1. **Web → GitHub Pages:** pujar `index.html`, `sw.js`, `manifest.webmanifest`,
    `.nojekyll` i `img/`. **MAI `Codi_AppsScript.gs`.** GitHub Pages: *Deploy from
-   a branch* → `main` / root.
+   a branch* → `main` / root. ⚠️ Si canvies imatges/assets de `sw.js`, apuja la
+   versió de `CACHE` (`coord-2n-v1`→v2) perquè els clients agafin els nous.
 2. **Backend → Apps Script:** enganxar `Codi_AppsScript.gs` a l'editor.
    - Si has canviat **accions de `doPost`** (casos del `switch`) → cal **NOU
      desplegament del Web App** (Implementar → Gestionar implementacions → versió
