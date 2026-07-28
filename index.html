@@ -362,6 +362,9 @@ a{color:var(--teal)}
 .rept-reg.curs{background:#fffdf3}
 .rept-reg-nom{font-weight:800;color:var(--teal-ink);flex:1;min-width:0}
 .rept-reg-est{font-weight:700;font-size:.8rem;color:var(--muted)}
+.rept-reg-toggle{border:1.5px solid var(--line);background:var(--panel);border-radius:8px;padding:.25em .55em;cursor:pointer}
+.rept-reg-toggle:hover{background:var(--panel-2);color:var(--teal)}
+.rept-reg.curs .rept-reg-toggle{border-color:#f0e2b0;color:#a4680d}
 .rept-reg-val{background:color-mix(in srgb,var(--c) 16%,#fff);color:var(--c);font-weight:800;font-size:.72rem;padding:.2em .5em;border-radius:7px}
 .rept-reg-by{font-size:.74rem;color:var(--muted);font-weight:700}
 /* per alumne */
@@ -1843,8 +1846,28 @@ function renderDash(){
   const a=buildMyTasksPanel(); if(a) cols.appendChild(a);
   const cr=buildCorreusPanel(); if(cr) cols.appendChild(cr);
   const cv=buildCarpetaPanel(); if(cv) cols.appendChild(cv);
+  const rp=buildReptesPanel(); if(rp) cols.appendChild(rp);
   const w=buildWeekPanel(); if(w) cols.appendChild(w);
   $('#dashBlock').style.display = cols.children.length ? '' : 'none';
+}
+/* Avís de portada: caixes de reptes amb poques còpies */
+function buildReptesPanel(){
+  if(typeof REPTES==='undefined' || !REPTES.caixes) return null;
+  const low=REPTES.caixes.filter(c=>reptQueden(c)<=(c.low||3)).sort((a,b)=>reptQueden(a)-reptQueden(b));
+  if(!low.length) return null;
+  const card=el('div','hpanel');
+  const head=el('div','hpanel-head');
+  head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg><h3>Reptes: còpies per acabar</h3><span class="hpanel-count">'+low.length+'</span>';
+  card.appendChild(head);
+  low.forEach(c=>{
+    const q=reptQueden(c);
+    const row=el('div','hrow');
+    const title=el('div','htitle'); title.textContent=c.nom; row.appendChild(title);
+    const st=el('span','hstatus'); st.style.background=(q===0?'var(--cristina)':'#EE9B4C'); st.textContent=(q===0?'sense còpies':q+' còpies'); row.appendChild(st);
+    row.onclick=()=>{ PENDING_EINA='reptes'; REPTES_CAIXA=c.id; openSection('eines'); };
+    card.appendChild(row);
+  });
+  return card;
 }
 function renderNovetats(){
   const wrap=$('#novetats'); wrap.innerHTML='';
@@ -3345,17 +3368,12 @@ function reptCaixaCard(c){
   const meta=el('div','rept-card-meta');
   meta.innerHTML='<span>✅ '+reptFetsDe(c.id)+' fets</span>'+(c.eval?'<span>· ⭐ amb valoració</span>':'')+(low?'<span class="rept-lowtag">⚠️ s’estan acabant</span>':'');
   card.appendChild(meta);
-  // enllaç NFC
-  const link=el('div','rept-link'); const code=el('code'); code.textContent=reptUrl(c.id); link.appendChild(code);
-  const cp=el('button','rept-copy'); cp.type='button'; cp.textContent='📋 Copia l’enllaç NFC';
-  cp.onclick=()=>{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(reptUrl(c.id)).then(()=>toast('Enllaç copiat! Grava’l a l’etiqueta NFC')).catch(()=>{}); } };
-  link.appendChild(cp); card.appendChild(link);
   // accions
   const acts=el('div','rept-acts');
   const open=el('button','btn btn-primary'); open.type='button'; open.innerHTML='▶ Obre (com si escanegessis)';
   open.onclick=()=>{ REPTES_CAIXA=c.id; openSection('eines'); }; acts.appendChild(open);
   const restock=el('button','btn btn-ghost'); restock.type='button'; restock.textContent='＋ Còpies';
-  restock.onclick=()=>askPrompt({title:'Afegir còpies impreses',label:'Quantes còpies has afegit a «'+c.nom+'»?',placeholder:'Ex.: 15',value:'15'},(v)=>{ const n=parseInt(v,10); if(!n||n<1) return false; reptRestock(c.id,n); openSection('eines'); toast('+'+n+' còpies · ara en queden '+reptQueden(reptCaixa(c.id))); });
+  restock.onclick=()=>askPrompt({title:'Afegir còpies impreses',label:'Quantes còpies has afegit a «'+c.nom+'»?',placeholder:'Nombre de còpies…',value:''},(v)=>{ const n=parseInt(v,10); if(!n||n<1) return false; reptRestock(c.id,n); openSection('eines'); toast('+'+n+' còpies · ara en queden '+reptQueden(reptCaixa(c.id))); });
   acts.appendChild(restock);
   const ed=el('button','rept-icona'); ed.type='button'; ed.title='Edita'; ed.innerHTML='✏️'; ed.onclick=()=>{ REPTES_ADD=c.id; openSection('eines'); }; acts.appendChild(ed);
   const del=el('button','rept-icona'); del.type='button'; del.title='Esborra'; del.innerHTML='🗑️';
@@ -3424,7 +3442,11 @@ function renderReptesScan(S,c){
 function reptRegRow(r,c){
   const row=el('div','rept-reg'+(r.estat==='curs'?' curs':''));
   const nm=el('span','rept-reg-nom'); nm.textContent=r.alumne; row.appendChild(nm);
-  const est=el('span','rept-reg-est'); est.textContent=r.estat==='fet'?'✓ Fet':'🕒 En curs'; row.appendChild(est);
+  const est=el('button','rept-reg-est rept-reg-toggle'); est.type='button';
+  est.textContent=r.estat==='fet'?'✓ Fet':'🕒 En curs → marca fet';
+  est.title=r.estat==='fet'?'Torna-ho a “en curs”':'Marca com a fet';
+  est.onclick=()=>{ r.estat=(r.estat==='fet'?'curs':'fet'); r.by=ME; r.at=nowISO(); reptesSave(); REPTES_CAIXA=c?c.id:REPTES_CAIXA; openSection('eines'); toast(r.alumne+' · '+(r.estat==='fet'?'fet ✓':'en curs')); };
+  row.appendChild(est);
   if(r.val){ const v=REPT_VALORS.find(x=>x.id===r.val); if(v){ const vb=el('span','rept-reg-val'); vb.style.setProperty('--c',v.c); vb.textContent=v.t; row.appendChild(vb); } }
   const by=el('span','rept-reg-by'); by.textContent=(userById(r.by)||{}).name||''; row.appendChild(by);
   const del=el('button','rept-icona'); del.type='button'; del.innerHTML='×'; del.title='Treu';
