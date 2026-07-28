@@ -3594,17 +3594,22 @@ function renderReptesEvol(S){
   const low=REPTES.caixes.filter(c=>reptQueden(c)<=(c.low||3)).sort((a,b)=>reptQueden(a)-reptQueden(b));
   if(low.length){ const h=el('div','rept-recent-h'); h.textContent='⚠️ Caixes que s’estan acabant'; S.appendChild(h);
     const list=el('div','rept-recent'); low.forEach(c=>{ const row=el('div','rept-reg'); row.innerHTML='<span class="rept-reg-nom">'+esc(c.nom)+'</span><span class="rept-lowtag">'+reptQueden(c)+' còpies</span>'; list.appendChild(row); }); S.appendChild(list); }
-  // progrés per caixa
+  // progrés per caixa, classificat per matèria
   const h2=el('div','rept-recent-h'); h2.textContent='Reptes fets per caixa'; S.appendChild(h2);
-  const list=el('div','rept-bars');
-  REPTES.caixes.slice().sort((a,b)=>reptFetsDe(b.id)-reptFetsDe(a.id)).forEach(c=>{
-    const fets=reptFetsDe(c.id); const pct=alumnes?Math.round(fets/alumnes*100):0;
-    const row=el('div','rept-bar'); row.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
-    const rbNom=(c.tema?('T'+c.tema+' · '):'')+esc(c.nom)+(c.nivell?' <span class="rept-stars">'+reptStars(c.nivell)+'</span>':'');
-    row.innerHTML='<div class="rb-nom">'+rbNom+'</div><div class="rb-track"><span style="width:'+Math.min(100,pct)+'%"></span></div><div class="rb-n">'+fets+'</div>';
-    list.appendChild(row);
+  ['mat','catala'].forEach(mat=>{
+    const caixes=REPTES.caixes.filter(c=>c.materia===mat).sort((a,b)=>(a.tema||0)-(b.tema||0)||(a.nivell||0)-(b.nivell||0));
+    if(!caixes.length) return;
+    const mh=el('div','rept-mathead'); mh.appendChild(reptMatBadge(mat)); S.appendChild(mh);
+    const list=el('div','rept-bars');
+    caixes.forEach(c=>{
+      const fets=reptFetsDe(c.id); const pct=alumnes?Math.round(fets/alumnes*100):0;
+      const row=el('div','rept-bar'); row.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
+      const rbNom=(c.tema?('T'+c.tema+' · '):'')+esc(c.nom)+(c.nivell?' <span class="rept-stars">'+reptStars(c.nivell)+'</span>':'');
+      row.innerHTML='<div class="rb-nom">'+rbNom+'</div><div class="rb-track"><span style="width:'+Math.min(100,pct)+'%"></span></div><div class="rb-n">'+fets+'</div>';
+      list.appendChild(row);
+    });
+    S.appendChild(list);
   });
-  S.appendChild(list);
 }
 function pickTutorClass(classes){
   const want=TUTOR_CLASS[ME];
