@@ -3600,7 +3600,8 @@ function renderReptesEvol(S){
   REPTES.caixes.slice().sort((a,b)=>reptFetsDe(b.id)-reptFetsDe(a.id)).forEach(c=>{
     const fets=reptFetsDe(c.id); const pct=alumnes?Math.round(fets/alumnes*100):0;
     const row=el('div','rept-bar'); row.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
-    row.innerHTML='<div class="rb-nom">'+esc(c.nom)+'</div><div class="rb-track"><span style="width:'+Math.min(100,pct)+'%"></span></div><div class="rb-n">'+fets+'</div>';
+    const rbNom=(c.tema?('T'+c.tema+' · '):'')+esc(c.nom)+(c.nivell?' <span class="rept-stars">'+reptStars(c.nivell)+'</span>':'');
+    row.innerHTML='<div class="rb-nom">'+rbNom+'</div><div class="rb-track"><span style="width:'+Math.min(100,pct)+'%"></span></div><div class="rb-n">'+fets+'</div>';
     list.appendChild(row);
   });
   S.appendChild(list);
