@@ -4,17 +4,23 @@
 const fs = require('fs');
 const BASE = 'https://poldpm.github.io/coordinaci-_2nPrim/?repte=';
 const html = fs.readFileSync('index.html', 'utf8');
-const m = html.match(/const REPTES_SEED\s*=\s*(\[[\s\S]*?\]);/);
-if (!m) { console.error('No he trobat REPTES_SEED a index.html'); process.exit(1); }
-// eslint-disable-next-line no-eval
-const caixes = eval(m[1]);
+const idFn = (html.match(/function reptCaixaId\s*\([^)]*\)\s*\{[\s\S]*?\}/) || [])[0] || '';
+const seedM = html.match(/const REPTES_SEED\s*=\s*(\(function[\s\S]*?\}\)\(\));/);
+if (!seedM) { console.error('No he trobat REPTES_SEED a index.html'); process.exit(1); }
+// eslint-disable-next-line no-new-func
+const caixes = new Function(idFn + '\n return ' + seedM[1] + ';')();
 const MAT = { mat: 'Matemàtiques', catala: 'Català' };
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const rows = caixes.map((c, i) => `
+const stars = n => '★'.repeat(Math.max(1, Math.min(3, n || 1)));
+const ordered = caixes.slice().sort((a, b) =>
+  (a.materia || '').localeCompare(b.materia || '') || (a.tema || 0) - (b.tema || 0) || (a.nivell || 0) - (b.nivell || 0));
+const rows = ordered.map((c, i) => `
     <tr>
       <td class="n">${i + 1}</td>
-      <td>${esc(c.nom)}</td>
       <td class="m">${MAT[c.materia] || c.materia}</td>
+      <td>${c.tema ? 'Tema ' + c.tema : ''}</td>
+      <td>${esc(c.nom)}</td>
+      <td class="lv">${c.nivell ? stars(c.nivell) : ''}</td>
       <td class="u"><code>${BASE}${encodeURIComponent(c.id)}</code></td>
     </tr>`).join('');
 const out = `<!doctype html><html lang="ca"><head><meta charset="utf-8">
@@ -29,13 +35,14 @@ const out = `<!doctype html><html lang="ca"><head><meta charset="utf-8">
   td.n{width:2em;text-align:center;color:#5E8494;font-weight:700}
   td.m{width:8em}
   td.u code{font-size:12px;word-break:break-all}
+  td.lv{color:#F2994A;white-space:nowrap;font-size:15px}
   .note{margin-top:18px;background:#fff7e6;border:1px solid #f0dfb0;color:#8a6d1f;padding:10px 12px;border-radius:8px;font-size:13px}
   @media print{.note{border:1px solid #ccc}}
 </style></head><body>
   <h1>🎯 El racó dels reptes — enllaços NFC</h1>
   <p class="sub">Grava cada enllaç a l'etiqueta NFC de la caixa corresponent (com a URL/Link, amb una app tipus «NFC Tools»). Tocar la caixa amb el mòbil obrirà la seva pantalla a l'app.</p>
   <table>
-    <thead><tr><th>#</th><th>Caixa</th><th>Matèria</th><th>Enllaç per a l'etiqueta NFC</th></tr></thead>
+    <thead><tr><th>#</th><th>Matèria</th><th>Tema</th><th>Caixa</th><th>Nivell</th><th>Enllaç per a l'etiqueta NFC</th></tr></thead>
     <tbody>${rows}
     </tbody>
   </table>
