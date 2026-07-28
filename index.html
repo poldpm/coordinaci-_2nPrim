@@ -3501,17 +3501,20 @@ function renderReptesAlumne(S){
 function renderReptesAlumneDetail(S){
   const back=el('button','prog-jump'); back.type='button'; back.innerHTML='‹ Tots els alumnes'; back.onclick=()=>{ REPTES_ALUMNE=null; openSection('eines'); }; S.appendChild(back);
   const h0=el('div','rept-recent-h'); h0.textContent=REPTES_ALUMNE; S.appendChild(h0);
+  let mostrades=0;
   ['mat','catala'].forEach(mat=>{
-    const caixes=REPTES.caixes.filter(c=>c.materia===mat).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+    // només les caixes que ha tocat (fetes o en curs); les que no ha fet, no es mostren
+    const caixes=REPTES.caixes.filter(c=>c.materia===mat && reptRegDe(c.id,REPTES_ALUMNE)).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
     if(!caixes.length) return;
     const h=el('div','rept-mathead'); h.appendChild(reptMatBadge(mat)); S.appendChild(h);
     const grid=el('div','rept-alu-grid');
-    caixes.forEach(c=>{ const r=reptRegDe(c.id,REPTES_ALUMNE);
-      const cell=el('div','rept-alu'+(r?(r.estat==='fet'?' fet':' curs'):' res'));
-      cell.innerHTML='<span class="ra-ico">'+(r?(r.estat==='fet'?'✓':'🕒'):'·')+'</span><span class="ra-nom">'+esc(c.nom)+'</span>'+(r&&r.val?('<span class="ra-val">'+((REPT_VALORS.find(x=>x.id===r.val)||{}).t||'')+'</span>'):'');
+    caixes.forEach(c=>{ const r=reptRegDe(c.id,REPTES_ALUMNE); mostrades++;
+      const cell=el('div','rept-alu'+(r.estat==='fet'?' fet':' curs'));
+      cell.innerHTML='<span class="ra-ico">'+(r.estat==='fet'?'✓':'🕒')+'</span><span class="ra-nom">'+esc(c.nom)+'</span>'+(r.val?('<span class="ra-val">'+((REPT_VALORS.find(x=>x.id===r.val)||{}).t||'')+'</span>'):'');
       grid.appendChild(cell); });
     S.appendChild(grid);
   });
+  if(!mostrades){ const em=el('div','rept-hint'); em.textContent='Encara no ha fet cap caixa.'; S.appendChild(em); }
   const fets=reptFetsAlumne(REPTES_ALUMNE); const tot=REPTES.caixes.length;
   const sum=el('div','rept-alu-sum'); sum.innerHTML='<b>'+fets+'</b> de '+tot+' caixes fetes'; S.appendChild(sum);
 }
