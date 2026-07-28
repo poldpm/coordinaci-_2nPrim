@@ -1878,7 +1878,7 @@ function buildReptesPanel(){
     const row=el('div','hrow');
     const title=el('div','htitle'); title.textContent=c.nom; row.appendChild(title);
     const st=el('span','hstatus'); st.style.background=(q===0?'var(--cristina)':'#EE9B4C'); st.textContent=(q===0?'sense còpies':q+' còpies'); row.appendChild(st);
-    row.onclick=()=>{ PENDING_EINA='reptes'; REPTES_CAIXA=c.id; openSection('eines'); };
+    row.onclick=()=>askPrompt({title:'Còpies impreses',label:'Quantes còpies has imprès de «'+c.nom+'»?',placeholder:'Nombre de còpies…',value:''},(v)=>{ const n=parseInt(v,10); if(!n||n<1) return false; reptRestock(c.id,n); renderDash(); toast('+'+n+' còpies · ara en queden '+reptQueden(reptCaixa(c.id))); });
     card.appendChild(row);
   });
   return card;
