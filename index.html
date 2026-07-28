@@ -322,6 +322,70 @@ a{color:var(--teal)}
 .pr-tag{display:inline-flex;align-items:center;gap:5px;background:#fff4e0;color:#a4680d;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
 .prog-tarda{display:flex;flex-wrap:wrap;gap:7px;margin:-6px 0 14px}
 .ptl-tag{display:inline-flex;align-items:center;gap:5px;background:#eef0f5;color:#55607a;font-weight:800;font-size:.8rem;padding:.35em .7em;border-radius:999px}
+/* --- El racó dels reptes --- */
+.rept-note{background:#fff7e6;border:1.5px solid #f0dfb0;color:#8a6d1f;font-weight:600;font-size:.86rem;padding:.7em .9em;border-radius:12px;margin-bottom:12px}
+.rept-mat{display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 32%,#fff);font-weight:800;font-size:.78rem;padding:.25em .6em;border-radius:8px}
+.rept-mathead{margin:16px 0 8px}
+.rept-addbtn{margin-bottom:10px}
+.rept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.rept-card{background:var(--panel);border:1.5px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r-lg);padding:14px;display:grid;gap:9px;box-shadow:var(--shadow-sm)}
+.rept-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.rept-card-nom{font-family:var(--font-d);font-weight:600;font-size:1.02rem;color:var(--teal-ink)}
+.rept-stock{flex:none;background:#eaf6ee;color:#1f7a44;font-weight:800;font-size:.74rem;padding:.25em .55em;border-radius:8px;white-space:nowrap}
+.rept-stock.low{background:#fff4e0;color:#a4680d}
+.rept-stock.zero{background:#fbeaf1;color:#c0392b}
+.rept-card-meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-weight:700;font-size:.8rem;align-items:center}
+.rept-lowtag{color:#a4680d;font-weight:800}
+.rept-link{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--panel-2);border-radius:9px;padding:6px 8px}
+.rept-link code{font-size:.68rem;color:#4a6b78;word-break:break-all;flex:1;min-width:120px}
+.rept-copy{border:none;background:var(--teal);color:#fff;font-weight:800;font-size:.72rem;padding:.4em .6em;border-radius:8px;cursor:pointer;white-space:nowrap}
+.rept-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rept-icona{background:transparent;border:1.5px solid var(--line);border-radius:8px;padding:.3em .5em;cursor:pointer;font-size:.9rem}
+.rept-icona:hover{background:var(--panel-2)}
+.rept-form{background:var(--panel-2);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:14px;display:grid;gap:10px;margin-bottom:14px}
+.rept-check{display:flex;align-items:center;gap:7px;font-weight:700;color:#33555f;font-size:.9rem}
+/* pantalla d'escaneig */
+.rept-scan{background:var(--panel);border:1.5px solid var(--line);border-top:6px solid var(--c);border-radius:var(--r-lg);padding:18px;display:grid;gap:12px;box-shadow:var(--shadow-sm)}
+.rept-scan-hd{display:grid;gap:6px}
+.rept-scan-nom{margin:0;font-family:var(--font-d);font-weight:600;font-size:1.5rem;color:var(--teal-ink)}
+.rept-scan-stock{background:var(--panel-2);border-radius:10px;padding:.6em .8em;font-weight:600;color:#33555f}
+.rept-scan-stock.low{background:#fff4e0;color:#8a5a0d}
+.rept-scan-stock.zero{background:#fbeaf1;color:#c0392b}
+.rept-scan-state{color:var(--teal);font-weight:700;font-size:.9rem;min-height:1em}
+.rept-scan-acts{display:flex;flex-wrap:wrap;gap:8px}
+.rept-big{font-size:1.05rem;padding:.7em 1.3em}
+.rept-val{border:2px solid var(--c);background:#fff;color:var(--c);font-weight:800;font-size:.9rem;padding:.55em .9em;border-radius:12px;cursor:pointer}
+.rept-val:hover{background:var(--c);color:#fff}
+.rept-recent-h{font-family:var(--font-d);font-weight:600;color:var(--teal-ink);margin:16px 0 8px}
+.rept-recent{display:grid;gap:6px}
+.rept-reg{display:flex;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:.5em .7em}
+.rept-reg.curs{background:#fffdf3}
+.rept-reg-nom{font-weight:800;color:var(--teal-ink);flex:1;min-width:0}
+.rept-reg-est{font-weight:700;font-size:.8rem;color:var(--muted)}
+.rept-reg-val{background:color-mix(in srgb,var(--c) 16%,#fff);color:var(--c);font-weight:800;font-size:.72rem;padding:.2em .5em;border-radius:7px}
+.rept-reg-by{font-size:.74rem;color:var(--muted);font-weight:700}
+/* per alumne */
+.rept-alumnesel,.rept-al-alumnesel{margin-bottom:6px}
+.rept-hint{color:var(--muted);font-weight:600;padding:10px 0}
+.rept-alu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.rept-alu{display:flex;align-items:center;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:.55em .7em}
+.rept-alu.fet{background:#eaf6ee;border-color:#bfe6cd}
+.rept-alu.curs{background:#fffdf3;border-color:#f0e2b0}
+.rept-alu .ra-ico{font-weight:800}
+.rept-alu .ra-nom{flex:1;min-width:0;font-weight:700;color:#33555f;font-size:.88rem}
+.rept-alu .ra-val{font-size:.7rem;font-weight:800;color:var(--muted)}
+.rept-alu-sum{margin-top:12px;font-weight:700;color:var(--teal-ink)}
+/* evolució */
+.rept-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.rept-stat{flex:1;min-width:90px;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.rept-stat b{display:block;font-family:var(--font-d);font-size:1.6rem;color:var(--teal)}
+.rept-stat span{color:var(--muted);font-weight:700;font-size:.8rem}
+.rept-bars{display:grid;gap:8px}
+.rept-bar{display:flex;align-items:center;gap:10px}
+.rept-bar .rb-nom{flex:1;min-width:0;font-weight:700;color:#33555f;font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rept-bar .rb-track{flex:1.4;height:9px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+.rept-bar .rb-track span{display:block;height:100%;background:var(--c);border-radius:99px}
+.rept-bar .rb-n{flex:none;font-weight:800;color:var(--c);font-size:.85rem;min-width:1.4em;text-align:right}
 .pit-k{flex:none;background:color-mix(in srgb, var(--c) 14%, #fff);color:var(--c);border:1px solid color-mix(in srgb, var(--c) 32%, #fff);
   font-weight:800;font-size:.68rem;letter-spacing:.02em;padding:.2em .5em;border-radius:7px;white-space:nowrap}
 .pit-s{flex:none;background:#eef3f6;color:#4a6b78;font-weight:800;font-size:.68rem;padding:.2em .5em;border-radius:7px;white-space:nowrap}
@@ -1669,6 +1733,7 @@ async function login(id){
   const av=$('#meAv'); av.textContent=u.name[0]; av.style.background=u.accent;
   goHome();
   armBack();
+  try{ reptApplyPending(); }catch(e){}
 }
 /* ---------- Botó "enrere" del mòbil: torna a l'inici en comptes de tancar ---------- */
 function armBack(){ try{ history.pushState({coord:1}, ''); }catch(e){} }
@@ -1916,8 +1981,49 @@ const OPEN_COMMENTS=new Set();   // ids d'entrades amb el panell de comentaris o
 let CAL_VIEW='llista', CAL_MONTH=null, SCHEDULING=null;
 let KANBAN_GROUP=false;
 let AV_TRI=null, AV_SUBJECT=null;
-let EINA=null;
+let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
+/* ---------- El racó dels reptes (maqueta local; se sincronitzarà quan tinguem la llista) ---------- */
+let REPTES_VIEW='caixes', REPTES_CAIXA=null, REPTES_ALUMNE=null, REPTES_ADD=false, PENDING_REPTE=null;
+let REPTES={caixes:[],registres:[]};
+const REPT_MAT={mat:{nom:'Matemàtiques',color:'#2D9CDB',ico:'🔢'}, catala:{nom:'Català',color:'#EB5757',ico:'📖'}};
+const REPT_VALORS=[{id:'millorar',t:'Cal millorar',c:'#EB5757'},{id:'be',t:'Bé',c:'#F2C94C'},{id:'molt',t:'Molt bé',c:'#27AE60'}];
+const REPTES_SEED=[
+  {id:'mat-01',nom:'Els nombres fins al 99',materia:'mat',estoc:15,low:3,eval:false,ordre:0},
+  {id:'mat-02',nom:'Sumes amb portada',materia:'mat',estoc:15,low:3,eval:true,ordre:1},
+  {id:'cat-01',nom:'La descripció d’un animal',materia:'catala',estoc:15,low:3,eval:false,ordre:2},
+];
+function reptesLoad(){ try{ const r=JSON.parse(localStorage.getItem('coord_reptes')||'null'); if(r&&r.caixes) REPTES=r; }catch(e){}
+  if(!REPTES.caixes||!REPTES.caixes.length) REPTES={caixes:REPTES_SEED.map(x=>Object.assign({},x)),registres:[]};
+  REPTES.caixes=REPTES.caixes||[]; REPTES.registres=REPTES.registres||[]; }
+function reptesSave(){ try{ localStorage.setItem('coord_reptes', JSON.stringify(REPTES)); }catch(e){} }
+function reptCaixa(id){ return REPTES.caixes.find(c=>c.id===id); }
+function reptRegsDe(id){ return REPTES.registres.filter(r=>r.caixa===id); }
+function reptQueden(c){ return Math.max(0, (c.estoc||0)-reptRegsDe(c.id).length); }
+function reptFetsDe(id){ return reptRegsDe(id).filter(r=>r.estat==='fet').length; }
+function reptAllStudents(){ const set=new Set(); Object.values(STATE.students||{}).forEach(a=>(a||[]).forEach(n=>set.add(n))); REPTES.registres.forEach(r=>set.add(r.alumne)); return [...set].sort((a,b)=>a.localeCompare(b,'ca')); }
+function reptUrl(id){ return location.origin+location.pathname+'?repte='+encodeURIComponent(id); }
+function reptRegDe(caixa, alumne){ return REPTES.registres.find(r=>r.caixa===caixa && (r.alumne||'').toLowerCase()===(alumne||'').toLowerCase()); }
+function reptRegistra(caixaId, alumne, estat, val){
+  alumne=(alumne||'').trim(); if(!alumne) return false;
+  let r=reptRegDe(caixaId, alumne); const ts=nowISO();
+  if(r){ r.estat=estat; if(val!==undefined) r.val=val; r.by=ME; r.at=ts; }
+  else REPTES.registres.push({id:uid(),caixa:caixaId,alumne:alumne,estat:estat,val:val||null,by:ME,at:ts});
+  reptesSave(); return true;
+}
+function reptRegDelete(id){ REPTES.registres=REPTES.registres.filter(r=>r.id!==id); reptesSave(); }
+function reptRestock(id, add){ const c=reptCaixa(id); if(c){ c.estoc=(c.estoc||0)+add; reptesSave(); } }
+function reptCaixaUpsert(c){ const i=REPTES.caixes.findIndex(x=>x.id===c.id); if(i>=0) REPTES.caixes[i]=c; else REPTES.caixes.push(c); reptesSave(); }
+function reptCaixaDelete(id){ REPTES.caixes=REPTES.caixes.filter(c=>c.id!==id); REPTES.registres=REPTES.registres.filter(r=>r.caixa!==id); reptesSave(); }
+let REPT_DEEPLINK_DONE=false;
+function reptApplyPending(){
+  if(REPT_DEEPLINK_DONE || !PENDING_REPTE || !ME) return;
+  const c=reptCaixa(PENDING_REPTE); PENDING_REPTE=null;
+  if(!c) return;
+  REPT_DEEPLINK_DONE=true; const id=c.id;
+  // obre la caixa DESPRÉS que l'arrencada i el parany d'història s'hagin assentat
+  setTimeout(()=>{ PENDING_EINA='reptes'; REPTES_CAIXA=id; REPTES_VIEW='caixes'; openSection('eines'); }, 80);
+}
 let GRP_HETERO=false;
 let ATT_CLASS=null, ATT_RESULT=null;
 let PICNIC_SUB=null, PICNIC_RESULT=null;
@@ -3164,7 +3270,12 @@ function generateGroups(size, mix, constraints, hetero){
   return {sections};
 }
 function renderEines(S,sec){
-  if(EINA==='grups'){
+  if(PENDING_EINA){ EINA=PENDING_EINA; PENDING_EINA=null; }
+  if(EINA==='reptes'){
+    buildSecHero(S,sec,{title:'\ud83c\udfaf El rac\u00f3 dels reptes', desc:'Control de les caixes de treball aut\u00f2nom.',
+      back:{label:sec.name, onClick:()=>{ EINA=null; REPTES_CAIXA=null; REPTES_ADD=false; openSection('eines'); }}});
+    renderReptes(S);
+  } else if(EINA==='grups'){
     buildSecHero(S,sec,{title:'Generador de grups', desc:'Fes grups a partir de la llista d\u2019alumnes.',
       back:{label:sec.name, onClick:()=>{ EINA=null; openSection('eines'); }}});
     renderGroupTool(S);
@@ -3180,6 +3291,7 @@ function renderEines(S,sec){
 function renderEinesList(S){
   const grid=el('div','subtheme-grid');
   const tools=[
+    {id:'reptes', name:'🎯 El racó dels reptes', desc:'Caixes de treball autònom: escaneja l’NFC, marca qui l’ha fet, controla còpies i evolució.'},
     {id:'grups', name:'👥 Generador de grups', desc:'Fes grups per mida, amb o sense barrejar classes.'},
     {id:'assistencia', name:'🚌 Assistència d\u2019excursió', desc:'Passa llista del teu grup i treu els absents per administració.'},
   ];
@@ -3191,6 +3303,177 @@ function renderEinesList(S){
     grid.appendChild(card);
   });
   S.appendChild(grid);
+}
+/* ============ EL RACÓ DELS REPTES ============ */
+function renderReptes(S){
+  if(REPTES_CAIXA){ const c=reptCaixa(REPTES_CAIXA); if(c){ renderReptesScan(S,c); return; } REPTES_CAIXA=null; }
+  const note=el('div','rept-note'); note.innerHTML='🧪 <b>Maqueta</b> · de moment les dades es desen només en aquest dispositiu. Quan tinguem la llista definitiva de caixes ho connectarem perquè se sincronitzi entre els tres.'; S.appendChild(note);
+  const seg=el('div','prog-seg');
+  [['caixes','📦 Caixes'],['alumne','🧒 Per alumne'],['evol','📈 Evolució']].forEach(([v,lbl])=>{
+    const b=el('button','prog-segbtn'+(REPTES_VIEW===v?' on':'')); b.type='button'; b.textContent=lbl;
+    b.onclick=()=>{ REPTES_VIEW=v; openSection('eines'); }; seg.appendChild(b);
+  });
+  S.appendChild(seg);
+  if(REPTES_VIEW==='alumne') renderReptesAlumne(S);
+  else if(REPTES_VIEW==='evol') renderReptesEvol(S);
+  else renderReptesCaixes(S);
+}
+function reptMatBadge(materia){ const m=REPT_MAT[materia]||REPT_MAT.mat; const s=el('span','rept-mat'); s.style.setProperty('--c',m.color); s.textContent=m.ico+' '+m.nom; return s; }
+function renderReptesCaixes(S){
+  // botó afegir
+  const addBtn=el('button','btn btn-ghost rept-addbtn'); addBtn.type='button'; addBtn.innerHTML='＋ Afegeix una caixa';
+  addBtn.onclick=()=>{ REPTES_ADD=!REPTES_ADD; openSection('eines'); };
+  S.appendChild(addBtn);
+  if(REPTES_ADD) S.appendChild(reptAddForm());
+  ['mat','catala'].forEach(mat=>{
+    const caixes=REPTES.caixes.filter(c=>c.materia===mat).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||a.nom.localeCompare(b.nom));
+    if(!caixes.length) return;
+    const h=el('div','rept-mathead'); h.appendChild(reptMatBadge(mat)); S.appendChild(h);
+    const grid=el('div','rept-grid');
+    caixes.forEach(c=>grid.appendChild(reptCaixaCard(c)));
+    S.appendChild(grid);
+  });
+  if(!REPTES.caixes.length){ const em=el('div','empty-feed'); em.innerHTML='<div class="big">🎯</div>Encara no hi ha cap caixa. Afegeix-ne una!'; S.appendChild(em); }
+}
+function reptCaixaCard(c){
+  const card=el('div','rept-card'); card.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
+  const top=el('div','rept-card-top');
+  const nom=el('div','rept-card-nom'); nom.textContent=c.nom; top.appendChild(nom);
+  const queden=reptQueden(c); const low=queden<=(c.low||3);
+  const stock=el('span','rept-stock'+(low?' low':'')+(queden===0?' zero':'')); stock.textContent=queden+' còpies';
+  top.appendChild(stock); card.appendChild(top);
+  const meta=el('div','rept-card-meta');
+  meta.innerHTML='<span>✅ '+reptFetsDe(c.id)+' fets</span>'+(c.eval?'<span>· ⭐ amb valoració</span>':'')+(low?'<span class="rept-lowtag">⚠️ s’estan acabant</span>':'');
+  card.appendChild(meta);
+  // enllaç NFC
+  const link=el('div','rept-link'); const code=el('code'); code.textContent=reptUrl(c.id); link.appendChild(code);
+  const cp=el('button','rept-copy'); cp.type='button'; cp.textContent='📋 Copia l’enllaç NFC';
+  cp.onclick=()=>{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(reptUrl(c.id)).then(()=>toast('Enllaç copiat! Grava’l a l’etiqueta NFC')).catch(()=>{}); } };
+  link.appendChild(cp); card.appendChild(link);
+  // accions
+  const acts=el('div','rept-acts');
+  const open=el('button','btn btn-primary'); open.type='button'; open.innerHTML='▶ Obre (com si escanegessis)';
+  open.onclick=()=>{ REPTES_CAIXA=c.id; openSection('eines'); }; acts.appendChild(open);
+  const restock=el('button','btn btn-ghost'); restock.type='button'; restock.textContent='＋ Còpies';
+  restock.onclick=()=>askPrompt({title:'Afegir còpies impreses',label:'Quantes còpies has afegit a «'+c.nom+'»?',placeholder:'Ex.: 15',value:'15'},(v)=>{ const n=parseInt(v,10); if(!n||n<1) return false; reptRestock(c.id,n); openSection('eines'); toast('+'+n+' còpies · ara en queden '+reptQueden(reptCaixa(c.id))); });
+  acts.appendChild(restock);
+  const ed=el('button','rept-icona'); ed.type='button'; ed.title='Edita'; ed.innerHTML='✏️'; ed.onclick=()=>{ REPTES_ADD=c.id; openSection('eines'); }; acts.appendChild(ed);
+  const del=el('button','rept-icona'); del.type='button'; del.title='Esborra'; del.innerHTML='🗑️';
+  del.onclick=()=>askConfirm('Vols esborrar la caixa «'+c.nom+'» i tots els seus registres?',()=>{ reptCaixaDelete(c.id); openSection('eines'); },{confirmLabel:'Esborra'});
+  acts.appendChild(del);
+  card.appendChild(acts);
+  return card;
+}
+function reptAddForm(){
+  const edit = (typeof REPTES_ADD==='string') ? reptCaixa(REPTES_ADD) : null;
+  const wrap=el('div','rept-form');
+  const nom=el('input','input'); nom.placeholder='Nom de la caixa…'; nom.value=edit?edit.nom:'';
+  const mat=el('select','input'); [['mat','🔢 Matemàtiques'],['catala','📖 Català']].forEach(o=>{ const op=el('option'); op.value=o[0]; op.textContent=o[1]; if(edit&&edit.materia===o[0])op.selected=true; mat.appendChild(op); });
+  const estoc=el('input','input'); estoc.type='number'; estoc.min='0'; estoc.value=edit?edit.estoc:15;
+  const evalL=el('label','rept-check'); const evalC=el('input'); evalC.type='checkbox'; if(edit&&edit.eval)evalC.checked=true; evalL.appendChild(evalC); evalL.appendChild(document.createTextNode(' Amb valoració (si no, només “Fet ✓”)'));
+  const row=(lbl,node)=>{ const f=el('div','field'); const l=el('label'); l.textContent=lbl; f.appendChild(l); f.appendChild(node); return f; };
+  wrap.appendChild(row('Nom',nom));
+  const r2=el('div','row2'); r2.appendChild(row('Matèria',mat)); r2.appendChild(row('Còpies inicials',estoc)); wrap.appendChild(r2);
+  wrap.appendChild(evalL);
+  const acts=el('div','rept-acts');
+  const save=el('button','btn btn-primary'); save.type='button'; save.textContent=edit?'Desa':'Crea la caixa';
+  save.onclick=()=>{ const n=nom.value.trim(); if(!n){ nom.focus(); return; }
+    let id; if(edit){ id=edit.id; } else { const nx=REPTES.caixes.filter(x=>x.materia===mat.value).length+1; id=(mat.value==='mat'?'mat':'cat')+'-'+String(nx).padStart(2,'0'); while(reptCaixa(id)) id=id+'x'; }
+    reptCaixaUpsert({id:id,nom:n,materia:mat.value,estoc:parseInt(estoc.value,10)||0,low:(edit?edit.low:3),eval:evalC.checked,ordre:(edit?edit.ordre:REPTES.caixes.length)});
+    REPTES_ADD=false; openSection('eines'); toast(edit?'Caixa desada':'Caixa creada'); };
+  const cancel=el('button','btn btn-ghost'); cancel.type='button'; cancel.textContent='Cancel·la'; cancel.onclick=()=>{ REPTES_ADD=false; openSection('eines'); };
+  acts.appendChild(save); acts.appendChild(cancel); wrap.appendChild(acts);
+  return wrap;
+}
+function renderReptesScan(S,c){
+  const back=el('button','prog-jump'); back.type='button'; back.innerHTML='‹ Totes les caixes'; back.onclick=()=>{ REPTES_CAIXA=null; openSection('eines'); }; S.appendChild(back);
+  const card=el('div','rept-scan'); card.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
+  const hd=el('div','rept-scan-hd'); hd.appendChild(reptMatBadge(c.materia));
+  const nom=el('h2','rept-scan-nom'); nom.textContent=c.nom; hd.appendChild(nom); card.appendChild(hd);
+  const queden=reptQueden(c); const low=queden<=(c.low||3);
+  const st=el('div','rept-scan-stock'+(low?' low':'')+(queden===0?' zero':''));
+  st.innerHTML='<b>'+queden+'</b> còpies disponibles'+(queden===0?' · <b>cap!</b>':(low?' · ⚠️ <b>s’estan acabant</b>':''));
+  card.appendChild(st);
+  // nom del nen
+  const dl=el('datalist'); dl.id='reptAlumnes'; reptAllStudents().forEach(n=>{ const o=el('option'); o.value=n; dl.appendChild(o); }); card.appendChild(dl);
+  const f=el('div','field'); const l=el('label'); l.textContent='Nom del nen/a'; f.appendChild(l);
+  const inp=el('input','input'); inp.setAttribute('list','reptAlumnes'); inp.placeholder='Escriu o tria el nom…'; inp.autocomplete='off'; f.appendChild(inp); card.appendChild(f);
+  const stateLine=el('div','rept-scan-state'); card.appendChild(stateLine);
+  const refreshState=()=>{ const r=reptRegDe(c.id, inp.value.trim()); stateLine.innerHTML = (inp.value.trim()&&r)? ('Ja consta com a <b>'+(r.estat==='fet'?'FET':'EN CURS')+'</b>'+(r.val?(' · '+(REPT_VALORS.find(x=>x.id===r.val)||{}).t):'')) : ''; };
+  inp.addEventListener('input',refreshState);
+  const mkDone=(val)=>{ const alu=inp.value.trim(); if(!alu){ inp.focus(); toast('Escriu el nom primer'); return; }
+    reptRegistra(c.id,alu,'fet',val); REPTES_CAIXA=c.id; openSection('eines'); toast('✅ '+alu+' · fet!'); };
+  const acts=el('div','rept-scan-acts');
+  if(c.eval){
+    REPT_VALORS.forEach(v=>{ const b=el('button','rept-val'); b.type='button'; b.style.setProperty('--c',v.c); b.textContent=v.t; b.onclick=()=>mkDone(v.id); acts.appendChild(b); });
+  } else {
+    const done=el('button','btn btn-primary rept-big'); done.type='button'; done.innerHTML='✅ Fet'; done.onclick=()=>mkDone(null); acts.appendChild(done);
+  }
+  const curs=el('button','btn btn-ghost'); curs.type='button'; curs.innerHTML='🕒 En curs (començada)';
+  curs.onclick=()=>{ const alu=inp.value.trim(); if(!alu){ inp.focus(); return; } reptRegistra(c.id,alu,'curs',null); REPTES_CAIXA=c.id; openSection('eines'); toast('🕒 '+alu+' · en curs'); };
+  acts.appendChild(curs);
+  card.appendChild(acts);
+  S.appendChild(card);
+  // registres recents d'aquesta caixa
+  const regs=reptRegsDe(c.id).slice().sort((a,b)=>(b.at||'').localeCompare(a.at||''));
+  if(regs.length){
+    const h=el('div','rept-recent-h'); h.textContent='Qui l’ha fet ('+regs.length+')'; S.appendChild(h);
+    const list=el('div','rept-recent'); regs.forEach(r=>list.appendChild(reptRegRow(r,c))); S.appendChild(list);
+  }
+}
+function reptRegRow(r,c){
+  const row=el('div','rept-reg'+(r.estat==='curs'?' curs':''));
+  const nm=el('span','rept-reg-nom'); nm.textContent=r.alumne; row.appendChild(nm);
+  const est=el('span','rept-reg-est'); est.textContent=r.estat==='fet'?'✓ Fet':'🕒 En curs'; row.appendChild(est);
+  if(r.val){ const v=REPT_VALORS.find(x=>x.id===r.val); if(v){ const vb=el('span','rept-reg-val'); vb.style.setProperty('--c',v.c); vb.textContent=v.t; row.appendChild(vb); } }
+  const by=el('span','rept-reg-by'); by.textContent=(userById(r.by)||{}).name||''; row.appendChild(by);
+  const del=el('button','rept-icona'); del.type='button'; del.innerHTML='×'; del.title='Treu';
+  del.onclick=()=>{ reptRegDelete(r.id); REPTES_CAIXA=c?c.id:REPTES_CAIXA; openSection('eines'); }; row.appendChild(del);
+  return row;
+}
+function renderReptesAlumne(S){
+  const alumnes=reptAllStudents();
+  const sel=el('select','input rept-alumnesel');
+  const o0=el('option'); o0.value=''; o0.textContent='Tria un alumne…'; sel.appendChild(o0);
+  alumnes.forEach(n=>{ const o=el('option'); o.value=n; o.textContent=n; if(n===REPTES_ALUMNE)o.selected=true; sel.appendChild(o); });
+  sel.onchange=()=>{ REPTES_ALUMNE=sel.value||null; openSection('eines'); }; S.appendChild(sel);
+  if(!REPTES_ALUMNE){ const em=el('div','rept-hint'); em.textContent='Tria un alumne per veure quines caixes ha fet.'; S.appendChild(em); return; }
+  ['mat','catala'].forEach(mat=>{
+    const caixes=REPTES.caixes.filter(c=>c.materia===mat).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+    if(!caixes.length) return;
+    const h=el('div','rept-mathead'); h.appendChild(reptMatBadge(mat)); S.appendChild(h);
+    const grid=el('div','rept-alu-grid');
+    caixes.forEach(c=>{ const r=reptRegDe(c.id,REPTES_ALUMNE);
+      const cell=el('div','rept-alu'+(r?(r.estat==='fet'?' fet':' curs'):' res'));
+      cell.innerHTML='<span class="ra-ico">'+(r?(r.estat==='fet'?'✓':'🕒'):'·')+'</span><span class="ra-nom">'+esc(c.nom)+'</span>'+(r&&r.val?('<span class="ra-val">'+((REPT_VALORS.find(x=>x.id===r.val)||{}).t||'')+'</span>'):'');
+      grid.appendChild(cell); });
+    S.appendChild(grid);
+  });
+  const fets=REPTES.registres.filter(r=>(r.alumne||'').toLowerCase()===REPTES_ALUMNE.toLowerCase()&&r.estat==='fet').length;
+  const tot=REPTES.caixes.length;
+  const sum=el('div','rept-alu-sum'); sum.innerHTML='<b>'+fets+'</b> de '+tot+' caixes fetes'; S.appendChild(sum);
+}
+function renderReptesEvol(S){
+  const tot=REPTES.caixes.length;
+  const totFets=REPTES.registres.filter(r=>r.estat==='fet').length;
+  const alumnes=reptAllStudents().length;
+  const cards=el('div','rept-stats');
+  const stat=(n,l)=>{ const c=el('div','rept-stat'); c.innerHTML='<b>'+n+'</b><span>'+l+'</span>'; return c; };
+  cards.appendChild(stat(tot,'caixes')); cards.appendChild(stat(totFets,'reptes fets')); cards.appendChild(stat(alumnes,'alumnes')); S.appendChild(cards);
+  // baixes d'estoc
+  const low=REPTES.caixes.filter(c=>reptQueden(c)<=(c.low||3)).sort((a,b)=>reptQueden(a)-reptQueden(b));
+  if(low.length){ const h=el('div','rept-recent-h'); h.textContent='⚠️ Caixes que s’estan acabant'; S.appendChild(h);
+    const list=el('div','rept-recent'); low.forEach(c=>{ const row=el('div','rept-reg'); row.innerHTML='<span class="rept-reg-nom">'+esc(c.nom)+'</span><span class="rept-lowtag">'+reptQueden(c)+' còpies</span>'; list.appendChild(row); }); S.appendChild(list); }
+  // progrés per caixa
+  const h2=el('div','rept-recent-h'); h2.textContent='Reptes fets per caixa'; S.appendChild(h2);
+  const list=el('div','rept-bars');
+  REPTES.caixes.slice().sort((a,b)=>reptFetsDe(b.id)-reptFetsDe(a.id)).forEach(c=>{
+    const fets=reptFetsDe(c.id); const pct=alumnes?Math.round(fets/alumnes*100):0;
+    const row=el('div','rept-bar'); row.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
+    row.innerHTML='<div class="rb-nom">'+esc(c.nom)+'</div><div class="rb-track"><span style="width:'+Math.min(100,pct)+'%"></span></div><div class="rb-n">'+fets+'</div>';
+    list.appendChild(row);
+  });
+  S.appendChild(list);
 }
 function pickTutorClass(classes){
   const want=TUTOR_CLASS[ME];
@@ -4409,6 +4692,8 @@ function openAndFlash(itemId){
    ============================================================ */
 (async function boot(){
   buildLogin();
+  try{ reptesLoad(); }catch(e){}
+  try{ const rp=new URLSearchParams(location.search).get('repte'); if(rp) PENDING_REPTE=rp; }catch(e){}
   try{ PENDING=_loadPending(); }catch(e){}
   let saved=null; try{ saved=localStorage.getItem('coord_me'); }catch(e){}
   const auto = saved && USERS.some(u=>u.id===saved);
