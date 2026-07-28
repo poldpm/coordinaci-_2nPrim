@@ -378,6 +378,20 @@ a{color:var(--teal)}
 .rept-alu .ra-nom{flex:1;min-width:0;font-weight:700;color:#33555f;font-size:.88rem}
 .rept-alu .ra-val{font-size:.7rem;font-weight:800;color:var(--muted)}
 .rept-alu-sum{margin-top:12px;font-weight:700;color:var(--teal-ink)}
+.rept-alu-head{background:var(--panel-2);border-radius:12px;padding:12px 14px;font-weight:700;color:#33555f;margin-bottom:8px}
+.rept-alu-head b{font-family:var(--font-d);font-size:1.5rem;color:var(--teal)}
+.rept-alu-sub{color:var(--muted);font-weight:700;font-size:.85rem}
+.rept-grp{margin-bottom:8px}
+.rept-grp-h{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:.7em .9em;cursor:pointer;font-weight:800;color:var(--teal-ink)}
+.rept-grp-h:hover{background:var(--panel-2)}
+.rept-grp-h.open{border-color:var(--cyan)}
+.rept-grp-n{flex:none;background:var(--teal);color:#fff;font-size:.8rem;min-width:1.8em;text-align:center;padding:.15em .5em;border-radius:99px}
+.rept-grp-body{display:grid;gap:5px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));padding:8px 2px}
+.rept-grp-alu{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:1.5px solid var(--line);border-radius:9px;padding:.5em .7em;cursor:pointer;text-align:left}
+.rept-grp-alu:hover{border-color:var(--cyan);background:var(--panel-2)}
+.rga-nom{font-weight:700;color:#33555f;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rept-grp-cnt{flex:none;font-weight:800;font-size:.74rem;color:var(--teal)}
+.rept-grp-empty{color:var(--muted);font-weight:600;font-size:.85rem;padding:4px}
 /* evolució */
 .rept-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
 .rept-stat{flex:1;min-width:90px;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center}
@@ -1857,7 +1871,7 @@ function buildReptesPanel(){
   if(!low.length) return null;
   const card=el('div','hpanel');
   const head=el('div','hpanel-head');
-  head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg><h3>Reptes: còpies per acabar</h3><span class="hpanel-count">'+low.length+'</span>';
+  head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg><h3>Racó dels reptes: còpies per imprimir</h3><span class="hpanel-count">'+low.length+'</span>';
   card.appendChild(head);
   low.forEach(c=>{
     const q=reptQueden(c);
@@ -3453,13 +3467,40 @@ function reptRegRow(r,c){
   del.onclick=()=>{ reptRegDelete(r.id); REPTES_CAIXA=c?c.id:REPTES_CAIXA; openSection('eines'); }; row.appendChild(del);
   return row;
 }
+function reptFetsAlumne(a){ return REPTES.registres.filter(r=>(r.alumne||'').toLowerCase()===(a||'').toLowerCase() && r.estat==='fet').length; }
 function renderReptesAlumne(S){
-  const alumnes=reptAllStudents();
-  const sel=el('select','input rept-alumnesel');
-  const o0=el('option'); o0.value=''; o0.textContent='Tria un alumne…'; sel.appendChild(o0);
-  alumnes.forEach(n=>{ const o=el('option'); o.value=n; o.textContent=n; if(n===REPTES_ALUMNE)o.selected=true; sel.appendChild(o); });
-  sel.onchange=()=>{ REPTES_ALUMNE=sel.value||null; openSection('eines'); }; S.appendChild(sel);
-  if(!REPTES_ALUMNE){ const em=el('div','rept-hint'); em.textContent='Tria un alumne per veure quines caixes ha fet.'; S.appendChild(em); return; }
+  if(REPTES_ALUMNE){ renderReptesAlumneDetail(S); return; }
+  const roster=reptAllStudents();
+  const ambUna=roster.filter(a=>reptFetsAlumne(a)>=1).length;
+  const head=el('div','rept-alu-head');
+  head.innerHTML='<b>'+ambUna+'</b> alumne'+(ambUna===1?'':'s')+' '+(ambUna===1?'ha':'han')+' fet com a mínim una caixa <span class="rept-alu-sub">de '+roster.length+'</span>';
+  S.appendChild(head);
+  const hint=el('div','rept-hint'); hint.textContent='Obre un grup per veure els noms. Clica un alumne per veure quines caixes ha fet.'; S.appendChild(hint);
+  const grups=[
+    {label:'🚫 No ha fet cap caixa', lo:0, hi:0, cnt:false},
+    {label:'1–5 caixes', lo:1, hi:5, cnt:true},
+    {label:'6–10 caixes', lo:6, hi:10, cnt:true},
+    {label:'Més de 10 caixes', lo:11, hi:Infinity, cnt:true},
+  ];
+  grups.forEach(g=>{
+    const membres=roster.map(a=>({a:a, n:reptFetsAlumne(a)})).filter(x=>x.n>=g.lo && x.n<=g.hi)
+      .sort((p,q)=>q.n-p.n || p.a.localeCompare(q.a,'ca'));
+    const box=el('div','rept-grp');
+    const hd=el('button','rept-grp-h'); hd.type='button';
+    hd.innerHTML='<span class="rgh-lbl">'+g.label+'</span><span class="rept-grp-n">'+membres.length+'</span>';
+    const body=el('div','rept-grp-body'); body.style.display='none';
+    if(!membres.length){ const em=el('div','rept-grp-empty'); em.textContent='Cap alumne en aquest grup.'; body.appendChild(em); }
+    membres.forEach(x=>{ const row=el('button','rept-grp-alu'); row.type='button';
+      row.innerHTML='<span class="rga-nom">'+esc(x.a)+'</span>'+(g.cnt?'<span class="rept-grp-cnt">'+x.n+(x.n===1?' caixa':' caixes')+'</span>':'');
+      row.onclick=()=>{ REPTES_ALUMNE=x.a; openSection('eines'); };
+      body.appendChild(row); });
+    hd.onclick=()=>{ const vis=body.style.display!=='none'; body.style.display=vis?'none':'grid'; hd.classList.toggle('open',!vis); };
+    box.appendChild(hd); box.appendChild(body); S.appendChild(box);
+  });
+}
+function renderReptesAlumneDetail(S){
+  const back=el('button','prog-jump'); back.type='button'; back.innerHTML='‹ Tots els alumnes'; back.onclick=()=>{ REPTES_ALUMNE=null; openSection('eines'); }; S.appendChild(back);
+  const h0=el('div','rept-recent-h'); h0.textContent=REPTES_ALUMNE; S.appendChild(h0);
   ['mat','catala'].forEach(mat=>{
     const caixes=REPTES.caixes.filter(c=>c.materia===mat).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
     if(!caixes.length) return;
@@ -3471,17 +3512,18 @@ function renderReptesAlumne(S){
       grid.appendChild(cell); });
     S.appendChild(grid);
   });
-  const fets=REPTES.registres.filter(r=>(r.alumne||'').toLowerCase()===REPTES_ALUMNE.toLowerCase()&&r.estat==='fet').length;
-  const tot=REPTES.caixes.length;
+  const fets=reptFetsAlumne(REPTES_ALUMNE); const tot=REPTES.caixes.length;
   const sum=el('div','rept-alu-sum'); sum.innerHTML='<b>'+fets+'</b> de '+tot+' caixes fetes'; S.appendChild(sum);
 }
 function renderReptesEvol(S){
   const tot=REPTES.caixes.length;
   const totFets=REPTES.registres.filter(r=>r.estat==='fet').length;
-  const alumnes=reptAllStudents().length;
+  const roster=reptAllStudents();
+  const alumnesActius=roster.filter(a=>reptFetsAlumne(a)>=1).length;
   const cards=el('div','rept-stats');
   const stat=(n,l)=>{ const c=el('div','rept-stat'); c.innerHTML='<b>'+n+'</b><span>'+l+'</span>'; return c; };
-  cards.appendChild(stat(tot,'caixes')); cards.appendChild(stat(totFets,'reptes fets')); cards.appendChild(stat(alumnes,'alumnes')); S.appendChild(cards);
+  cards.appendChild(stat(tot,'caixes')); cards.appendChild(stat(totFets,'reptes fets')); cards.appendChild(stat(alumnesActius,'alumnes amb reptes')); S.appendChild(cards);
+  const alumnes=roster.length;
   // baixes d'estoc
   const low=REPTES.caixes.filter(c=>reptQueden(c)<=(c.low||3)).sort((a,b)=>reptQueden(a)-reptQueden(b));
   if(low.length){ const h=el('div','rept-recent-h'); h.textContent='⚠️ Caixes que s’estan acabant'; S.appendChild(h);
