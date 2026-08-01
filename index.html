@@ -1413,6 +1413,18 @@ const api = {
     if(th && th.replies) th.replies = th.replies.filter(r=>r.id!==replyId);
     await persist('commentReplyDelete', {entryId, commentId, replyId});
   },
+  /* --- El racó dels reptes --- */
+  async reptSetCaixes(caixes, v){
+    // La llista de caixes és regenerable: NO entra a la cua de reintents
+    const R=reptesState(); R.caixes=caixes; R.v=v; safeSave();
+    if(DEMO_MODE) return;
+    await request('reptSetCaixes', {caixes, v});
+  },
+  async reptCaixaUpsert(c){ await persist('reptCaixaUpsert', {caixa:c}); },
+  async reptCaixaSet(id, patch){ await persist('reptCaixaSet', {id, patch}); },
+  async reptCaixaDelete(id){ await persist('reptCaixaDelete', {id}); },
+  async reptRegUpsert(r){ await persist('reptRegUpsert', {reg:r}); },
+  async reptRegDelete(id){ await persist('reptRegDelete', {id}); },
   async commentSeen(entryId){
     STATE.comments = STATE.comments || {};
     (STATE.comments[entryId]||[]).forEach(t=>{
@@ -1463,6 +1475,8 @@ function normalizeState(){
   if(!STATE.correus) STATE.correus=[];
   if(!STATE.emailReminders) STATE.emailReminders={};
   if(!STATE.comments) STATE.comments={};
+  if(!STATE.reptes) STATE.reptes={caixes:[],registres:[],v:0};
+  STATE.reptes.caixes=STATE.reptes.caixes||[]; STATE.reptes.registres=STATE.reptes.registres||[];
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
   (STATE.tasks||[]).forEach(t=>{ t.readBy=t.readBy||[t.author]; t.createdAt=t.createdAt||t.date; t.updatedAt=t.updatedAt||t.createdAt; });
 }
@@ -2038,9 +2052,16 @@ let KANBAN_GROUP=false;
 let AV_TRI=null, AV_SUBJECT=null;
 let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
-/* ---------- El racó dels reptes (maqueta local; se sincronitzarà quan tinguem la llista) ---------- */
+/* ---------- El racó dels reptes (dins STATE.reptes → sincronitzat entre els tres) ---------- */
 let REPTES_VIEW='caixes', REPTES_CAIXA=null, REPTES_ALUMNE=null, REPTES_ADD=false, PENDING_REPTE=null;
-let REPTES={caixes:[],registres:[]};
+/* REPTES apunta SEMPRE a STATE.reptes (el sync del núvol reemplaça STATE sencer) */
+function reptesState(){
+  STATE.reptes = STATE.reptes || {caixes:[], registres:[], v:0};
+  STATE.reptes.caixes = STATE.reptes.caixes || [];
+  STATE.reptes.registres = STATE.reptes.registres || [];
+  return STATE.reptes;
+}
+Object.defineProperty(window,'REPTES',{ get:reptesState, set:v=>{ STATE.reptes=v; }, configurable:true });
 const REPT_MAT={mat:{nom:'Matemàtiques',color:'#2D9CDB',ico:'🔢'}, catala:{nom:'Català',color:'#EB5757',ico:'📖'}};
 const REPT_VALORS=[{id:'millorar',t:'Cal millorar',c:'#EB5757'},{id:'be',t:'Bé',c:'#F2C94C'},{id:'molt',t:'Molt bé',c:'#27AE60'}];
 function reptStars(n){ if(n===4) return '⭐'; n=Math.max(1,Math.min(3,n||1)); return '★'.repeat(n); }
@@ -2056,18 +2077,25 @@ const REPTES_SEED=[{"id":"cat-t01-n1","m":"catala","c":"C-01","t":1,"n":1,"num":
 function reptSeedNorm(x){ return {id:x.id, materia:x.m, codi:x.c, tema:x.t, nivell:x.n, num:x.num,
   nom:x.nom, nn:x.nn, d:x.d, estoc:15, low:3, eval:false, ordre:x.num}; }
 const REPTES_SEED_V=2;   // puja aquest número si canvia la llista de caixes
-function reptesLoad(){ try{ const r=JSON.parse(localStorage.getItem('coord_reptes')||'null'); if(r&&r.caixes) REPTES=r; }catch(e){}
-  REPTES.caixes=REPTES.caixes||[]; REPTES.registres=REPTES.registres||[];
-  // Primera càrrega o llista de caixes nova → sembra les caixes reals conservant
-  // els registres dels nens i l'estoc de les caixes que segueixen existint.
-  if(!REPTES.caixes.length || REPTES.v!==REPTES_SEED_V){
-    const prev={}; REPTES.caixes.forEach(c=>{ prev[c.id]=c; });
-    REPTES.caixes=REPTES_SEED.map(x=>{ const c=reptSeedNorm(x); const p=prev[c.id];
+/* Sembra/actualitza la llista de caixes AL NÚVOL (conserva registres i estoc).
+   Només ho fa si al full encara no hi ha les caixes o si la llista ha canviat. */
+function reptesLoad(){
+  const R=reptesState();
+  // migració des de la maqueta local (dispositiu) → només si al núvol encara no hi ha res
+  if(!R.registres.length){
+    try{ const old=JSON.parse(localStorage.getItem('coord_reptes')||'null');
+      if(old && old.registres && old.registres.length){ R.registres=old.registres; } }catch(e){}
+  }
+  if(!R.caixes.length || R.v!==REPTES_SEED_V){
+    const prev={}; R.caixes.forEach(c=>{ prev[c.id]=c; });
+    R.caixes=REPTES_SEED.map(x=>{ const c=reptSeedNorm(x); const p=prev[c.id];
       if(p){ if(typeof p.estoc==='number') c.estoc=p.estoc; if(typeof p.low==='number') c.low=p.low; if(p.eval) c.eval=true; }
       return c; });
-    REPTES.v=REPTES_SEED_V; reptesSave();
-  } }
-function reptesSave(){ try{ localStorage.setItem('coord_reptes', JSON.stringify(REPTES)); }catch(e){} }
+    R.v=REPTES_SEED_V;
+    if(!DEMO_MODE) api.reptSetCaixes(R.caixes, R.v).catch(()=>{}); else safeSave();
+  }
+}
+function reptesSave(){ safeSave(); }   // còpia local; el desat real va per api.rept*
 function reptCaixa(id){ return REPTES.caixes.find(c=>c.id===id); }
 function reptRegsDe(id){ return REPTES.registres.filter(r=>r.caixa===id); }
 function reptQueden(c){ return Math.max(0, (c.estoc||0)-reptRegsDe(c.id).length); }
@@ -2077,15 +2105,20 @@ function reptUrl(id){ return location.origin+location.pathname+'?repte='+encodeU
 function reptRegDe(caixa, alumne){ return REPTES.registres.find(r=>r.caixa===caixa && (r.alumne||'').toLowerCase()===(alumne||'').toLowerCase()); }
 function reptRegistra(caixaId, alumne, estat, val){
   alumne=(alumne||'').trim(); if(!alumne) return false;
-  let r=reptRegDe(caixaId, alumne); const ts=nowISO();
+  const R=reptesState(); let r=reptRegDe(caixaId, alumne); const ts=nowISO();
   if(r){ r.estat=estat; if(val!==undefined) r.val=val; r.by=ME; r.at=ts; }
-  else REPTES.registres.push({id:uid(),caixa:caixaId,alumne:alumne,estat:estat,val:val||null,by:ME,at:ts});
-  reptesSave(); return true;
+  else { r={id:uid(),caixa:caixaId,alumne:alumne,estat:estat,val:val||null,by:ME,at:ts}; R.registres.push(r); }
+  api.reptRegUpsert(r); return true;
 }
-function reptRegDelete(id){ REPTES.registres=REPTES.registres.filter(r=>r.id!==id); reptesSave(); }
-function reptRestock(id, add){ const c=reptCaixa(id); if(c){ c.estoc=(c.estoc||0)+add; reptesSave(); } }
-function reptCaixaUpsert(c){ const i=REPTES.caixes.findIndex(x=>x.id===c.id); if(i>=0) REPTES.caixes[i]=c; else REPTES.caixes.push(c); reptesSave(); }
-function reptCaixaDelete(id){ REPTES.caixes=REPTES.caixes.filter(c=>c.id!==id); REPTES.registres=REPTES.registres.filter(r=>r.caixa!==id); reptesSave(); }
+/* Canvia l'estat (i/o la valoració) d'un registre ja existent */
+function reptRegSet(r, estat, val){
+  if(!r) return; r.estat=estat; if(val!==undefined) r.val=val; r.by=ME; r.at=nowISO();
+  api.reptRegUpsert(r);
+}
+function reptRegDelete(id){ const R=reptesState(); R.registres=R.registres.filter(r=>r.id!==id); api.reptRegDelete(id); }
+function reptRestock(id, add){ const c=reptCaixa(id); if(c){ c.estoc=(c.estoc||0)+add; api.reptCaixaSet(id,{estoc:c.estoc}); } }
+function reptCaixaUpsert(c){ const R=reptesState(); const i=R.caixes.findIndex(x=>x.id===c.id); if(i>=0) R.caixes[i]=c; else R.caixes.push(c); api.reptCaixaUpsert(c); }
+function reptCaixaDelete(id){ const R=reptesState(); R.caixes=R.caixes.filter(c=>c.id!==id); R.registres=R.registres.filter(r=>r.caixa!==id); api.reptCaixaDelete(id); }
 let REPT_DEEPLINK_DONE=false;
 function reptApplyPending(){
   if(REPT_DEEPLINK_DONE || !PENDING_REPTE || !ME) return;
@@ -3512,7 +3545,7 @@ function reptRegRow(r,c){
   const est=el('button','rept-reg-est rept-reg-toggle'); est.type='button';
   est.textContent=r.estat==='fet'?'✓ Fet':'🕒 En curs → marca fet';
   est.title=r.estat==='fet'?'Torna-ho a “en curs”':'Marca com a fet';
-  est.onclick=()=>{ r.estat=(r.estat==='fet'?'curs':'fet'); r.by=ME; r.at=nowISO(); reptesSave(); REPTES_CAIXA=c?c.id:REPTES_CAIXA; openSection('eines'); toast(r.alumne+' · '+(r.estat==='fet'?'fet ✓':'en curs')); };
+  est.onclick=()=>{ reptRegSet(r, r.estat==='fet'?'curs':'fet'); REPTES_CAIXA=c?c.id:REPTES_CAIXA; openSection('eines'); toast(r.alumne+' · '+(r.estat==='fet'?'fet ✓':'en curs')); };
   row.appendChild(est);
   if(r.val){ const v=REPT_VALORS.find(x=>x.id===r.val); if(v){ const vb=el('span','rept-reg-val'); vb.style.setProperty('--c',v.c); vb.textContent=v.t; row.appendChild(vb); } }
   const by=el('span','rept-reg-by'); by.textContent=(userById(r.by)||{}).name||''; row.appendChild(by);
@@ -3548,7 +3581,7 @@ function renderReptesAlumneManage(S){
       if(r.val){ const v=REPT_VALORS.find(x=>x.id===r.val)||{}; const vb=el('span','rept-reg-val'); vb.style.setProperty('--c',v.c||'#888'); vb.textContent=v.t||''; row.appendChild(vb); }
       const pill=el('button','rept-reg-est rept-reg-toggle'); pill.type='button'; pill.textContent=r.estat==='fet'?'✓ Fet':'🕒 En curs';
       pill.title=r.estat==='fet'?'Torna-ho a en curs':'Marca com a fet';
-      pill.onclick=()=>{ r.estat=r.estat==='fet'?'curs':'fet'; r.by=ME; r.at=nowISO(); reptesSave(); openSection('eines'); toast(REPTES_ALUMNE+' · '+(r.estat==='fet'?'fet ✓':'en curs')); };
+      pill.onclick=()=>{ reptRegSet(r, r.estat==='fet'?'curs':'fet'); openSection('eines'); toast(REPTES_ALUMNE+' · '+(r.estat==='fet'?'fet ✓':'en curs')); };
       row.appendChild(pill);
       list.appendChild(row); });
     S.appendChild(list);
@@ -3556,7 +3589,7 @@ function renderReptesAlumneManage(S){
   if(!mostrades){ const em=el('div','rept-hint'); em.textContent='Encara no ha fet cap caixa.'; S.appendChild(em); return; }
   if(curs){ const bulk=el('button','btn btn-primary rept-bulk'); bulk.type='button'; bulk.innerHTML='✓ Passa a fet les seleccionades';
     bulk.onclick=()=>{ const sel=[...document.querySelectorAll('#section .rept-sel:checked')]; if(!sel.length){ toast('Marca alguna caixa en curs primer'); return; }
-      sel.forEach(cb=>{ const r=reptRegDe(cb.dataset.caixa,REPTES_ALUMNE); if(r){ r.estat='fet'; r.by=ME; r.at=nowISO(); } }); reptesSave(); openSection('eines'); toast(sel.length+' caixa(es) passades a fet'); };
+      sel.forEach(cb=>{ const r=reptRegDe(cb.dataset.caixa,REPTES_ALUMNE); if(r) reptRegSet(r,'fet'); }); openSection('eines'); toast(sel.length+' caixa(es) passades a fet'); };
     S.appendChild(bulk); }
   const fets=reptFetsAlumne(REPTES_ALUMNE); const tot=REPTES.caixes.length;
   const sum=el('div','rept-alu-sum'); sum.innerHTML='<b>'+fets+'</b> de '+tot+' caixes fetes'; S.appendChild(sum);
@@ -4845,7 +4878,6 @@ function openAndFlash(itemId){
    ============================================================ */
 (async function boot(){
   buildLogin();
-  try{ reptesLoad(); }catch(e){}
   try{ const rp=new URLSearchParams(location.search).get('repte'); if(rp) PENDING_REPTE=rp; }catch(e){}
   try{ PENDING=_loadPending(); }catch(e){}
   let saved=null; try{ saved=localStorage.getItem('coord_me'); }catch(e){}
@@ -4856,9 +4888,11 @@ function openAndFlash(itemId){
     login(saved);            // entra a l'instant, sense mostrar la pantalla de login
   }
   await api.init();           // baixa les dades fresques del núvol
+  try{ reptesLoad(); }catch(e){}   // sembra/actualitza les caixes DESPRÉS de tenir l'estat real
   startCloudSync();
   try{ flushPending(); }catch(e){}
   if(auto){ refreshHome(); }  // repinta l'inici amb les dades ja actualitzades
+  try{ reptApplyPending(); }catch(e){}   // NFC: obre la caixa un cop hi ha dades
 })();
 /* Service worker: accelera les càrregues repetides (fail-safe: si no es pot, l'app funciona igual) */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
