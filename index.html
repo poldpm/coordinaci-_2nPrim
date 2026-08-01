@@ -2081,11 +2081,6 @@ const REPTES_SEED_V=2;   // puja aquest número si canvia la llista de caixes
    Només ho fa si al full encara no hi ha les caixes o si la llista ha canviat. */
 function reptesLoad(){
   const R=reptesState();
-  // migració des de la maqueta local (dispositiu) → només si al núvol encara no hi ha res
-  if(!R.registres.length){
-    try{ const old=JSON.parse(localStorage.getItem('coord_reptes')||'null');
-      if(old && old.registres && old.registres.length){ R.registres=old.registres; } }catch(e){}
-  }
   if(!R.caixes.length || R.v!==REPTES_SEED_V){
     const prev={}; R.caixes.forEach(c=>{ prev[c.id]=c; });
     R.caixes=REPTES_SEED.map(x=>{ const c=reptSeedNorm(x); const p=prev[c.id];
@@ -2094,6 +2089,22 @@ function reptesLoad(){
     R.v=REPTES_SEED_V;
     if(!DEMO_MODE) api.reptSetCaixes(R.caixes, R.v).catch(()=>{}); else safeSave();
   }
+  reptMigraLocal(R);
+}
+/* Migració UNA SOLA VEGADA dels registres que hi hagués al dispositiu (maqueta)
+   cap al núvol. Només els de caixes que encara existeixen; després es marca com a
+   feta perquè no es repeteixi ni ressusciti res esborrat. */
+function reptMigraLocal(R){
+  try{
+    if(localStorage.getItem('coord_reptes_migrat')==='1') return;
+    const old=JSON.parse(localStorage.getItem('coord_reptes')||'null');
+    const regs=(old && old.registres) ? old.registres : [];
+    const vius=regs.filter(r=>r && r.caixa && R.caixes.some(c=>c.id===r.caixa)
+                              && !R.registres.some(x=>x.id===r.id));
+    vius.forEach(r=>{ R.registres.push(r); if(!DEMO_MODE) api.reptRegUpsert(r); });
+    localStorage.setItem('coord_reptes_migrat','1');
+    if(vius.length) toast(vius.length+' registres del racó migrats al núvol');
+  }catch(e){}
 }
 function reptesSave(){ safeSave(); }   // còpia local; el desat real va per api.rept*
 function reptCaixa(id){ return REPTES.caixes.find(c=>c.id===id); }

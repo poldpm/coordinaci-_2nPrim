@@ -203,11 +203,18 @@ nom estandarditzat.
   - **Vistes:** *Caixes* (agrupades per codi/tema, targeta clicable), *Per alumne*
     (cerca pel nom → gestió: checkbox a les "en curs" + passar-les a fet), *Evolució*
     (estadístiques, ★/★★/★★★, alumnes per nombre de caixes, barres per matèria).
-  - **Estat:** `REPTES={caixes,registres,v}`; registre = `{caixa, alumne, estat:'fet'|'curs',
-    val, by, at}`. Comptador de còpies = `estoc − registres`; avís a ≤3 → panell a la
-    portada (`buildReptesPanel`, clic = popup de còpies impreses).
-  - ⚠️ **De moment és LOCAL** (localStorage `coord_reptes`), no se sincronitza entre els
-    tres tutors. Pendent: passar-ho a `STATE` + backend (caldrà redesplegar).
+  - **Estat:** viu a **`STATE.reptes = {caixes, registres, v}`** → **sincronitzat** entre
+    els tres tutors (Google Sheets), com la resta. `REPTES` és un *getter* que apunta
+    sempre a `STATE.reptes` (si fos una còpia, el sync de 20s el deixaria desfasat).
+    Registre = `{id, caixa, alumne, estat:'fet'|'curs', val, by, at}`. Comptador de
+    còpies = `estoc − registres`; avís a ≤3 → panell a la portada (`buildReptesPanel`,
+    clic = popup de còpies impreses).
+  - **API/backend:** `reptSetCaixes` (sembra; **no** entra a la cua de reintents perquè
+    és regenerable), `reptCaixaUpsert`, `reptCaixaSet` (patch: estoc/low/eval),
+    `reptCaixaDelete`, `reptRegUpsert`, `reptRegDelete`. **`reptRegUpsert` és idempotent
+    per `id` I per `caixa+alumne`** → dos tutors marcant el mateix nen no dupliquen.
+  - `reptesLoad()` s'executa **després** d'`api.init()`; `reptMigraLocal()` puja un sol
+    cop els registres que hi hagués al dispositiu (flag `coord_reptes_migrat`).
 - **Comentaris a les entrades** (estil Google): cada targeta renderitzada per
   `entryCard` (Aspectes generals + subtemes) porta un **botó al costat, FORA de la
   targeta** (`entryRow` → `.comment-rail`) que desplega un **panell de comentaris**.
