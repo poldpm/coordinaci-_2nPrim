@@ -187,6 +187,27 @@ cicles"** (`CV_VIEW`), navegador de cicle (`CV_IDX`).
 nom estandarditzat.
 
 ## 9. Altres funcions
+- **El racó dels reptes** (dins `eines`, `EINA='reptes'`): control de les caixes de
+  treball autònom. **110 caixes-nivell** reals del curs 2026-27: Mates 20 caixes/62
+  nivells (2 ⭐ reptes extra: M-06 Meitats i quarts, M-12 Simetria) i Català 16/48.
+  Font de veritat: `dades/reptes_caixes_2026-2027.json` (extret de `Guia_de_les_caixes.pdf`).
+  Regenerar la sembra: `node scripts/gen_reptes_seed.js` i substituir `REPTES_SEED` a
+  `index.html`; el full d'etiquetes: `node scripts/gen_nfc_doc.js` (**no** va dins l'app).
+  - **Model d'ítem:** `{id:'mat-t06-n2', codi:'M-06', materia, tema, nivell(1-3=★..★★★,
+    4=⭐ extra), num(llista de la paret), nom(caixa), nn(nom del nivell), d(què fa el nen),
+    estoc, low, eval}`. `REPTES_SEED_V` = versió de la llista: si puja, `reptesLoad()`
+    resembra les caixes **conservant registres i estoc**.
+  - **NFC:** cada caixa té la URL `?repte=<id>`; a l'arrencada `PENDING_REPTE` +
+    `reptApplyPending()` (amb retard, perquè el parany de `popstate` no ho trepitgi)
+    obre la pantalla d'escaneig d'aquella caixa.
+  - **Vistes:** *Caixes* (agrupades per codi/tema, targeta clicable), *Per alumne*
+    (cerca pel nom → gestió: checkbox a les "en curs" + passar-les a fet), *Evolució*
+    (estadístiques, ★/★★/★★★, alumnes per nombre de caixes, barres per matèria).
+  - **Estat:** `REPTES={caixes,registres,v}`; registre = `{caixa, alumne, estat:'fet'|'curs',
+    val, by, at}`. Comptador de còpies = `estoc − registres`; avís a ≤3 → panell a la
+    portada (`buildReptesPanel`, clic = popup de còpies impreses).
+  - ⚠️ **De moment és LOCAL** (localStorage `coord_reptes`), no se sincronitza entre els
+    tres tutors. Pendent: passar-ho a `STATE` + backend (caldrà redesplegar).
 - **Comentaris a les entrades** (estil Google): cada targeta renderitzada per
   `entryCard` (Aspectes generals + subtemes) porta un **botó al costat, FORA de la
   targeta** (`entryRow` → `.comment-rail`) que desplega un **panell de comentaris**.

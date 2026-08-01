@@ -1,0 +1,1068 @@
+{
+ "curs": "2026-2027",
+ "font": "Guia_de_les_caixes.pdf",
+ "materies": {
+  "mat": "Matemàtiques",
+  "catala": "Català"
+ },
+ "caixes": [
+  {
+   "codi": "C-01",
+   "materia": "catala",
+   "nom": "Síl·labes i tònica",
+   "desc": "Separar paraules en síl·labes, comptar-les i reconèixer la síl·laba tònica.",
+   "nivells": [
+    {
+     "num": 1,
+     "nom": "Separa i compta",
+     "desc": "Separa la paraula en síl·labes muntant-la amb fitxes, i les compta.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 2,
+     "nom": "La síl·laba tònica",
+     "desc": "Troba la síl·laba tònica: la que sona més forta.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 3,
+     "nom": "Compta i classifica",
+     "desc": "Classifica paraules segons si tenen 1, 2, 3 o 4 síl·labes.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-02",
+   "materia": "catala",
+   "nom": "Famílies de paraules",
+   "desc": "Relacionar paraules de la mateixa família i formar-ne derivats.",
+   "nivells": [
+    {
+     "num": 4,
+     "nom": "Agrupa per família",
+     "desc": "Agrupa paraules que comparteixen el tros principal: flor, floreta, florista.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 5,
+     "nom": "Troba la intrusa",
+     "desc": "De 4 paraules, troba la que no és de la família.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 6,
+     "nom": "Forma un derivat",
+     "desc": "A partir d'una paraula i una pista, en forma el derivat.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-03",
+   "materia": "catala",
+   "nom": "Sinònims i antònims",
+   "desc": "Reconèixer i aparellar sinònims i antònims.",
+   "nivells": [
+    {
+     "num": 7,
+     "nom": "Aparella sinònims",
+     "desc": "Aparella paraules que volen dir gairebé el mateix.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 8,
+     "nom": "Aparella antònims",
+     "desc": "Aparella paraules que volen dir el contrari.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 9,
+     "nom": "Sinònims o antònims?",
+     "desc": "Barrejats: diu si la parella són sinònims o antònims.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-04",
+   "materia": "catala",
+   "nom": "Noms propis i comuns",
+   "desc": "Distingir el nom propi del comú i saber quan hi va la majúscula.",
+   "nivells": [
+    {
+     "num": 10,
+     "nom": "Propi o comú?",
+     "desc": "Classifica paraules en nom propi i nom comú.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 11,
+     "nom": "Posa la majúscula",
+     "desc": "En una frase tota en minúscula, diu què ha d'anar amb majúscula.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 12,
+     "nom": "Troba el nom propi",
+     "desc": "Troba el nom propi sense confondre'l amb la majúscula del principi.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-05",
+   "materia": "catala",
+   "nom": "El gènere i el nombre",
+   "desc": "Masculí i femení, singular i plural, i la concordança de tot el grup.",
+   "nivells": [
+    {
+     "num": 13,
+     "nom": "Masculí o femení?",
+     "desc": "Diu si la paraula és masculina o femenina i hi posa l'article.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 14,
+     "nom": "Singular i plural",
+     "desc": "Classifica el plural segons la regla: -s, -es o -os.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 15,
+     "nom": "Passa-ho a plural",
+     "desc": "Passa article + nom + adjectiu al plural, fent concordar-ho tot.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-06",
+   "materia": "catala",
+   "nom": "Les accions (el verb)",
+   "desc": "Identificar l'acció (el verb), qui la fa, i completar la frase.",
+   "nivells": [
+    {
+     "num": 16,
+     "nom": "Què fa?",
+     "desc": "Mira el dibuix i diu el verb: què s'hi fa.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 17,
+     "nom": "Qui fa l'acció?",
+     "desc": "En una frase, troba el verb i qui fa l'acció.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 18,
+     "nom": "Fes la frase",
+     "desc": "Completa la frase encaixant-hi l'etiqueta que hi va.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-07",
+   "materia": "catala",
+   "nom": "Els adjectius",
+   "desc": "Descriure amb adjectius i fer-los concordar amb el nom.",
+   "nivells": [
+    {
+     "num": 19,
+     "nom": "Com és?",
+     "desc": "Mira el dibuix i diu com és: l'adjectiu.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 20,
+     "nom": "Que hi concordi",
+     "desc": "Posa l'adjectiu en la forma que concorda amb el nom.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 21,
+     "nom": "Descriu amb 2 adjectius",
+     "desc": "Descriu una cosa amb dos adjectius que hi concordin.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-08",
+   "materia": "catala",
+   "nom": "Els determinants",
+   "desc": "Triar l'article, el possessiu o la paraula que hi va (al nen no li diem «determinant»).",
+   "nivells": [
+    {
+     "num": 22,
+     "nom": "el · la · els · les",
+     "desc": "Posa cada nom a la columna del seu article: el, la, els, les.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 23,
+     "nom": "De qui és?",
+     "desc": "Diu de qui és la cosa amb la forma que concorda: la meva motxilla.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 24,
+     "nom": "Quina paraula hi va?",
+     "desc": "Dins d'una frase, tria entre tres paraules la que hi va.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-09",
+   "materia": "catala",
+   "nom": "Els sons forts: c/qu i g/gu",
+   "desc": "Escriure ca/co/cu · que/qui i ga/go/gu · gue/gui mirant la vocal que ve després.",
+   "nivells": [
+    {
+     "num": 25,
+     "nom": "C o QU?",
+     "desc": "Decideix si el so [k] s'escriu C o QU segons la vocal que ve després.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 26,
+     "nom": "G o GU?",
+     "desc": "El mateix amb el so [g]: G o GU.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 27,
+     "nom": "Totes barrejades (i la Ü)",
+     "desc": "Barrejades, i hi entra la ü que s'ha de sentir: pingüí.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-10",
+   "materia": "catala",
+   "nom": "La g i la j",
+   "desc": "Distingir ge/gi de ja/jo/ju i corregir la paraula mal escrita.",
+   "nivells": [
+    {
+     "num": 28,
+     "nom": "G o J?",
+     "desc": "ge/gi però ja/jo/ju: decideix segons la vocal que ve després.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 29,
+     "nom": "Completa la frase",
+     "desc": "Completa la paraula amb G o J dins d'una frase.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 30,
+     "nom": "Troba l'error",
+     "desc": "De 4 paraules, troba l'única mal escrita i la corregeix.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-11",
+   "materia": "catala",
+   "nom": "La b i la v",
+   "desc": "Escriure b i v, que no tenen regla: memòria i família de paraules.",
+   "nivells": [
+    {
+     "num": 31,
+     "nom": "Amb B o amb V?",
+     "desc": "B o V, que no tenen regla: s'ajuda de la família de paraules o de la memòria.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 32,
+     "nom": "Completa la frase",
+     "desc": "Completa amb B o V dins d'una frase; al dors, el truc per recordar-ho.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 33,
+     "nom": "Parelles (vaca / baca)",
+     "desc": "Parelles que només canvien la b/v i volen dir coses diferents: vaca / baca.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-12",
+   "materia": "catala",
+   "nom": "La r i la rr",
+   "desc": "Relacionar el so de la r (fort o fluix) amb la grafia r o rr.",
+   "nivells": [
+    {
+     "num": 34,
+     "nom": "R o RR?",
+     "desc": "Entre vocals: si el so és fort s'escriu RR (carro), si és fluix R (pera).",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 35,
+     "nom": "Completa la frase",
+     "desc": "Completa dins d'una frase; hi entra la r de principi, forta però mai RR.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 36,
+     "nom": "Com sona la R?",
+     "desc": "Classifica pel so i descobreix que un so fort no sempre s'escriu RR.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-13",
+   "materia": "catala",
+   "nom": "La s sorda i la s sonora",
+   "desc": "Relacionar el so (el coll vibra o no) amb les grafies s, ss, z, c i ç.",
+   "nivells": [
+    {
+     "num": 37,
+     "nom": "S o SS?",
+     "desc": "Entre vocals, amb la mà al coll: si vibra, una S (casa); si no, dues (tassa).",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 38,
+     "nom": "Completa la frase",
+     "desc": "Completa dins d'una frase amb la mateixa prova de la mà al coll.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 39,
+     "nom": "Vibra o no vibra?",
+     "desc": "Classifica pel so i veu que s, ss, z, c i ç poden fer el mateix so.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-14",
+   "materia": "catala",
+   "nom": "La x, la ix, la tx i la ig",
+   "desc": "Relacionar cada so amb la grafia segons la posició: x, ix, tx i ig.",
+   "nivells": [
+    {
+     "num": 40,
+     "nom": "X o IX?",
+     "desc": "El so de xocolata: X al principi (xai), IX darrere de vocal (caixa).",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 41,
+     "nom": "TX o IG?",
+     "desc": "El so de cotxe: TX al mig (cotxe), IG al final (maig).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 42,
+     "nom": "Totes barrejades",
+     "desc": "Dues decisions seguides: primer quin so és, després en quina posició.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-15",
+   "materia": "catala",
+   "nom": "L'abecedari i l'ordre alfabètic",
+   "desc": "Ordenar alfabèticament per la 1a i per la 2a lletra amb la tira de l'ordre.",
+   "nivells": [
+    {
+     "num": 43,
+     "nom": "Les lletres en ordre",
+     "desc": "Posa 5 lletres del mateix grup en ordre alfabètic sobre la tira.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 44,
+     "nom": "Ordena per la 1a lletra",
+     "desc": "Ordena 5 paraules mirant només la primera lletra.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 45,
+     "nom": "Ordena per la 2a lletra",
+     "desc": "Totes comencen igual: cal mirar la segona lletra.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "C-16",
+   "materia": "catala",
+   "nom": "Fem una frase",
+   "desc": "Construir i revisar frases: ordre, majúscula, punt i signe final.",
+   "nivells": [
+    {
+     "num": 46,
+     "nom": "Fes la frase",
+     "desc": "Ordena 5 paraules per fer una frase amb sentit.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 47,
+     "nom": "La majúscula i el punt",
+     "desc": "De tres versions de la frase, tria l'única ben escrita: és revisió.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 48,
+     "nom": "Quin signe hi va?",
+     "desc": "Decideix si la frase acaba amb punt, interrogant o exclamació.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-01",
+   "materia": "mat",
+   "nom": "Construeix el número",
+   "desc": "Valor posicional i composició de números fins a 199 amb peces de base-10.",
+   "nivells": [
+    {
+     "num": 1,
+     "nom": "Compta les desenes i les unitats",
+     "desc": "Forma números de 2 xifres amb els dígits i diu quantes desenes i unitats té.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 2,
+     "nom": "Construeix-lo amb les peces",
+     "desc": "Representa números fins a 199 amb peces de base-10 (centenes, desenes, unitats).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 3,
+     "nom": "Llegeix i escriu quin número és",
+     "desc": "Del revés: a partir de les C-D-U, esbrina quin número és i el construeix.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-02",
+   "materia": "mat",
+   "nom": "Ordena i compara",
+   "desc": "Ordenar, situar a la recta, anterior i posterior, i comparar amb < > =.",
+   "nivells": [
+    {
+     "num": 4,
+     "nom": "Ordenar",
+     "desc": "Ordena de menor a major una tira de 5 números fins a 99.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 5,
+     "nom": "Quin falta",
+     "desc": "Troba el número que falta d'una sèrie fins a 199 (anterior i posterior).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 6,
+     "nom": "Quin signe",
+     "desc": "Posa el signe <, = o > entre dues quantitats fins a 199.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-03",
+   "materia": "mat",
+   "nom": "Amics del 10 i del 100",
+   "desc": "Descomposicions del 10 i desenes que sumen 100: la base del càlcul mental.",
+   "nivells": [
+    {
+     "num": 7,
+     "nom": "Amics del 10",
+     "desc": "Totes les maneres de fer 10.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 8,
+     "nom": "Amics del 100",
+     "desc": "Parelles de desenes que sumen 100 (10+90, 20+80…).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 9,
+     "nom": "Completa el buit",
+     "desc": "Completa el buit d'una suma fins a 10 o 100 (7+_=10, 30+_=100).",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-04",
+   "materia": "mat",
+   "nom": "Sumo i resto",
+   "desc": "Suma i resta de dues xifres, amb portada i sense, fins a arribar a la columna.",
+   "nivells": [
+    {
+     "num": 10,
+     "nom": "Calcula i comprova",
+     "desc": "Sumes i restes senzilles: calcula i gira per comprovar.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 11,
+     "nom": "Portant-ne · graella D-U",
+     "desc": "Suma portant-ne i resta col·locant cada xifra a la graella D-U.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 12,
+     "nom": "Portant-ne · en columna",
+     "desc": "Suma portant-ne i resta en columna, fins a 3 xifres.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-05",
+   "materia": "mat",
+   "nom": "Dobles i meitats",
+   "desc": "Dobles, quasi dobles i meitats com a estratègia de càlcul ràpid.",
+   "nivells": [
+    {
+     "num": 13,
+     "nom": "Dobles fins a 10",
+     "desc": "El doble d'un número fins a 10.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 14,
+     "nom": "Quasi dobles i dobles fins a 20",
+     "desc": "Dobles fins a 20 i quasi dobles (6+7) amb el truc del doble.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 15,
+     "nom": "Meitats de nombres parells",
+     "desc": "La meitat d'un nombre parell.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-06",
+   "materia": "mat",
+   "nom": "Comencem a multiplicar",
+   "desc": "El concepte de multiplicar com a suma repetida, i les taules del 2, del 5 i del 10.",
+   "nivells": [
+    {
+     "num": 16,
+     "nom": "n vegades (suma repetida)",
+     "desc": "Entén que 3×4 és «3 vegades 4», amb la graella de punts o sumant.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 17,
+     "nom": "Taula del 2 i del 10",
+     "desc": "Multiplica per 2 (el doble) i per 10 (de 10 en 10).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 18,
+     "nom": "Taula del 5 i barrejades",
+     "desc": "Multiplica per 5 (de 5 en 5) i repassa el 2 i el 10.",
+     "extra": false,
+     "nivell": 3
+    },
+    {
+     "num": 19,
+     "nom": "Meitats i quarts",
+     "desc": "Reparteix en meitats i quarts: la primera idea de fracció.",
+     "extra": true,
+     "nivell": 4
+    }
+   ]
+  },
+  {
+   "codi": "M-07",
+   "materia": "mat",
+   "nom": "Quina hora és",
+   "desc": "Llegir i posar l'hora al rellotge d'agulles.",
+   "nivells": [
+    {
+     "num": 20,
+     "nom": "L'hora en punt",
+     "desc": "Llegeix i posa les hores en punt.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 21,
+     "nom": "Hores i mitges",
+     "desc": "Hores en punt i mitges (dos quarts de cinc).",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 22,
+     "nom": "Hores i quarts",
+     "desc": "Els quarts: un quart, dos quarts i tres quarts de…",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-08",
+   "materia": "mat",
+   "nom": "Compto amb euros",
+   "desc": "Monedes i bitllets, equivalències i sumar imports per pagar el preu just.",
+   "nivells": [
+    {
+     "num": 23,
+     "nom": "Monedes i equivalències",
+     "desc": "Coneix monedes i bitllets i en fa equivalències (1 € = dues de 50 c).",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 24,
+     "nom": "El preu just",
+     "desc": "Paga el preu exacte d'un objecte amb les monedes que toquen.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 25,
+     "nom": "La compra",
+     "desc": "Suma el total d'una compra de 2-3 articles i la paga.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-09",
+   "materia": "mat",
+   "nom": "Mesuro longituds",
+   "desc": "Comparar i mesurar longituds, primer sense regle i després amb regle.",
+   "nivells": [
+    {
+     "num": 26,
+     "nom": "Ordena per llargada",
+     "desc": "Ordena tires de la més curta a la més llarga.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 27,
+     "nom": "Mesura amb unitats",
+     "desc": "Mesura amb unitats iguals no convencionals, una rere l'altra.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 28,
+     "nom": "Mesura amb regle (cm)",
+     "desc": "Mesura amb el regle, en centímetres.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-10",
+   "materia": "mat",
+   "nom": "El calendari",
+   "desc": "Dies, mesos i ordinals: ordenar-los i situar-hi una data.",
+   "nivells": [
+    {
+     "num": 29,
+     "nom": "Ordena dies i mesos",
+     "desc": "Ordena els dies de la setmana i els mesos de l'any.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 30,
+     "nom": "Quin dia o mes és",
+     "desc": "Ordinals: quin dia o quin mes és el número 3.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 31,
+     "nom": "Ahir, avui i demà",
+     "desc": "Situa dates: què va just abans (ahir) i just després (demà).",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-11",
+   "materia": "mat",
+   "nom": "Pesa i compara",
+   "desc": "Comparar i ordenar objectes per pes i per capacitat, sense balança.",
+   "nivells": [
+    {
+     "num": 32,
+     "nom": "Quin pesa més",
+     "desc": "Compara dos objectes i diu quin pesaria més de veritat.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 33,
+     "nom": "Ordena per pes",
+     "desc": "Ordena tres objectes del més lleuger al més pesat.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 34,
+     "nom": "Quin conté més",
+     "desc": "Compara capacitats: en quin recipient en cap més.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-12",
+   "materia": "mat",
+   "nom": "Figures planes",
+   "desc": "Reconèixer i classificar figures planes, i comptar-ne costats i vèrtexs.",
+   "nivells": [
+    {
+     "num": 35,
+     "nom": "Classifica les figures",
+     "desc": "Classifica figures planes per la forma: triangle, quadrat, rectangle, cercle.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 36,
+     "nom": "Costats i vèrtexs",
+     "desc": "Compta costats i vèrtexs i aparella cada figura amb el seu carnet.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 37,
+     "nom": "Endevinalles",
+     "desc": "Endevina la figura a partir de pistes de costats i vèrtexs.",
+     "extra": false,
+     "nivell": 3
+    },
+    {
+     "num": 38,
+     "nom": "Simetria",
+     "desc": "Completa l'altra meitat del dibuix perquè quedi simètric (retolador esborrable).",
+     "extra": true,
+     "nivell": 4
+    }
+   ]
+  },
+  {
+   "codi": "M-13",
+   "materia": "mat",
+   "nom": "Tangram",
+   "desc": "Compondre i descompondre figures amb les peces del tangram.",
+   "nivells": [
+    {
+     "num": 39,
+     "nom": "Copia la figura",
+     "desc": "Construeix la figura copiant la targeta de colors.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 40,
+     "nom": "Construeix la silueta",
+     "desc": "Construeix una silueta i comprova amb la cara de colors.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 41,
+     "nom": "Més siluetes",
+     "desc": "Siluetes noves, sense la pista dels colors.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-14",
+   "materia": "mat",
+   "nom": "Geoplà i simetria",
+   "desc": "Construir figures al geoplà i treballar la simetria.",
+   "nivells": [
+    {
+     "num": 42,
+     "nom": "Reprodueix la figura",
+     "desc": "Reprodueix al geoplà la figura d'una targeta-model.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 43,
+     "nom": "Nombre de costats",
+     "desc": "Fa al geoplà una figura amb un nombre de costats donat.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 44,
+     "nom": "Simetria",
+     "desc": "Completa l'altra meitat perquè la figura quedi simètrica.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-15",
+   "materia": "mat",
+   "nom": "Cossos geomètrics",
+   "desc": "Reconèixer el cub, l'esfera, el cilindre, el con i el prisma, i les seves cares.",
+   "nivells": [
+    {
+     "num": 45,
+     "nom": "Aparella cos i nom",
+     "desc": "Aparella cada cos amb el seu nom: cub, esfera, cilindre, con, prisma.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 46,
+     "nom": "Objectes al taulell",
+     "desc": "Posa cada objecte real sobre el cos que té la seva forma.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 47,
+     "nom": "Cares i vèrtexs",
+     "desc": "Compta les cares planes i els vèrtexs d'un cos.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-16",
+   "materia": "mat",
+   "nom": "Orientació i itineraris",
+   "desc": "Posició relativa i itineraris: seguir i descriure un camí amb referents.",
+   "nivells": [
+    {
+     "num": 48,
+     "nom": "On és la pilota?",
+     "desc": "Diu on és la pilota: a sobre, a sota, davant, darrere, a dins, entre.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 49,
+     "nom": "Segueix les fletxes",
+     "desc": "Segueix les fletxes des de la sortida i diu a quin lloc arriba.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 50,
+     "nom": "Escriu el camí",
+     "desc": "Del revés: escriu les fletxes del camí fins a un lloc.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-17",
+   "materia": "mat",
+   "nom": "Recompte i gràfic",
+   "desc": "Recollir dades, fer un pictograma i llegir-ne la freqüència.",
+   "nivells": [
+    {
+     "num": 51,
+     "nom": "Compta i classifica",
+     "desc": "Compta quantes n'hi ha de cada fruita i les classifica.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 52,
+     "nom": "Fes el pictograma",
+     "desc": "Passa el recompte a un pictograma, una casella per fruita.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 53,
+     "nom": "Llegeix el gràfic",
+     "desc": "Llegeix un gràfic ja fet i respon: qui en té més, quantes, en total.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-18",
+   "materia": "mat",
+   "nom": "Segur, possible o impossible",
+   "desc": "Atzar bàsic: segur, possible i impossible, i què és més probable.",
+   "nivells": [
+    {
+     "num": 54,
+     "nom": "Classifica",
+     "desc": "Classifica situacions en segur, possible i impossible.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 55,
+     "nom": "La bossa de peces",
+     "desc": "Mira les peces d'una bossa i diu què és fàcil, segur o impossible que surti.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 56,
+     "nom": "Quina és més probable",
+     "desc": "Compara dues bosses i diu on és més fàcil treure un color.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-19",
+   "materia": "mat",
+   "nom": "Sèries i patrons",
+   "desc": "Identificar i continuar patrons de colors, de formes i de números.",
+   "nivells": [
+    {
+     "num": 57,
+     "nom": "Patrons de colors",
+     "desc": "Continua un patró de colors ABAB amb les peces.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 58,
+     "nom": "Patrons més difícils",
+     "desc": "Patrons més llargs: ABC i AABB.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 59,
+     "nom": "Patrons de números",
+     "desc": "Patrons de números: de 2 en 2, de 10 en 10.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  },
+  {
+   "codi": "M-20",
+   "materia": "mat",
+   "nom": "Resol el problema",
+   "desc": "Resoldre problemes d'una i de dues operacions amb una pauta fixa.",
+   "nivells": [
+    {
+     "num": 60,
+     "nom": "Problemes amb dibuix",
+     "desc": "Problema d'una operació, amb dibuix de suport.",
+     "extra": false,
+     "nivell": 1
+    },
+    {
+     "num": 61,
+     "nom": "Sumar o restar",
+     "desc": "Llegeix el problema i decideix si cal sumar o restar.",
+     "extra": false,
+     "nivell": 2
+    },
+    {
+     "num": 62,
+     "nom": "Problemes de 2 passos",
+     "desc": "Problemes de dos passos.",
+     "extra": false,
+     "nivell": 3
+    }
+   ]
+  }
+ ]
+}
