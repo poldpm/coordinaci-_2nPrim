@@ -27,9 +27,25 @@ j.caixes
     });
   });
 
+/* Entrades de TEMA (una per caixa): hi viuen les còpies i la fitxa imprimible,
+   perquè la fitxa és la mateixa per als 3 nivells del tema. */
+const temes = j.caixes
+  .slice()
+  .sort((a, b) => a.materia.localeCompare(b.materia) || a.codi.localeCompare(b.codi))
+  .map(c => ({
+    id: c.codi,                      // 'M-01'
+    m: c.materia,
+    t: parseInt(c.codi.split('-')[1], 10),
+    nom: c.nom,
+    d: c.desc,
+    f: 'fitxes/Fitxa_' + c.codi + '_BN.pdf'
+  }));
+
 const out = '/* Caixes del Racó dels reptes (generat des de dades/reptes_caixes_2026-2027.json) */\n'
-  + 'const REPTES_SEED=' + JSON.stringify(rows) + ';\n';
+  + 'const REPTES_SEED=' + JSON.stringify(rows) + ';\n'
+  + 'const REPTES_TEMES=' + JSON.stringify(temes) + ';\n';
 fs.writeFileSync(dest, out, 'utf8');
+console.log('temes:', temes.length);
 
 const perMat = {};
 rows.forEach(r => { perMat[r.m] = (perMat[r.m] || 0) + 1; });
