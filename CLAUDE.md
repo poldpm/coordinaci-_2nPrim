@@ -47,6 +47,7 @@ sw.js                    ← service worker (cau: HTML xarxa-primer, assets cau-
 manifest.webmanifest     ← PWA
 .nojekyll                ← perquè GitHub Pages no "processi" res
 img/                     ← favicons + icones (3 pals) + logo.webp (hero, extern, ~182 KB)
+fitxes/                  ← 36 PDF imprimibles del Racó dels reptes (Fitxa_<CODI>_BN.pdf)
 Codi_AppsScript.gs       ← BACKEND. NO va MAI a GitHub (veure §10). Local + Apps Script.
 CLAUDE.md                ← aquest fitxer
 .gitignore               ← exclou Codi_AppsScript.gs de git
@@ -193,10 +194,20 @@ nom estandarditzat.
   Font de veritat: `dades/reptes_caixes_2026-2027.json` (extret de `Guia_de_les_caixes.pdf`).
   Regenerar la sembra: `node scripts/gen_reptes_seed.js` i substituir `REPTES_SEED` a
   `index.html`; el full d'etiquetes: `node scripts/gen_nfc_doc.js` (**no** va dins l'app).
-  - **Model d'ítem:** `{id:'mat-t06-n2', codi:'M-06', materia, tema, nivell(1-3=★..★★★,
-    4=⭐ extra), num(llista de la paret), nom(caixa), nn(nom del nivell), d(què fa el nen),
-    estoc, low, eval}`. `REPTES_SEED_V` = versió de la llista: si puja, `reptesLoad()`
-    resembra les caixes **conservant registres i estoc**.
+  - **Dos tipus d'entrada dins `caixes`** (⚠️ important):
+    - **TEMA** `{id:'M-06', tipus:'tema', codi, materia, tema, nom, d, fitxa, estoc, low, eval}`
+      → aquí hi viuen les **còpies** i la **fitxa imprimible**, perquè *la fitxa és la
+      mateixa per als 3 nivells de la caixa* (una fitxa per alumne i nivell fet).
+    - **NIVELL** `{id:'mat-t06-n2', codi:'M-06', materia, tema, nivell(1-3=★..★★★, 4=⭐ extra),
+      num(llista de la paret), nom(caixa), nn(nom del nivell), d(què fa el nen)}` → per a
+      l'NFC i el seguiment. **No** té estoc propi.
+    - `reptTemaDe(x)` resol sempre al tema; `reptQueden`/`reptLow` compten les fitxes
+      gastades com els registres de **tots** els nivells d'aquell tema.
+    `REPTES_SEED_V` = versió de la llista: si puja, `reptesLoad()` resembra
+    **conservant registres i estoc**.
+  - **Fitxes imprimibles:** 36 PDF a `fitxes/Fitxa_<CODI>_BN.pdf` (A4 apaïsat, 2 fitxes
+    per full, B/N). El botó 🖨️ de la targeta de tema (i l'avís de la portada) demana
+    quantes còpies faràs, les suma a l'estoc i obre el PDF.
   - **NFC:** cada caixa té la URL `?repte=<id>`; a l'arrencada `PENDING_REPTE` +
     `reptApplyPending()` (amb retard, perquè el parany de `popstate` no ho trepitgi)
     obre la pantalla d'escaneig d'aquella caixa.
