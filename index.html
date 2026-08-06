@@ -2093,7 +2093,7 @@ function reptSeedNorm(x){ return {id:x.id, materia:x.m, codi:x.c, tema:x.t, nive
 /* Entrada de TEMA: hi viuen les CÒPIES i la fitxa imprimible, perquè la fitxa
    és la mateixa per als 3 nivells del tema (una fitxa per alumne i nivell fet). */
 function reptTemaNorm(x){ return {id:x.id, tipus:'tema', codi:x.id, materia:x.m, tema:x.t,
-  nom:x.nom, d:x.d, fitxa:x.f, estoc:15, low:3, eval:false}; }
+  nom:x.nom, d:x.d, fitxa:x.f, estoc:10, low:3, eval:false}; }
 const REPTES_SEED_V=3;   // puja aquest número si canvia la llista de caixes
 /* Sembra/actualitza la llista AL NÚVOL (conserva registres i estoc).
    `caixes` conté entrades de TEMA (id='M-01') i de NIVELL (id='mat-t01-n2'). */
@@ -3542,7 +3542,7 @@ function reptAddForm(){
   const nom=el('input','input'); nom.placeholder='Nom de la caixa…'; nom.value=edit?edit.nom:'';
   const codi=el('input','input'); codi.placeholder='M-21 / C-17'; codi.value=edit?edit.codi:''; if(edit) codi.disabled=true;
   const mat=el('select','input'); [['mat','🔢 Matemàtiques'],['catala','📖 Català']].forEach(o=>{ const op=el('option'); op.value=o[0]; op.textContent=o[1]; if(edit&&edit.materia===o[0])op.selected=true; mat.appendChild(op); });
-  const estoc=el('input','input'); estoc.type='number'; estoc.min='0'; estoc.value=edit?edit.estoc:15;
+  const estoc=el('input','input'); estoc.type='number'; estoc.min='0'; estoc.value=edit?edit.estoc:10;
   const low=el('input','input'); low.type='number'; low.min='0'; low.value=edit?(edit.low||3):3;
   const fitxa=el('input','input'); fitxa.placeholder='fitxes/Fitxa_M-01_BN.pdf'; fitxa.value=edit?(edit.fitxa||''):'';
   const evalL=el('label','rept-check'); const evalC=el('input'); evalC.type='checkbox'; if(edit&&edit.eval)evalC.checked=true; evalL.appendChild(evalC); evalL.appendChild(document.createTextNode(' Amb valoració (si no, només “Fet ✓”)'));
