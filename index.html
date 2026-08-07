@@ -833,6 +833,7 @@ textarea.input{resize:vertical;min-height:74px}
 .sres{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-sm);cursor:pointer;text-align:left;width:100%;animation:sdown .2s}
 .sres:hover{border-color:var(--cyan);transform:translateY(-1px)}
 .sres .avatar{width:32px;height:32px;font-size:.82rem;flex:none}
+.sres-ico{width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--panel-2);border-radius:50%;font-size:1rem}
 .sres .body{flex:1;min-width:0}
 .sres .top{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap}
 .sres h5{margin:0 0 3px;font-family:var(--font-d);font-weight:600;font-size:1.02rem;color:var(--teal-ink);line-height:1.2}
@@ -2062,7 +2063,7 @@ let EDITING=null;
 const OPEN_COMMENTS=new Set();   // ids d'entrades amb el panell de comentaris obert
 let CAL_VIEW='llista', CAL_MONTH=null, SCHEDULING=null;
 let KANBAN_GROUP=false;
-let AV_TRI=null, AV_SUBJECT=null;
+let AV_TRI=null, AV_SUBJECT=null, PENDING_AV=null;
 let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
 /* ---------- El racó dels reptes (dins STATE.reptes → sincronitzat entre els tres) ---------- */
@@ -3953,6 +3954,7 @@ function renderGroupResults(S){
 
 /* ---------- AVALUACIÓ ---------- */
 function renderAvaluacio(S,sec){
+  if(PENDING_AV){ AV_TRI=PENDING_AV.tri; AV_SUBJECT=PENDING_AV.subj; PENDING_AV=null; }
   if(AV_TRI && AV_SUBJECT){
     const subj=subjectsForTri(AV_TRI).find(s=>s.id===AV_SUBJECT);
     buildSecHero(S,sec,{title:(subj?subj.name:''), desc:triName(AV_TRI),
@@ -4879,14 +4881,105 @@ function buildQuick(){
    CERCADOR GLOBAL
    ============================================================ */
 const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+/* Cerca global: busca a TOTES les àrees de l'app */
 function searchAll(q){
   const tokens = norm(q).split(/\s+/).filter(Boolean);
   if(!tokens.length) return [];
   const match = text => { const t=norm(text); return tokens.every(tok=>t.includes(tok)); };
-  const res=[];
-  STATE.entries.forEach(e=>{ if(match((e.title||'')+' '+stripHtml(e.body||''))) res.push({type:'entry',item:e,section:e.section}); });
-  STATE.tasks.forEach(t=>{ if(match((t.title||'')+' '+(t.desc||''))) res.push({type:'task',item:t,section:'tasques'}); });
-  res.sort((a,b)=> new Date(b.item.date)-new Date(a.item.date));
+  const res=[]; const add=o=>{ res.push(o); };
+  const cut=(s,n)=>{ s=String(s||'').replace(/\s+/g,' ').trim(); return s.length>n?s.slice(0,n)+'…':s; };
+
+  // 1) Entrades (aspectes generals, calendari, comandes, enllaços i subtemes)
+  STATE.entries.forEach(e=>{ if(match((e.title||'')+' '+stripHtml(e.body||'')+' '+(e.url||'')))
+    add({g:0,type:'entry',item:e,section:e.section,date:e.updatedAt||e.date}); });
+  // 2) Tasques
+  STATE.tasks.forEach(t=>{ if(match((t.title||'')+' '+(t.desc||'')))
+    add({g:0,type:'task',item:t,section:'tasques',date:t.updatedAt||t.date}); });
+  // 3) Comentaris (i respostes)
+  Object.keys(STATE.comments||{}).forEach(eid=>{
+    const entry=STATE.entries.find(e=>e.id===eid); if(!entry) return;
+    ((STATE.comments||{})[eid]||[]).forEach(th=>{
+      [{a:th.author,t:th.text,at:th.createdAt}].concat((th.replies||[]).map(r=>({a:r.author,t:r.text,at:r.createdAt})))
+        .forEach(u=>{ if(match(u.t||'')) add({g:1,type:'comment',section:entry.section,author:u.a,date:u.at,
+          title:'Comentari a «'+(entry.title||stripHtml(entry.body||'').slice(0,30))+'»', snippet:u.t,
+          go:()=>{ OPEN_COMMENTS.add(eid); try{ api.commentSeen(eid); }catch(e2){} openAndFlash(eid); }}); });
+    });
+  });
+  // 4) Subtemes (projectes, excursions, activitats)
+  (STATE.subthemes||[]).forEach(s=>{ if(match(s.name||''))
+    add({g:1,type:'sub',section:s.section,title:s.name,snippet:'Subtema de '+(secById(s.section)||{}).name,
+      go:()=>{ closeSearch(); openSubtheme(s.section,s.id); }}); });
+  // 5) Correus
+  (STATE.correus||[]).forEach(c=>{ if(match((c.title||'')+' '+stripHtml(c.body||'')))
+    add({g:1,type:'correu',section:'correus',author:c.author,date:c.createdAt||c.date,
+      title:c.title||'(sense assumpte)', snippet:stripHtml(c.body||''),
+      go:()=>{ closeSearch(); openSection('correus'); }}); });
+  // 6) Frases d'avaluació
+  TRIMESTRES.forEach(tri=>{ const byS=(STATE.avaluacio||{})[tri.id]||{};
+    Object.keys(byS).forEach(subjId=>{
+      const subj=(subjectsForTri(tri.id)||[]).find(x=>x.id===subjId)||{name:subjId};
+      (byS[subjId]||[]).forEach(l=>{
+      if(match((subj.name||'')+' '+(l.name||'')+' '+(l.phrase||''))){
+        add({g:2,type:'aval',section:'avaluacio',title:subj.name+' · '+(l.name||''),snippet:l.phrase||'',
+          go:()=>{ closeSearch(); PENDING_AV={tri:tri.id, subj:subjId}; openSection('avaluacio'); },
+          extra:tri.name});
+      }
+    }); });
+  });
+  // 7) Programació (setmanes de cada assignatura, projectes de Medi i carpeta viatgera)
+  try{
+    const weeks=PROG_WEEKS_ARR.filter(w=>!w.isVac);
+    ['mates','catala','medi'].forEach(subj=>{
+      weeks.forEach((w,i)=>{
+        const cell=progCell(subj,w.monday);
+        const items=progItemsView(subj,w.monday);
+        const txt=items.map(x=>x.t).join(' | ')+' '+(cell.notes||'')+' '+(cell.title||'');
+        if(match(txt)){
+          const hit=items.filter(x=>match(x.t||''))[0];
+          add({g:3,type:'prog',section:'programacio',
+            title:(PROG_SUBJECTS.find(s=>s.id===subj)||{}).name+' · Setmana '+w.teachingN,
+            snippet: hit? hit.t : cut(cell.notes||cell.title,120), extra:progWeekLabel(w),
+            go:()=>{ closeSearch(); PROG_SUBJECT=subj; PROG_VIEW='week'; PROG_WEEK_IDX=PROG_WEEKS_ARR.indexOf(w); openSection('programacio'); }});
+        }
+      });
+    });
+    // Medi per projectes
+    if(typeof PROG_MEDI_PROJ!=='undefined') PROG_MEDI_PROJ.forEach(p=>{
+      const items=progItemsView('medi',p.key);
+      const txt=p.nom+' '+items.map(x=>x.t).join(' | ')+' '+(p.pla||[]).join(' ');
+      if(match(txt)){ const hit=items.filter(x=>match(x.t||''))[0];
+        add({g:3,type:'prog',section:'programacio',title:'Medi · '+p.nom,snippet:hit?hit.t:cut((p.pla||[])[0],120),
+          go:()=>{ closeSearch(); PROG_SUBJECT='medi'; MEDI_VIEW='projectes'; openSection('programacio'); }}); }
+    });
+    // Carpeta viatgera
+    (typeof CV_GIVES!=='undefined'?CV_GIVES:[]).forEach((g,idx)=>{
+      const cell=progCell('carpeta',g); const items=progItemsView('carpeta',g);
+      const txt=(cell.title||'')+' '+items.map(x=>x.t).join(' | ')+' '+(cell.notes||'');
+      if(match(txt)){ const hit=items.filter(x=>match(x.t||''))[0];
+        add({g:3,type:'prog',section:'programacio',title:'Carpeta viatgera · cicle '+(idx+1),
+          snippet:hit?hit.t:cut(cell.title||cell.notes,120),extra:cvDateLabel(g),
+          go:()=>{ closeSearch(); PROG_SUBJECT='carpeta'; CV_VIEW='cycle'; CV_IDX=idx; openSection('programacio'); }}); }
+    });
+  }catch(e){}
+  // 8) El racó dels reptes (caixes, nivells i alumnes)
+  try{
+    (REPTES.caixes||[]).forEach(c=>{
+      if(match((c.codi||'')+' '+(c.nom||'')+' '+(c.nn||'')+' '+(c.d||''))){
+        const esTema=reptEsTema(c);
+        add({g:4,type:'repte',section:'eines',
+          title:(c.codi?c.codi+' · ':'')+(esTema?c.nom:(c.nn||c.nom))+(c.nivell?' '+reptStars(c.nivell):''),
+          snippet:c.d||'', extra:esTema?'Caixa':'Nivell',
+          go:()=>{ closeSearch(); PENDING_EINA='reptes'; REPTES_VIEW='caixes';
+            REPTES_CAIXA=esTema?null:c.id; openSection('eines'); }});
+      }
+    });
+    const alumnes=[...new Set((REPTES.registres||[]).map(r=>r.alumne))].filter(a=>match(a||''));
+    alumnes.forEach(a=>{ const n=(REPTES.registres||[]).filter(r=>r.alumne===a).length;
+      add({g:4,type:'repte',section:'eines',title:a,snippet:n+' caixa(es) registrades al racó dels reptes',extra:'Alumne',
+        go:()=>{ closeSearch(); PENDING_EINA='reptes'; REPTES_VIEW='alumne'; REPTES_ALUMNE=a; openSection('eines'); }}); });
+  }catch(e){}
+
+  res.sort((a,b)=> (a.g-b.g) || (new Date(b.date||0)-new Date(a.date||0)) || String(a.title||'').localeCompare(String(b.title||'')));
   return res;
 }
 const searchOv=$('#search');
@@ -4907,21 +5000,26 @@ function renderSearch(q){
   head.style.textAlign='left'; head.textContent=`${res.length} resultat${res.length===1?'':'s'}`; box.appendChild(head);
   res.forEach(r=>box.appendChild(searchRow(r)));
 }
+const SEARCH_ICO={comment:'💬',sub:'📁',correu:'✉️',aval:'📝',prog:'📅',repte:'🎯'};
 function searchRow(r){
-  const sec=secById(r.section);
-  const isTask=r.type==='task';
-  const row=el('button','sres'); row.dataset.id=r.item.id;
-  row.appendChild(avatarEl(r.item.author,32));
+  const sec=secById(r.section)||{name:'',color:'var(--muted)'};
+  const isTask=r.type==='task', isEntry=r.type==='entry';
+  const row=el('button','sres');
+  if(r.item) row.dataset.id=r.item.id;
+  const author = r.item ? r.item.author : r.author;
+  if(author && userById(author).name) row.appendChild(avatarEl(author,32));
+  else { const ic=el('div','sres-ico'); ic.textContent=SEARCH_ICO[r.type]||'•'; row.appendChild(ic); }
   const body=el('div','body');
   const top=el('div','top');
   const tag=el('span','chip'); tag.style.background=sec.color+'22'; tag.style.color=sec.color; tag.textContent=sec.name; top.appendChild(tag);
-  if(isTask){ const st=STATUSES.find(s=>s.id===r.item.status); const stc=el('span','chip'); stc.style.background=st.color; stc.style.color='#fff'; stc.textContent=st.name; top.appendChild(stc); }
+  if(isTask){ const st=STATUSES.find(s=>s.id===r.item.status); if(st){ const stc=el('span','chip'); stc.style.background=st.color; stc.style.color='#fff'; stc.textContent=st.name; top.appendChild(stc); } }
+  if(r.extra){ const ex=el('span','chip'); ex.style.background='var(--panel-2)'; ex.style.color='var(--muted)'; ex.textContent=r.extra; top.appendChild(ex); }
   body.appendChild(top);
-  const h=el('h5'); h.textContent=r.item.title || sec.name; body.appendChild(h);
-  const snippet = isTask ? (r.item.desc||'') : stripHtml(r.item.body||'');
+  const h=el('h5'); h.textContent=(r.item? (r.item.title||sec.name) : (r.title||sec.name)); body.appendChild(h);
+  const snippet = r.item ? (isTask ? (r.item.desc||'') : stripHtml(r.item.body||'')) : (r.snippet||'');
   if(snippet){ const p=el('p'); p.textContent=snippet; body.appendChild(p); }
   row.appendChild(body);
-  row.onclick=()=>openAndFlash(r.item.id);
+  row.onclick = r.go ? r.go : ()=>openAndFlash(r.item.id);
   return row;
 }
 function openAndFlash(itemId){
