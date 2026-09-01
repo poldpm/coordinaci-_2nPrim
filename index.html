@@ -332,6 +332,7 @@ a{color:var(--teal)}
 .cv-cnt{background:var(--panel-2);color:var(--teal);font-weight:800;font-size:.76rem;padding:.12em .5em;border-radius:8px}
 .cv-lliurat{margin-top:10px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:14px;padding:12px}
 .att-chip.cv-chip.fet{background:#27AE60;border-color:#27AE60;color:#fff}
+.nov-cmt{background:#fff4e0;color:#a4680d;font-weight:800}
 .rept-tema-h{font-family:var(--font-d);font-weight:600;color:var(--teal-ink);margin:12px 0 6px;font-size:.98rem;border-left:3px solid var(--cyan);padding-left:8px}
 /* Targeta del TEMA (hi viuen les còpies i la fitxa) */
 .rept-tema{background:var(--panel-2);border:1.5px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r-lg);
@@ -1843,6 +1844,8 @@ function novItems(){
       updatedAt:t.updatedAt||t.date,edited:isEdited(t)}); });
   Object.keys(STATE.comments||{}).forEach(entryId=>{
     const entry=STATE.entries.find(e=>e.id===entryId); if(!entry) return;
+    // si l'entrada ja surt com a novetat, els comentaris hi van inclosos (una sola targeta)
+    if(!(entry.readBy||[]).includes(ME)) return;
     const units=[];
     (STATE.comments[entryId]||[]).forEach(t=>{
       if(t.author!==ME && !(t.seenBy||[]).includes(ME)) units.push({author:t.author,text:t.text,createdAt:t.createdAt});
@@ -1946,7 +1949,7 @@ function renderNovetats(){
   const wrap=$('#novetats'); wrap.innerHTML='';
   const list=novItems();
   const block=$('#novBlock');
-  if(!list.length){ if(block) block.style.display='none'; return; }
+  if(!list.length){ if(block) block.style.display='none'; const c=$('#novCount'); if(c){ c.textContent='0'; c.style.display='none'; } return; }
   if(block) block.style.display='';
   $('#novCount').textContent=list.length;
   $('#novCount').style.display='';
@@ -1980,6 +1983,8 @@ function buildNovCard(nov){
   else if(nov.ref.subtheme){ const sub=STATE.subthemes.find(s=>s.id===nov.ref.subtheme); if(sub) label=sec.name+' · '+sub.name; }
   tag.textContent=label;
   c.appendChild(tag);
+  if(nov.kind==='entry' && typeof entryHasUnseenComments==='function' && entryHasUnseenComments(nov.id)){
+    const cm=el('span','chip nov-cmt'); cm.textContent='💬 amb comentaris nous'; c.appendChild(cm); }
   const h=el('h4'); h.textContent=nov.title||sec.name; c.appendChild(h);
   const p=el('p'); p.textContent=stripHtml(nov.snippet)||''; c.appendChild(p);
   const foot=el('div','foot');
@@ -1997,20 +2002,30 @@ function buildNovCard(nov){
   return c;
 }
 function markNovRead(nov,card){
+  if(nov._marcant) return;   // evita marcar-ho dos cops si es clica ràpid
+  nov._marcant=true;
   card.style.pointerEvents='none';
-  const anim=card.animate(
-    [{transform:'none',opacity:1},{transform:'translateY(-46px) rotate(-5deg)',opacity:0}],
-    {duration:340,easing:'cubic-bezier(.4,0,.2,1)'}
-  );
-  const done=async()=>{
-    if(nov.kind==='comment'){ await api.commentSeen(nov.id); }
-    else {
-      nov.ref.readBy=[...(nov.ref.readBy||[]),ME];
-      if(nov.kind==='task') await api.updateTask(nov.ref); else await api.updateEntry(nov.ref);
-    }
-    renderNovetats(); renderBento();
-  };
-  anim.onfinish=done; anim.oncancel=done;
+  // 1) Desa PRIMER (no depèn de l'animació: si la pestanya està en segon pla
+  //    o el refresc la cancel·la, la novetat s'ha de marcar igualment)
+  const desat=(async()=>{
+    if(nov.kind==='comment'){ await api.commentSeen(nov.id); return; }
+    nov.ref.readBy=[...new Set([...(nov.ref.readBy||[]), ME])];
+    if(nov.kind==='task'){ await api.updateTask(nov.ref); return; }
+    await api.updateEntry(nov.ref);
+    // els comentaris d'aquesta entrada anaven dins la mateixa targeta
+    if(entryHasUnseenComments(nov.ref.id)) await api.commentSeen(nov.ref.id);
+  })();
+  // 2) Repinta quan acabi l'animació (o de seguida, si no arrenca)
+  let repintat=false;
+  const repinta=()=>{ if(repintat) return; repintat=true;
+    Promise.resolve(desat).catch(()=>{}).then(()=>{ renderNovetats(); renderBento(); }); };
+  try{
+    const anim=card.animate(
+      [{transform:'none',opacity:1},{transform:'translateY(-46px) rotate(-5deg)',opacity:0}],
+      {duration:340,easing:'cubic-bezier(.4,0,.2,1)'});
+    anim.onfinish=repinta; anim.oncancel=repinta;
+  }catch(e){}
+  setTimeout(repinta, 420);   // xarxa de seguretat
 }
 
 function sectionBadge(sec){
