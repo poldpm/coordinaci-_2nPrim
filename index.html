@@ -326,6 +326,12 @@ a{color:var(--teal)}
 .rept-note{background:#fff7e6;border:1.5px solid #f0dfb0;color:#8a6d1f;font-weight:600;font-size:.86rem;padding:.7em .9em;border-radius:12px;margin-bottom:12px}
 .rept-mat{display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 32%,#fff);font-weight:800;font-size:.78rem;padding:.25em .6em;border-radius:8px}
 .rept-mathead{margin:16px 0 8px}
+
+/* Carpeta viatgera: qui l'ha entregada */
+.cv-lliurat-btn{display:inline-flex;align-items:center;gap:8px}
+.cv-cnt{background:var(--panel-2);color:var(--teal);font-weight:800;font-size:.76rem;padding:.12em .5em;border-radius:8px}
+.cv-lliurat{margin-top:10px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:14px;padding:12px}
+.att-chip.cv-chip.fet{background:#27AE60;border-color:#27AE60;color:#fff}
 .rept-tema-h{font-family:var(--font-d);font-weight:600;color:var(--teal-ink);margin:12px 0 6px;font-size:.98rem;border-left:3px solid var(--cyan);padding-left:8px}
 /* Targeta del TEMA (hi viuen les còpies i la fitxa) */
 .rept-tema{background:var(--panel-2);border:1.5px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r-lg);
@@ -1373,6 +1379,12 @@ const api = {
     STATE.programacio[subject] = map || {};
     await persist('progSetSubject', {subject, map:map||{}});
   },
+  async cvLliurat(key, alumne, on){
+    STATE.cvLliurat = STATE.cvLliurat || {};
+    const m = STATE.cvLliurat[key] = STATE.cvLliurat[key] || {};
+    if(on) m[alumne]=true; else delete m[alumne];
+    await persist('cvLliurat', {key, alumne, on:!!on});
+  },
   async correuUpsert(c){
     STATE.correus = STATE.correus || [];
     const i = STATE.correus.findIndex(x=>x.id===c.id);
@@ -1485,6 +1497,7 @@ function normalizeState(){
   if(!STATE.correus) STATE.correus=[];
   if(!STATE.emailReminders) STATE.emailReminders={};
   if(!STATE.comments) STATE.comments={};
+  if(!STATE.cvLliurat) STATE.cvLliurat={};
   if(!STATE.reptes) STATE.reptes={caixes:[],registres:[],v:0};
   STATE.reptes.caixes=STATE.reptes.caixes||[]; STATE.reptes.registres=STATE.reptes.registres||[];
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
@@ -2489,7 +2502,7 @@ async function doProgCarry(subject, fromMonday, items){
 }
 
 let CV_IDX=null;
-let CV_VIEW='cycle';
+let CV_VIEW='cycle', CV_LLIURAT_OPEN=false, CV_CLASS=null;
 function cvDateLabel(iso){ const p=String(iso).split('-'); const d=new Date(+p[0],+p[1]-1,+p[2]); return d.toLocaleDateString('ca-ES',{weekday:'short',day:'numeric',month:'short'}); }
 function progItemListEl(subject, key){
   const wrap=el('div','prog-items');
@@ -2560,6 +2573,9 @@ function renderCarpeta(S, subj){
   const dl=el('div','prog-field'); dl.innerHTML='<label>Deures d\u2019aquesta carpeta</label>';
   dl.appendChild(progItemListEl('carpeta', give)); card.appendChild(dl);
 
+  // --- Qui l'ha entregada ---
+  card.appendChild(cvLliuratBlock(give));
+
   const linkWrap=el('div','prog-field'); linkWrap.innerHTML='<label>Document dels deures (Google Doc)</label>';
   const link=el('input','input'); link.type='url'; link.value=cell.link||''; link.placeholder='Enganxa l\u2019enlla\u00e7 del document de Drive\u2026'; link.style.textAlign='left';
   link.addEventListener('blur',()=>{ const c=progCell('carpeta',give); if((c.link||'')!==link.value) api.progSetCell('carpeta', give, {items:progItemsOf(c), notes:c.notes||'', link:link.value}).then(()=>toast('Desat \u2713')).catch(()=>{}); });
@@ -2568,6 +2584,57 @@ function renderCarpeta(S, subj){
   card.appendChild(linkWrap);
 
   S.appendChild(card);
+}
+/* Qui ha entregat la carpeta d'aquest cicle (per classe) */
+function cvLliuratsDe(give){ return (STATE.cvLliurat||{})[give]||{}; }
+function cvLliuratBlock(give){
+  const wrap=el('div','prog-field');
+  const classes=Object.keys(STATE.students||{}).filter(c=>STATE.students[c] && STATE.students[c].length);
+  const marks=cvLliuratsDe(give);
+  const totalTots=classes.reduce((n,c)=>n+(STATE.students[c]||[]).length,0);
+  const fetsTots=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>marks[x]).length,0);
+  const btn=el('button','btn btn-ghost cv-lliurat-btn'); btn.type='button';
+  btn.innerHTML='🎒 Qui l’ha entregada <span class="cv-cnt">'+fetsTots+'/'+totalTots+'</span>';
+  btn.onclick=()=>{ CV_LLIURAT_OPEN=!CV_LLIURAT_OPEN; openSection('programacio'); };
+  wrap.appendChild(btn);
+  if(!CV_LLIURAT_OPEN) return wrap;
+  if(!classes.length){ const e=el('div','rept-hint'); e.textContent='No hi ha alumnes. Omple la pestanya “Alumnes” del full.'; wrap.appendChild(e); return wrap; }
+  if(!CV_CLASS || classes.indexOf(CV_CLASS)<0) CV_CLASS=pickTutorClass(classes);
+  const box=el('div','cv-lliurat');
+  // pestanyes de classe
+  const selRow=el('div','att-classsel');
+  classes.forEach(c=>{ const t=el('button','att-tab'+(c===CV_CLASS?' on':'')); t.type='button';
+    if(c===CV_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    const n=(STATE.students[c]||[]).filter(x=>marks[x]).length;
+    t.textContent=c+' ('+n+'/'+(STATE.students[c]||[]).length+')';
+    t.onclick=()=>{ CV_CLASS=c; openSection('programacio'); }; selRow.appendChild(t); });
+  box.appendChild(selRow);
+  const roster=STATE.students[CV_CLASS]||[];
+  const info=el('div','att-info');
+  const cnt=el('span','att-count');
+  const setCnt=()=>{ const f=roster.filter(n=>cvLliuratsDe(give)[n]).length;
+    cnt.innerHTML='<b>'+f+'</b> entregades · <b class="att-cabs">'+(roster.length-f)+'</b> pendents'; };
+  setCnt(); info.appendChild(cnt);
+  const hint=el('span','att-hint'); hint.textContent='Toca els que te l’han entregada'; info.appendChild(hint);
+  box.appendChild(info);
+  const grid=el('div','att-grid');
+  roster.forEach(name=>{
+    const on=!!cvLliuratsDe(give)[name];
+    const chip=el('button','att-chip cv-chip'+(on?' fet':'')); chip.type='button'; chip.textContent=name;
+    chip.onclick=async()=>{ const nou=!chip.classList.contains('fet');
+      chip.classList.toggle('fet', nou);
+      await api.cvLliurat(give, name, nou);
+      setCnt();
+      const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(CV_CLASS)===0);
+      if(tab){ const f=roster.filter(n=>cvLliuratsDe(give)[n]).length; tab.textContent=CV_CLASS+' ('+f+'/'+roster.length+')'; }
+      const c2=btn.querySelector('.cv-cnt'); if(c2){ const m2=cvLliuratsDe(give);
+        c2.textContent=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>m2[x]).length,0)+'/'+totalTots; }
+    };
+    grid.appendChild(chip);
+  });
+  box.appendChild(grid);
+  wrap.appendChild(box);
+  return wrap;
 }
 function renderCarpetaOverview(S, subj){
   const curGive=cvCurrentGive();

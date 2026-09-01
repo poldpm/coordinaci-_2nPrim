@@ -63,6 +63,7 @@ avaluacio{}      // frases d'avaluació per trimestre
 programacio{}    // programació setmanal + carpeta viatgera (veure §8)
 correus[]        // {id, title, body, date, sent:{tutor:true}, author, createdAt}
 emailReminders{} // opt-in del correu recordatori: { tutor: true }
+cvLliurat{}      // qui ha entregat la carpeta viatgera: { dataISO_del_cicle: { 'Nom alumne': true } }
 comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
 ```
 `normalizeState()` garanteix que totes les claus existeixen.
@@ -177,6 +178,12 @@ amb `subject='carpeta'` i `key=dataISO_de_dona`. Cada cicle té: **títol**
 (ex. "Carpeta Viatgera 1 · La tardor"), **deures** (llista amb 3 punts per tutor),
 **enllaç al Google Doc** (a Drive). Dues vistes: **"Aquest cicle" / "Tots els
 cicles"** (`CV_VIEW`), navegador de cicle (`CV_IDX`).
+**Qui l'ha entregada:** dins de cada cicle, botó 🎒 que desplega la llista d'alumnes
+per classe (pestanyes; per defecte la del tutor) per marcar qui l'ha tornada.
+Model: `STATE.cvLliurat[dataDelCicle][nom]=true` (§5) — granular i idempotent, així
+els tres poden marcar alhora. `api.cvLliurat(key,alumne,on)` → backend `cvLliurat`.
+Funcions: `cvLliuratBlock` / `cvLliuratsDe`; estat obert: `CV_LLIURAT_OPEN`, `CV_CLASS`.
+
 **Avisos a la portada** (`buildCarpetaPanel` + `cvUpcoming`):
 - Si la carpeta d'AQUESTA setmana està **buida** → avisa des del **dilluns**
   ("Prepara la carpeta d'aquesta setmana"). Les setmanes futures no molesten.
