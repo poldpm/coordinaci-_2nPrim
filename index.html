@@ -4744,7 +4744,7 @@ function renderTasks(S){
       </div>
     </div>`;
   S.appendChild(collapsibleComposer(c,'Nova tasca'));
-  $('#tOwner').value=ME;
+  $('#tOwner').value='general';   // per defecte: General (no qui la crea)
   $('#tSave').onclick=async()=>{
     const title=$('#tTitle').value.trim(); if(!title){ toast('Posa un títol a la tasca'); return; }
     const ts=nowISO();
