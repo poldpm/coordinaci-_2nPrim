@@ -89,10 +89,23 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
 - **Cua de reintents `PENDING`:** si falla la xarxa, la mutació s'encua a
   localStorage i es reintenta (en ordre) a `flushPending()` — abans de cada pull,
   en tornar el focus i a l'event `online`. **Cap edició/esborrat es perd.**
-- **`startCloudSync()`:** cada 20s (només si s'està a la portada) fa `getState`.
-  **Només re-renderitza si l'estat ha canviat** (compara `JSON.stringify`, var
-  `_lastSig`). Si hi ha canvis locals pendents sense enviar, **NO** sobreescriu
-  l'estat.
+  `request()` marca l'error com a **`.network`** (sense xarxa → es reintenta per
+  sempre) o **`.server`** (el backend l'ha rebutjada → **es descarta**, amb avís).
+  Sense això, UNA acció rebutjada encallava la cua i, com que el pull no es fa si
+  la cua no s'ha buidat, **la sincronització quedava morta per sempre** en aquell
+  dispositiu (bug real: el perfil de la Mireia no s'actualitzava mai).
+- **`startCloudSync()`:** cada 20s fa `getState` **a tota l'app** (abans només a la
+  portada → si eres dins d'una secció no s'actualitzava mai i calia tancar i tornar
+  a obrir). També en `focus`, en **`visibilitychange`** (al mòbil el `focus` sovint
+  no arriba) i en tornar la connexió. **Només re-renderitza si l'estat ha canviat**
+  (compara `JSON.stringify`, var `_lastSig`). Si hi ha canvis locals pendents sense
+  enviar, **NO** sobreescriu l'estat, i tampoc si hi ha una escriptura en curs
+  (`_inflight`).
+  El repintat el fa `repaintAfterSync()`: a la portada `refreshHome()`; dins d'una
+  secció, la repinta conservant el scroll, **excepte si `sectionBusy()`** (modal
+  obert, `EDITING`, un compositor obert o un camp amb el focus) — llavors només
+  actualitza les dades i ja es veurà en navegar, per no esborrar mai res a mig
+  escriure.
 - **Backend:** `_handle` aplica cada acció amb `LockService` (serialitza
   escriptures concurrents). Les **altes són idempotents** (upsert per `id`) →
   un reintent no duplica.

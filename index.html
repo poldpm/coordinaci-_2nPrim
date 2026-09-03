@@ -1467,22 +1467,33 @@ function _loadPending(){ try{ return JSON.parse(localStorage.getItem('coord_pend
 function _savePending(){ try{ localStorage.setItem('coord_pending', JSON.stringify(PENDING)); }catch(e){} }
 async function flushPending(){
   if(DEMO_MODE || !PENDING.length) return true;
+  let descartades=0;
   while(PENDING.length){
-    try{ await request(PENDING[0].action, PENDING[0].payload); PENDING.shift(); _savePending(); }
-    catch(e){ return false; }   // encara sense xarxa: es reintentar\u00e0 m\u00e9s tard
+    const it=PENDING[0];
+    try{ await request(it.action, it.payload); PENDING.shift(); _savePending(); }
+    catch(e){
+      if(e && e.network){ return false; }   // sense xarxa: es reintentarà més tard (no es perd res)
+      // El servidor l'ha rebutjada: reintentar-la no funcionarà MAI i bloquejaria
+      // la sincronització per sempre. La descartem i seguim amb la resta.
+      PENDING.shift(); _savePending(); descartades++;
+      try{ console.warn('Acció descartada pel servidor:', it.action, e && e.message); }catch(_){}
+    }
   }
+  if(descartades) toast('⚠️ '+descartades+' canvi(s) no s\u2019han pogut desar al servidor');
   return true;
 }
+let _inflight = 0;   // escriptures en curs (per no trepitjar-les amb un pull)
 async function persist(action, payload){
   if(DEMO_MODE){ safeSave(); return; }
   safeSave();                                  // cache local immediata (optimista)
+  _inflight++;
   try{
     if(PENDING.length) await flushPending();   // primer, el que hi hagu\u00e9s pendent (en ordre)
     await request(action, payload);
   }catch(err){
     PENDING.push({action, payload}); _savePending();
     const now=Date.now(); if(now-(window._offAt||0)>4000){ window._offAt=now; toast('\u26A0\uFE0F Sense connexi\u00f3: es desar\u00e0 sol quan torni'); }
-  }
+  } finally { _inflight--; }
 }
 function normalizeState(){
   if(!STATE.subthemes) STATE.subthemes=[];
@@ -1509,32 +1520,67 @@ async function request(action, payload){
   const ctrl = new AbortController();
   const timer = setTimeout(()=>ctrl.abort(), 15000);
   try{
-    const res = await fetch(CONFIG.WEB_APP_URL, {
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({action, payload, secret:CONFIG.SECRET}),
-      signal: ctrl.signal
-    });
-    const data = await res.json();
-    if(data && data.error) throw new Error(data.error);
+    let res;
+    try{
+      res = await fetch(CONFIG.WEB_APP_URL, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({action, payload, secret:CONFIG.SECRET}),
+        signal: ctrl.signal
+      });
+    }catch(err){ err.network=true; throw err; }   // sense xarxa o massa lent: es pot reintentar
+    let data;
+    try{ data = await res.json(); }
+    catch(err){ const e=new Error('Resposta no vàlida del servidor'); e.server=true; throw e; }
+    if(data && data.error){ const e=new Error(data.error); e.server=true; throw e; }
     return data;
   } finally { clearTimeout(timer); }
 }
 /* refresc en viu quan estàs a l'inici (perquè vegis els canvis dels altres) */
 function refreshHome(){ if(!$('#home').classList.contains('hidden')){ renderDash(); renderNovetats(); renderBento(); } }
 let _lastSig = '';
+/* Es pot repintar la secció sense destrossar res que l'usuari estigui fent? */
+function sectionBusy(){
+  try{
+    if(document.querySelector('.modal.open')) return true;
+    if(typeof EDITING!=='undefined' && EDITING) return true;
+    if(typeof COMANDA_NEW!=='undefined' && (COMANDA_NEW || COMANDA_EDIT)) return true;
+    if(typeof REPTES_ADD!=='undefined' && REPTES_ADD) return true;
+    if(typeof SCHEDULING!=='undefined' && SCHEDULING) return true;
+    const S=$('#section'); if(!S) return true;
+    // un compositor obert vol dir que hi pot haver text escrit encara sense focus
+    if(S.querySelector('.composer.open, .composer-collapsed.open')) return true;
+    const ae=document.activeElement;
+    if(ae && ae!==document.body && S.contains(ae)){
+      const t=(ae.tagName||'').toLowerCase();
+      if(t==='input' || t==='textarea' || t==='select' || ae.isContentEditable) return true;
+    }
+    return false;
+  }catch(e){ return true; }   // en cas de dubte, no toquis res
+}
+/* Repinta el que s'estigui mirant quan arriben canvis dels altres */
+function repaintAfterSync(){
+  if(!$('#home').classList.contains('hidden')){ refreshHome(); return; }
+  if(!CURRENT || sectionBusy()) return;   // l'estat ja està actualitzat; es veurà en navegar
+  const y=window.scrollY;
+  try{ if(CURRENT_SUB) openSubtheme(CURRENT, CURRENT_SUB); else openSection(CURRENT); }catch(e){ return; }
+  window.scrollTo(0,y);
+}
 function startCloudSync(){
   if(DEMO_MODE) return;
   const pull=async()=>{
-    if(document.hidden || $('#home').classList.contains('hidden')) return;
+    if(document.hidden) return;                  // en segon pla no cal
+    if(_inflight) return;                        // s'està desant alguna cosa: no baixis estat vell
     if(!(await flushPending())) return;          // si hi ha canvis locals sense enviar, NO sobreescriguis res
     try{ const s=await request('getState');
       if(s){ const sig=JSON.stringify(s);
-        if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState(); safeSave(); refreshHome(); } } }catch(e){}
+        if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } } }catch(e){}
   };
   setInterval(pull, 20000);
   window.addEventListener('focus', ()=>{ flushPending(); pull(); });
-  window.addEventListener('online', flushPending);
+  // Al mòbil el 'focus' no sempre arriba: aquest és el que dispara en tornar a l'app
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ flushPending(); pull(); } });
+  window.addEventListener('online', ()=>{ flushPending().then(pull); });
 }
 
 /* ---------- DADES D'EXEMPLE (rescatades del caos del doc) ---------- */
