@@ -1472,14 +1472,26 @@ function _loadPending(){ try{ return JSON.parse(localStorage.getItem('coord_pend
 function _savePending(){ try{ localStorage.setItem('coord_pending', JSON.stringify(PENDING)); }catch(e){}
   try{ updateSyncBadge(); }catch(e){} }
 /* Avís permanent mentre hi hagi canvis pendents d'enviar (per no confiar a cegues) */
+/* Detall del que està encallat: així es pot saber QUÈ falla, en comptes d'endevinar */
+function mostraDiagnostic(){
+  const linies=[];
+  linies.push('Canvis pendents: '+PENDING.length);
+  const perAccio={}; PENDING.forEach(p=>{ perAccio[p.action]=(perAccio[p.action]||0)+1; });
+  Object.keys(perAccio).forEach(a=>linies.push('• '+a+' ×'+perAccio[a]));
+  const ue=window._ultimError;
+  if(ue) linies.push('','Últim error ('+ue.quan+'):','“'+ue.missatge+'”','a l’acció: '+ue.accio);
+  linies.push('', 'Connexió del navegador: '+(navigator.onLine?'sí':'NO'));
+  askConfirm(linies.join(' · '), ()=>{}, {title:'Què està fallant', confirmLabel:'D’acord'});
+}
 function updateSyncBadge(){
   let b=document.getElementById('syncBadge');
   if(!b){
     b=document.createElement('button'); b.id='syncBadge'; b.type='button'; b.className='sync-badge';
     b.title='Canvis pendents d\u2019enviar. Toca per tornar-ho a provar.';
+    b.oncontextmenu=(ev)=>{ ev.preventDefault(); mostraDiagnostic(); };
     b.onclick=async()=>{ b.disabled=true; b.textContent='Enviant\u2026';
       const ok=await flushPending(); updateSyncBadge(); b.disabled=false;
-      toast(PENDING.length ? 'Encara queden canvis per desar' : 'Tot desat \u2713');
+      if(PENDING.length) mostraDiagnostic(); else toast('Tot desat \u2713');
       if(ok && !PENDING.length){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } }catch(e){} }
     };
     document.body.appendChild(b);
@@ -1490,7 +1502,13 @@ function updateSyncBadge(){
   b.textContent='\u21BB '+n+' sense desar';
 }
 const PENDING_MAX_TRIES = 2;   // intents per sessió abans d'apartar una acció
+let _flushing = null;          // només una execució alhora (si no, es trepitgen els índexs)
 async function flushPending(){
+  if(_flushing) return _flushing;
+  _flushing = _flushPendingReal().finally(()=>{ _flushing=null; });
+  return _flushing;
+}
+async function _flushPendingReal(){
   if(DEMO_MODE || !PENDING.length) return true;
   let i=0, rebutjades=0;
   while(i < PENDING.length){
@@ -1498,10 +1516,16 @@ async function flushPending(){
     if((it.tries||0) >= PENDING_MAX_TRIES){ i++; continue; }   // apartada: no bloqueja la resta
     try{ await request(it.action, it.payload); PENDING.splice(i,1); _savePending(); }
     catch(e){
-      if(e && e.retryable){ return false; }   // xarxa o servidor ocupat: ho tornarem a provar TOT
+      if(e && e.retryable){
+        it.err=(e&&e.message)||'error';
+        window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
+        _savePending();
+        return false;   // xarxa o servidor ocupat: ho tornarem a provar TOT
+      }
       // El servidor l'ha rebutjada. NO l'esborrem (seria perdre feina teva):
       // l'apartem perquè no encalli la sincronització i es reintenta a la propera obertura.
-      it.tries=(it.tries||0)+1; rebutjades++; _savePending(); i++;
+      it.tries=(it.tries||0)+1; it.err=(e&&e.message)||'error'; rebutjades++; _savePending(); i++;
+      window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
       try{ console.warn('Acció rebutjada:', it.action, e && e.message); }catch(_){}
     }
   }
@@ -1523,9 +1547,14 @@ function persist(action, payload){
       if(PENDING.length) await flushPending();  // primer, el que hi hagués pendent (en ordre)
       await request(action, payload);
     }catch(err){
-      PENDING.push({action, payload, tries:0}); _savePending();
+      PENDING.push({action, payload, tries:0, err:(err&&err.message)||'error'}); _savePending();
+      window._ultimError={ accio:action, missatge:(err&&err.message)||'error', quan:new Date().toLocaleTimeString('ca-ES') };
       const now=Date.now();
-      if(now-(window._offAt||0)>4000){ window._offAt=now; toast('⚠️ Sense connexió: es desarà sol quan torni'); }
+      if(now-(window._offAt||0)>6000){ window._offAt=now;
+        const senseXarxa = !navigator.onLine;
+        toast(senseXarxa ? '⚠️ Sense connexió: es desarà sol quan torni'
+                         : '⚠️ El servidor no ha respost: es tornarà a provar sol');
+      }
     } finally { _inflight--; }
   });
   return Promise.resolve();                    // la pantalla no espera el servidor
