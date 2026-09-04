@@ -89,11 +89,15 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
 - **Cua de reintents `PENDING`:** si falla la xarxa, la mutació s'encua a
   localStorage i es reintenta (en ordre) a `flushPending()` — abans de cada pull,
   en tornar el focus i a l'event `online`. **Cap edició/esborrat es perd.**
-  `request()` marca l'error com a **`.network`** (sense xarxa → es reintenta per
-  sempre) o **`.server`** (el backend l'ha rebutjada → **es descarta**, amb avís).
-  Sense això, UNA acció rebutjada encallava la cua i, com que el pull no es fa si
-  la cua no s'ha buidat, **la sincronització quedava morta per sempre** en aquell
-  dispositiu (bug real: el perfil de la Mireia no s'actualitzava mai).
+  `request()` marca l'error com a **`.retryable`** (sense xarxa, timeout, servidor
+  ocupat o resposta que no és JSON) o **`.fatal`** (el backend diu explícitament que
+  l'acció no és vàlida). **Res no s'esborra mai:** una acció `.fatal` s'aparta
+  després de `PENDING_MAX_TRIES` intents perquè no encalli la resta, però es
+  conserva i es reintenta a la següent obertura (`tries` es reseteja al boot).
+  ⚠️ Història: primer una acció rebutjada encallava la cua i deixava el dispositiu
+  **sense sincronitzar per sempre**; després es va "arreglar" descartant-la, i això
+  **feia perdre canvis** quan el backend petava per contenció del lock (retornava
+  HTML, no JSON). Cap de les dues coses pot tornar a passar.
 - **`startCloudSync()`:** cada 20s fa `getState` **a tota l'app** (abans només a la
   portada → si eres dins d'una secció no s'actualitzava mai i calia tancar i tornar
   a obrir). També en `focus`, en **`visibilitychange`** (al mòbil el `focus` sovint
@@ -106,8 +110,17 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   obert, `EDITING`, un compositor obert o un camp amb el focus) — llavors només
   actualitza les dades i ja es veurà en navegar, per no esborrar mai res a mig
   escriure.
+- **Indicador visible:** mentre queden accions a `PENDING` surt una píndola
+  «↻ N sense desar» (`updateSyncBadge`); clicant-la es força l'enviament i un pull.
+- **Auto-actualització:** el service worker es consulta en tornar a l'app i cada
+  15 min; quan n'entra una versió nova, `provaRecarregar()` recarrega **si no
+  s'està escrivint res ni queden canvis pendents**. Sense això, una PWA oberta
+  dies seguits es quedava amb codi antic i no rebia cap arreglament.
 - **Backend:** `_handle` aplica cada acció amb `LockService` (serialitza
-  escriptures concurrents). Les **altes són idempotents** (upsert per `id`) →
+  escriptures concurrents). Si no obté el torn en 12s retorna
+  `{error, retry:true}` (mai una excepció), i `doPost`/`doGet` **sempre** retornen
+  JSON: si petessin, Apps Script retorna una pàgina HTML i el client no la sap
+  llegir. Les **altes són idempotents** (upsert per `id`) →
   un reintent no duplica.
 - **Login instantani:** a l'arrencada entra des de la còpia local abans d'esperar
   la xarxa (sense parpelleig).

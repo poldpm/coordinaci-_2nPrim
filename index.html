@@ -333,6 +333,11 @@ a{color:var(--teal)}
 .cv-lliurat{margin-top:10px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:14px;padding:12px}
 .att-chip.cv-chip.fet{background:#27AE60;border-color:#27AE60;color:#fff}
 .nov-cmt{background:#fff4e0;color:#a4680d;font-weight:800}
+.sync-badge{position:fixed;left:14px;bottom:14px;z-index:60;font:inherit;font-weight:800;font-size:.82rem;
+  padding:.55em .9em;border-radius:999px;border:1.5px solid #e0a03a;background:#fff6e6;color:#8a5a08;
+  box-shadow:0 6px 18px rgba(0,0,0,.14);cursor:pointer}
+.sync-badge:hover{background:#ffeccc}
+.sync-badge:disabled{opacity:.6}
 .rept-tema-h{font-family:var(--font-d);font-weight:600;color:var(--teal-ink);margin:12px 0 6px;font-size:.98rem;border-left:3px solid var(--cyan);padding-left:8px}
 /* Targeta del TEMA (hi viuen les còpies i la fitxa) */
 .rept-tema{background:var(--panel-2);border:1.5px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r-lg);
@@ -1464,23 +1469,44 @@ let DEMO_COMANDES = [
 /* ---- Cua de mutacions no sincronitzades (robustesa davant talls de xarxa) ---- */
 let PENDING = [];
 function _loadPending(){ try{ return JSON.parse(localStorage.getItem('coord_pending')||'[]'); }catch(e){ return []; } }
-function _savePending(){ try{ localStorage.setItem('coord_pending', JSON.stringify(PENDING)); }catch(e){} }
+function _savePending(){ try{ localStorage.setItem('coord_pending', JSON.stringify(PENDING)); }catch(e){}
+  try{ updateSyncBadge(); }catch(e){} }
+/* Avís permanent mentre hi hagi canvis pendents d'enviar (per no confiar a cegues) */
+function updateSyncBadge(){
+  let b=document.getElementById('syncBadge');
+  if(!b){
+    b=document.createElement('button'); b.id='syncBadge'; b.type='button'; b.className='sync-badge';
+    b.title='Canvis pendents d\u2019enviar. Toca per tornar-ho a provar.';
+    b.onclick=async()=>{ b.disabled=true; b.textContent='Enviant\u2026';
+      const ok=await flushPending(); updateSyncBadge(); b.disabled=false;
+      toast(PENDING.length ? 'Encara queden canvis per desar' : 'Tot desat \u2713');
+      if(ok && !PENDING.length){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } }catch(e){} }
+    };
+    document.body.appendChild(b);
+  }
+  const n=PENDING.length;
+  if(!n){ b.style.display='none'; return; }
+  b.style.display='';
+  b.textContent='\u21BB '+n+' sense desar';
+}
+const PENDING_MAX_TRIES = 2;   // intents per sessió abans d'apartar una acció
 async function flushPending(){
   if(DEMO_MODE || !PENDING.length) return true;
-  let descartades=0;
-  while(PENDING.length){
-    const it=PENDING[0];
-    try{ await request(it.action, it.payload); PENDING.shift(); _savePending(); }
+  let i=0, rebutjades=0;
+  while(i < PENDING.length){
+    const it=PENDING[i];
+    if((it.tries||0) >= PENDING_MAX_TRIES){ i++; continue; }   // apartada: no bloqueja la resta
+    try{ await request(it.action, it.payload); PENDING.splice(i,1); _savePending(); }
     catch(e){
-      if(e && e.network){ return false; }   // sense xarxa: es reintentarà més tard (no es perd res)
-      // El servidor l'ha rebutjada: reintentar-la no funcionarà MAI i bloquejaria
-      // la sincronització per sempre. La descartem i seguim amb la resta.
-      PENDING.shift(); _savePending(); descartades++;
-      try{ console.warn('Acció descartada pel servidor:', it.action, e && e.message); }catch(_){}
+      if(e && e.retryable){ return false; }   // xarxa o servidor ocupat: ho tornarem a provar TOT
+      // El servidor l'ha rebutjada. NO l'esborrem (seria perdre feina teva):
+      // l'apartem perquè no encalli la sincronització i es reintenta a la propera obertura.
+      it.tries=(it.tries||0)+1; rebutjades++; _savePending(); i++;
+      try{ console.warn('Acció rebutjada:', it.action, e && e.message); }catch(_){}
     }
   }
-  if(descartades) toast('⚠️ '+descartades+' canvi(s) no s\u2019han pogut desar al servidor');
-  return true;
+  if(rebutjades) toast('\u26A0\uFE0F '+rebutjades+' canvi(s) no s\u2019han pogut desar. Es tornarà a provar.');
+  return !PENDING.some(x=>(x.tries||0) < PENDING_MAX_TRIES);
 }
 let _inflight = 0;   // escriptures en curs (per no trepitjar-les amb un pull)
 async function persist(action, payload){
@@ -1518,7 +1544,7 @@ function normalizeState(){
 /* crida a l'Apps Script (POST text/plain → sense preflight de CORS) */
 async function request(action, payload){
   const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), 15000);
+  const timer = setTimeout(()=>ctrl.abort(), 25000);
   try{
     let res;
     try{
@@ -1528,11 +1554,19 @@ async function request(action, payload){
         body: JSON.stringify({action, payload, secret:CONFIG.SECRET}),
         signal: ctrl.signal
       });
-    }catch(err){ err.network=true; throw err; }   // sense xarxa o massa lent: es pot reintentar
+    }catch(err){ err.retryable=true; throw err; }   // sense xarxa o massa lent
     let data;
     try{ data = await res.json(); }
-    catch(err){ const e=new Error('Resposta no vàlida del servidor'); e.server=true; throw e; }
-    if(data && data.error){ const e=new Error(data.error); e.server=true; throw e; }
+    catch(err){
+      // El servidor ha respost amb una pàgina d'error (p. ex. estava ocupat).
+      // És TEMPORAL: s'ha de tornar a provar, mai descartar.
+      const e=new Error('El servidor no ha respost bé'); e.retryable=true; throw e;
+    }
+    if(data && data.error){
+      const e=new Error(data.error);
+      if(data.retry) e.retryable=true; else e.fatal=true;
+      throw e;
+    }
     return data;
   } finally { clearTimeout(timer); }
 }
@@ -5172,7 +5206,8 @@ function openAndFlash(itemId){
 (async function boot(){
   buildLogin();
   try{ const rp=new URLSearchParams(location.search).get('repte'); if(rp) PENDING_REPTE=rp; }catch(e){}
-  try{ PENDING=_loadPending(); }catch(e){}
+  try{ PENDING=_loadPending(); PENDING.forEach(p=>{ p.tries=0; }); }catch(e){}
+  try{ updateSyncBadge(); }catch(e){}
   let saved=null; try{ saved=localStorage.getItem('coord_me'); }catch(e){}
   const auto = saved && USERS.some(u=>u.id===saved);
   if(auto){
@@ -5188,8 +5223,25 @@ function openAndFlash(itemId){
   try{ reptApplyPending(); }catch(e){}   // NFC: obre la caixa un cop hi ha dades
 })();
 /* Service worker: accelera les càrregues repetides (fail-safe: si no es pot, l'app funciona igual) */
+/* Recarrega quan hi ha una versió nova, però mai enmig d'una feina */
+function provaRecarregar(){
+  if(!window._needsReload) return;
+  try{ if(typeof sectionBusy==='function' && sectionBusy()) return; }catch(e){}
+  if(PENDING && PENDING.length) return;      // primer que s'enviï el que hi ha pendent
+  window._needsReload=false; location.reload();
+}
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).catch(()=>{}); });
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(reg=>{
+      // Busca versions noves en tornar a l'app i cada 15 min: una PWA que es
+      // queda oberta dies seguits no rebia mai cap arreglament.
+      const mira=()=>{ try{ reg.update(); }catch(e){} };
+      document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) mira(); });
+      setInterval(mira, 15*60*1000);
+    }).catch(()=>{});
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', ()=>{ window._needsReload=true; provaRecarregar(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) provaRecarregar(); });
 }
 </script>
 </body>
