@@ -1530,6 +1530,18 @@ function persist(action, payload){
   });
   return Promise.resolve();                    // la pantalla no espera el servidor
 }
+/* Evita duplicats quan algú repeteix l'acció perquè creu que no ha funcionat.
+   Mira si ja existeix un element igual (mateix títol i autor) fet fa menys de 2 min. */
+function jaCreatAra(llista, titol, autor, segons){
+  const lim = Date.now() - (segons||120)*1000;
+  const t = norm(String(titol||'').trim());
+  return (llista||[]).find(x=>{
+    if(!x || x.author!==autor) return false;
+    if(norm(String(x.title||'').trim())!==t) return false;
+    const q = Date.parse(x.createdAt || x.date || 0);
+    return q && q >= lim;
+  }) || null;
+}
 function normalizeState(){
   if(!STATE.subthemes) STATE.subthemes=[];
   if(!STATE.avaluacio) STATE.avaluacio={};
@@ -4337,6 +4349,7 @@ function renderEntries(S,sec,subId){
     if(rich ? !stripHtml(body) : !body){ toast('Escriu alguna cosa primer'); return; }
     const ts=nowISO();
     const e={id:uid(),section:sec.id,subtheme:subId||null,author:ME,title:$('#cTitle').value.trim(),body,rich,url:$('#cUrl').value.trim(),date:ts,createdAt:ts,updatedAt:ts,readBy:[ME]};
+    if(jaCreatAra(STATE.entries, e.title, ME)){ reopen(sec,subId); toast('Aquesta entrada ja l’acabes de crear'); return; }
     await api.addEntry(e); reopen(sec,subId); toast('Entrada afegida');
   };
   // feed
@@ -4919,6 +4932,7 @@ function renderTasks(S){
   $('#tSave').onclick=async()=>{
     const title=$('#tTitle').value.trim(); if(!title){ toast('Posa un títol a la tasca'); return; }
     const ts=nowISO();
+    if(jaCreatAra(STATE.tasks, title, ME)){ openSection('tasques'); toast('Aquesta tasca ja l’acabes de crear'); return; }
     const t={id:uid(),title,desc:$('#tDesc').value.trim(),owner:$('#tOwner').value,status:'pendent',url:$('#tUrl').value.trim(),author:ME,date:ts,createdAt:ts,updatedAt:ts,readBy:[ME]};
     await api.addTask(t); openSection('tasques'); toast('Tasca creada');
   };
