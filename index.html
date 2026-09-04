@@ -1508,18 +1508,27 @@ async function flushPending(){
   if(rebutjades) toast('\u26A0\uFE0F '+rebutjades+' canvi(s) no s\u2019han pogut desar. Es tornarà a provar.');
   return !PENDING.some(x=>(x.tries||0) < PENDING_MAX_TRIES);
 }
-let _inflight = 0;   // escriptures en curs (per no trepitjar-les amb un pull)
-async function persist(action, payload){
-  if(DEMO_MODE){ safeSave(); return; }
-  safeSave();                                  // cache local immediata (optimista)
+let _inflight = 0;              // escriptures en curs (per no trepitjar-les amb un pull)
+let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esperar la pantalla
+/* IMPORTANT: NO espera el servidor. La pantalla s'ha d'actualitzar a l'instant (el
+   canvi ja és a STATE i a la còpia local) i l'enviament va en segon pla. Si falla,
+   va a la cua i es veu la píndola «sense desar». Abans esperàvem 2-6 segons amb el
+   formulari obert i semblava que el botó no funcionés. */
+function persist(action, payload){
+  safeSave();                                  // còpia local immediata (optimista)
+  if(DEMO_MODE) return Promise.resolve();
   _inflight++;
-  try{
-    if(PENDING.length) await flushPending();   // primer, el que hi hagu\u00e9s pendent (en ordre)
-    await request(action, payload);
-  }catch(err){
-    PENDING.push({action, payload}); _savePending();
-    const now=Date.now(); if(now-(window._offAt||0)>4000){ window._offAt=now; toast('\u26A0\uFE0F Sense connexi\u00f3: es desar\u00e0 sol quan torni'); }
-  } finally { _inflight--; }
+  _chain = _chain.then(async ()=>{
+    try{
+      if(PENDING.length) await flushPending();  // primer, el que hi hagués pendent (en ordre)
+      await request(action, payload);
+    }catch(err){
+      PENDING.push({action, payload, tries:0}); _savePending();
+      const now=Date.now();
+      if(now-(window._offAt||0)>4000){ window._offAt=now; toast('⚠️ Sense connexió: es desarà sol quan torni'); }
+    } finally { _inflight--; }
+  });
+  return Promise.resolve();                    // la pantalla no espera el servidor
 }
 function normalizeState(){
   if(!STATE.subthemes) STATE.subthemes=[];
@@ -5144,6 +5153,15 @@ function searchAll(q){
   res.sort((a,b)=> (a.g-b.g) || (new Date(b.date||0)-new Date(a.date||0)) || String(a.title||'').localeCompare(String(b.title||'')));
   return res;
 }
+/* Si algú clica un botó d'acció diverses vegades seguides (perquè sembla que no
+   passa res), només compta el primer: així no es creen 30 tasques iguals. */
+document.addEventListener('click', (e)=>{
+  const b = (e.target && e.target.closest) ? e.target.closest('.btn-primary') : null;
+  if(!b) return;
+  const ara = Date.now();
+  if(b._darrerClic && ara - b._darrerClic < 1500){ e.preventDefault(); e.stopPropagation(); return; }
+  b._darrerClic = ara;
+}, true);
 const searchOv=$('#search');
 $('#searchBtn').onclick=openSearch;
 $('#searchClose').onclick=closeSearch;
