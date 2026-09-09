@@ -26,7 +26,9 @@
   --panel:#FFFFFF;
   --panel-2:#EAF6FA;
   --line:#D5EAF1;
-  --muted:#5E8494;
+  --muted:#4A6B7A;     /* contrast AA sobre paper i blanc (abans #5E8494 = 3,9:1) */
+  --ink:#33555F;       /* faltava definir-la: 7 usos la donaven per bona */
+  --indigo:#5A6FE0;    /* faltava definir-la: per això l'interruptor del recordatori no s'encenia */
 
   --mireia:#EE9B4C;
   --cristina:#D5638E;
@@ -265,11 +267,11 @@ a{color:var(--teal)}
 .prog-tab{border:1.5px solid var(--line);background:var(--panel);color:var(--muted);font-family:var(--font-d);font-weight:600;font-size:.95rem;padding:.5em 1.1em;border-radius:999px;cursor:pointer;transition:.15s}
 .prog-tab:hover{border-color:var(--c)}
 .prog-tab.on{background:var(--c);border-color:var(--c);color:#fff;box-shadow:0 8px 16px -10px var(--c)}
-.prog-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.prog-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px;min-width:0}
 .prog-navbtn{width:42px;height:42px;flex:none;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);color:var(--teal-ink);font-size:1.5rem;line-height:1;font-weight:800;cursor:pointer;display:grid;place-items:center;transition:.15s}
 .prog-navbtn:hover:not(:disabled){border-color:var(--cyan);background:#eef8fb}
 .prog-navbtn:disabled{opacity:.35;cursor:default}
-.prog-weeksel{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:.7em .8em;font-family:var(--font-d);font-weight:600;font-size:1.05rem;color:var(--teal-ink);background:var(--panel);text-align:center;cursor:pointer}
+.prog-weeksel{flex:1;min-width:0;max-width:100%;border:1.5px solid var(--line);border-radius:12px;padding:.7em .8em;font-family:var(--font-d);font-weight:600;font-size:1.05rem;color:var(--teal-ink);background:var(--panel);text-align:center;cursor:pointer}
 .prog-week{background:var(--panel);border:1.5px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r-lg);padding:18px 18px 16px;box-shadow:var(--shadow-sm)}
 .prog-field{margin-bottom:15px}
 .prog-field label{display:block;font-weight:800;font-size:.82rem;color:var(--teal-ink);margin-bottom:6px}
@@ -464,7 +466,7 @@ a{color:var(--teal)}
 .pit-inp:focus{outline:none;border-color:var(--c);background:var(--paper)}
 .pit.done .pit-inp{color:var(--muted);text-decoration:line-through}
 .pit-c{flex:none;color:var(--c);font-weight:800;font-size:.9rem}
-.pit-del{flex:none;width:26px;height:26px;border:0;background:transparent;color:#b9c7ce;font-size:1.3rem;line-height:1;cursor:pointer;border-radius:8px}
+.pit-del{flex:none;width:26px;height:26px;border:0;background:transparent;color:#7E97A2;font-size:1.3rem;line-height:1;cursor:pointer;border-radius:8px}
 .pit-del:hover{color:#e5484d;background:#fdecec}
 .pit-add{align-self:flex-start;margin-top:2px;border:0;background:transparent;color:var(--c);font:inherit;font-weight:800;font-size:.85rem;padding:4px 2px;cursor:pointer}
 .pit-add:hover{text-decoration:underline}
@@ -489,7 +491,7 @@ a{color:var(--teal)}
 .prog-row-wk small{color:var(--muted);font-weight:700;font-size:.77rem}
 .prog-row-body{flex:1;min-width:0}
 .prog-row-txt{color:var(--ink);font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prog-row-txt i{color:#b9c7ce}
+.prog-row-txt i{color:#7E97A2}
 .prog-row-full{display:none;color:var(--ink);font-weight:600;font-size:.9rem;line-height:1.55}
 .prog-row-full .pf-notes{margin-top:6px;color:var(--muted);font-weight:600}
 .prog-row-full .pf-notes b{color:var(--teal-ink)}
@@ -498,7 +500,7 @@ a{color:var(--teal)}
 .prog-more{margin-top:5px;border:0;background:transparent;color:var(--c);font:inherit;font-weight:800;font-size:.8rem;padding:2px 0;cursor:pointer}
 .prog-more:hover{text-decoration:underline}
 .prog-row-side{flex:none;display:flex;align-items:center;gap:7px}
-.prog-note-ico{width:24px;height:24px;position:relative;color:#c2ccd2;display:grid;place-items:center;flex:none}
+.prog-note-ico{width:24px;height:24px;position:relative;color:#7E97A2;display:grid;place-items:center;flex:none}
 button.prog-note-ico{border:0;background:transparent;padding:0;cursor:pointer}
 button.prog-note-ico:hover{transform:scale(1.08)}
 .prog-note-ico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linejoin:round}
@@ -554,7 +556,7 @@ button.prog-note-ico:hover{transform:scale(1.08)}
   font-weight:800;font-size:.78rem;padding:.42em .7em;border-radius:10px}
 .av-copy .icon{width:14px;height:14px;stroke-width:2.2}
 .av-copy:hover{background:#d7eff5}
-.av-rm{background:transparent;border:none;color:#c9dbe1;padding:5px;border-radius:8px;line-height:0}
+.av-rm{background:transparent;border:none;color:#7E97A2;padding:5px;border-radius:8px;line-height:0}
 .av-rm .icon{width:16px;height:16px}
 .av-rm:hover{color:var(--cristina);background:var(--panel-2)}
 .av-phrase{width:100%;min-height:70px;resize:vertical}
@@ -687,7 +689,7 @@ textarea.input{resize:vertical;min-height:74px}
 .entry .link{display:inline-flex;align-items:center;gap:.4em;margin-top:10px;background:var(--panel-2);
   color:var(--teal);font-weight:800;font-size:.82rem;padding:.45em .8em;border-radius:10px;text-decoration:none}
 .entry .link:hover{background:#d7eff5}
-.entry .del{position:absolute;top:12px;right:12px;background:transparent;border:none;color:#c3d6dd;padding:4px;border-radius:8px}
+.entry .del{position:absolute;top:12px;right:12px;background:transparent;border:none;color:#7E97A2;padding:4px;border-radius:8px}
 .entry .del:hover{color:var(--cristina);background:#fbeaf1}
 .entry .foot-actions{margin-top:10px;display:flex;gap:8px}
 .card-tools{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px}
@@ -719,7 +721,7 @@ textarea.input{resize:vertical;min-height:74px}
 .cb-head b{font-family:var(--font-d);font-weight:600;font-size:.9rem}
 .cb-date{color:var(--muted);font-weight:700;font-size:.74rem}
 .cb-text{white-space:pre-wrap;font-weight:600;color:#33555f;line-height:1.45;font-size:.92rem}
-.cb-del{position:absolute;top:0;right:0;background:transparent;border:none;color:#c3d6dd;padding:3px;border-radius:7px;cursor:pointer}
+.cb-del{position:absolute;top:0;right:0;background:transparent;border:none;color:#7E97A2;padding:3px;border-radius:7px;cursor:pointer}
 .cb-del:hover{color:var(--cristina);background:#fbeaf1}
 .cb-del .icon{width:15px;height:15px}
 .cthread-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -741,7 +743,7 @@ textarea.input{resize:vertical;min-height:74px}
 .cp-restoggle{display:inline-flex;align-items:center;gap:.4em;justify-self:start;border:none;background:transparent;color:var(--muted);font-weight:800;font-size:.8rem;cursor:pointer;padding:.2em 0}
 .cp-restoggle .icon{width:14px;height:14px;color:#27AE60}
 .cp-resbox{display:grid;gap:8px}
-.edit-btn{background:transparent;border:none;color:#c3d6dd;padding:4px;border-radius:8px}
+.edit-btn{background:transparent;border:none;color:#7E97A2;padding:4px;border-radius:8px}
 .edit-btn:hover{color:var(--teal);background:var(--panel-2)}
 .entry.editing,.task.editing{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(79,195,222,.25),var(--shadow-sm)}
 .entry.editing .field,.task.editing .field{margin-bottom:10px}
@@ -769,7 +771,7 @@ textarea.input{resize:vertical;min-height:74px}
 .task .move button{flex:1;border:1.5px solid var(--line);background:var(--paper);color:var(--muted);font-weight:800;
   font-size:.72rem;padding:.4em;border-radius:9px}
 .task .move button.on{color:#fff;border-color:transparent}
-.task .del{background:transparent;border:none;color:#c3d6dd;padding:3px;border-radius:7px;margin-left:auto}
+.task .del{background:transparent;border:none;color:#7E97A2;padding:3px;border-radius:7px;margin-left:auto}
 .task .del:hover{color:var(--cristina)}
 .task .toprow{display:flex;align-items:flex-start;gap:8px}
 .task .toprow h5{flex:1}
@@ -838,10 +840,10 @@ textarea.input{resize:vertical;min-height:74px}
 @keyframes sdown{from{transform:translateY(-18px);opacity:.4}}
 .search-bar .icon{width:22px;height:22px;stroke:var(--muted);flex:none}
 .search-bar input{flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-weight:700;font-size:1.05rem;color:var(--teal-ink);background:transparent}
-.search-bar input::placeholder{color:#9db8c2;font-weight:700}
+.search-bar input::placeholder{color:#6B8794;font-weight:700}
 .search-bar .close{background:var(--panel-2);border:none;border-radius:11px;color:var(--muted);font-weight:800;width:34px;height:34px;flex:none;font-size:1rem}
 .search-bar .close:hover{background:#dceff4}
-.search-results{margin-top:12px;display:grid;gap:10px;max-height:66vh;overflow:auto;padding:2px}
+.search-results{margin-top:12px;display:grid;gap:10px;max-height:66dvh;overflow:auto;padding:2px}
 .sres{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-sm);cursor:pointer;text-align:left;width:100%;animation:sdown .2s}
 .sres:hover{border-color:var(--cyan);transform:translateY(-1px)}
 .sres .avatar{width:32px;height:32px;font-size:.82rem;flex:none}
@@ -856,14 +858,16 @@ textarea.input{resize:vertical;min-height:74px}
 @keyframes flash{0%,32%{box-shadow:0 0 0 3px var(--sun-deep),var(--shadow-sm)}100%{box-shadow:var(--shadow-sm)}}
 
 /* ---------- MODAL confirmació ---------- */
-.modal{position:fixed;inset:0;z-index:65;display:none;align-items:center;justify-content:center;padding:20px}
+/* overflow-y + max-height: en mòbil horitzontal el menú de perfil sobreeixia la
+   pantalla i els botons de baix quedaven inabastables (no es podia fer scroll). */
+.modal{position:fixed;inset:0;z-index:65;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;overscroll-behavior:contain}
 .modal.open{display:flex}
-.modal .scrim{position:absolute;inset:0;background:rgba(9,50,63,.5);backdrop-filter:blur(2px);animation:fade .2s}
-.modal-box{position:relative;z-index:1;background:#fff;width:min(400px,100%);border-radius:24px;padding:26px 24px 20px;text-align:center;box-shadow:var(--shadow);animation:up .26s cubic-bezier(.2,1,.3,1)}
+.modal .scrim{position:fixed;inset:0;background:rgba(9,50,63,.5);backdrop-filter:blur(2px);animation:fade .2s}
+.modal-box{position:relative;z-index:1;background:#fff;width:min(400px,100%);border-radius:24px;padding:26px 24px 20px;text-align:center;box-shadow:var(--shadow);animation:up .26s cubic-bezier(.2,1,.3,1);margin:auto;max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain}
 .modal-ico{font-size:2rem;margin-bottom:4px}
 .modal-box h3{font-family:var(--font-d);font-weight:600;font-size:1.25rem;margin:0 0 6px;color:var(--teal-ink)}
 .modal-box p{color:var(--muted);font-weight:700;margin:0 0 20px;line-height:1.45}
-.modal-note{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin:0 0 20px;color:var(--ink);font-weight:600;line-height:1.55;white-space:normal;max-height:50vh;overflow:auto}
+.modal-note{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin:0 0 20px;color:var(--ink);font-weight:600;line-height:1.55;white-space:normal;max-height:50dvh;overflow:auto}
 .modal-actions{display:flex;gap:10px;justify-content:center}
 .modal-actions .btn{flex:1;justify-content:center}
 .btn-danger{background:linear-gradient(180deg,#EC6A88,#DB4F72);color:#fff;box-shadow:0 8px 18px -8px rgba(219,79,114,.6)}
@@ -880,7 +884,7 @@ textarea.input{resize:vertical;min-height:74px}
 .subtheme-card .st-meta{font-weight:800;font-size:.8rem;color:var(--muted);margin-top:6px}
 .subtheme-card .st-bar{height:5px;border-radius:5px;margin-top:10px;opacity:.9}
 .subtheme-card .st-badge{position:absolute;top:11px;right:36px;background:var(--sun);color:#5a4406;font-weight:800;font-size:.72rem;min-width:1.5em;height:1.5em;padding:0 .4em;border-radius:999px;display:grid;place-items:center}
-.subtheme-card .del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:#c3d6dd;
+.subtheme-card .del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:#7E97A2;
   padding:5px;border-radius:9px;line-height:0;opacity:.55;transition:color .15s,background .15s,opacity .15s}
 .subtheme-card .del .icon{width:15px;height:15px;stroke-width:2.2}
 .subtheme-card:hover .del{opacity:.9}
@@ -903,7 +907,7 @@ textarea.input{resize:vertical;min-height:74px}
 .todo .txt{flex:1;font-weight:700;color:var(--teal-ink);font-size:.92rem;line-height:1.3}
 .todo.done .txt{text-decoration:line-through;color:var(--muted)}
 .todo .owner-sel{border:1.5px solid var(--line);border-radius:9px;padding:.28em .4em;font-family:inherit;font-weight:800;font-size:.72rem;color:var(--teal);background:var(--paper);flex:none}
-.todo .rm{background:transparent;border:none;color:#c9dbe1;padding:3px;border-radius:7px;line-height:0;flex:none}
+.todo .rm{background:transparent;border:none;color:#7E97A2;padding:3px;border-radius:7px;line-height:0;flex:none}
 .todo .rm .icon{width:14px;height:14px}
 .todo .rm:hover{color:var(--cristina);background:var(--panel-2)}
 .add-todo-toggle{background:transparent;border:1.5px dashed var(--line);color:var(--muted);font-weight:800;font-size:.82rem;border-radius:11px;padding:.5em .8em;margin-top:9px;width:100%;display:flex;align-items:center;justify-content:center;gap:.35em}
@@ -1032,6 +1036,38 @@ textarea.input{resize:vertical;min-height:74px}
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* --- Zones tàctils: els controls petits d'ús diari feien 20-26 px. El
+   pseudo-element amplia l'àrea de toc a 44 px sense canviar-ne l'aspecte. --- */
+.hbox,.todo .box,.loose-row .box,.pit-chk,.pdot,.pit-del,.prog-note-ico,
+.entry .del,.edit-btn,.cb-del,.todo .rm,.av-rm{position:relative}
+.hbox::after,.todo .box::after,.loose-row .box::after,.pit-chk::after,.pdot::after,
+.pit-del::after,.prog-note-ico::after,.entry .del::after,.edit-btn::after,
+.cb-del::after,.todo .rm::after,.av-rm::after{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:44px;height:44px;border-radius:50%}
+/* --- Text blanc sobre colors clars: no arribava ni a 3:1 --- */
+.hstatus{text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.avatar{text-shadow:0 1px 2px rgba(0,0,0,.45)}
+/* --- Focus visible també als camps que l'anul·laven --- */
+.rich-ed:focus-visible,.search-bar input:focus-visible,.av-level-name:focus-visible,
+.todo-add input:focus-visible,.pit-inp:focus-visible,.input:focus-visible,
+.prog-ta:focus-visible{outline:3px solid var(--pol);outline-offset:2px}
+/* --- El spinner és informació, no decoració: ha de seguir girant --- */
+@media(prefers-reduced-motion:reduce){ .spin{animation:cspin 1.4s linear infinite!important} }
+/* --- Àrea segura de l'iPhone (viewport-fit=cover sense env() deixava els
+       controls de baix sota la barra de gest) --- */
+.launcher{bottom:calc(22px + env(safe-area-inset-bottom))}
+.sync-badge{bottom:calc(14px + env(safe-area-inset-bottom))}
+.sheet .panel{padding-bottom:calc(26px + env(safe-area-inset-bottom))}
+
+/* --- Text llarg sense espais (un enllaç enganxat com a títol, una paraula molt
+   llarga) inflava la targeta i feia que TOTA l'app es pogués desplaçar de costat.
+   Amb overflow-wrap:anywhere el text es parteix i la targeta respecta l'amplada. --- */
+.entry h4,.entry .body,.entry .body *,.task h5,.task .body,.cc-body,.cb-text,
+.agenda-card .body,.sres,.nov-card,.subtheme-card,.prog-row-txt,.rept-card,
+.hrow,.loose-row,.st-name{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+.entry .link,.cb-text a,.entry .body a{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -1145,7 +1181,7 @@ textarea.input{resize:vertical;min-height:74px}
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 /* ============================================================
@@ -1311,12 +1347,25 @@ const api = {
   },
   async addEntry(e){ STATE.entries.unshift(e); await persist('addEntry', e); },
   async updateEntry(e){ const i=STATE.entries.findIndex(x=>x.id===e.id); if(i>-1) STATE.entries[i]=e; await persist('updateEntry', e); },
+  /* Marcar «llegida» NO ha de reenviar l'entrada sencera: si la teva còpia era d'ara
+     fa uns segons, el text que hagi escrit una altra tutora entremig es perdria.
+     Aquestes dues accions només afegeixen el teu nom a readBy (unió idempotent). */
+  async entryRead(id){ const e=STATE.entries.find(x=>x.id===id);
+    if(e) e.readBy=[...new Set([...(e.readBy||[]), ME])];
+    await persist('entryRead', {id:id, tutor:ME}); },
+  async taskRead(id){ const t=STATE.tasks.find(x=>x.id===id);
+    if(t) t.readBy=[...new Set([...(t.readBy||[]), ME])];
+    await persist('taskRead', {id:id, tutor:ME}); },
   async deleteEntry(id){ STATE.entries=STATE.entries.filter(x=>x.id!==id); if(STATE.comments) delete STATE.comments[id]; await persist('deleteEntry',{id}); },
   async addTask(t){ STATE.tasks.unshift(t); await persist('addTask', t); },
   async updateTask(t){ const i=STATE.tasks.findIndex(x=>x.id===t.id); if(i>-1) STATE.tasks[i]=t; await persist('updateTask', t); },
   async deleteTask(id){ STATE.tasks=STATE.tasks.filter(x=>x.id!==id); await persist('deleteTask',{id}); },
   async addSubtheme(s){ STATE.subthemes.push(s); await persist('addSubtheme', s); },
-  async deleteSubtheme(id){ STATE.subthemes=STATE.subthemes.filter(x=>x.id!==id); STATE.entries=STATE.entries.filter(e=>e.subtheme!==id); await persist('deleteSubtheme',{id}); },
+  async deleteSubtheme(id){ STATE.subthemes=STATE.subthemes.filter(x=>x.id!==id);
+    // També els comentaris de les entrades que hi penjaven: si no, quedaven per
+    // sempre a l'estat sense que ningú els pogués veure ni esborrar.
+    STATE.entries.filter(e=>e.subtheme===id).forEach(e=>{ if(STATE.comments) delete STATE.comments[e.id]; });
+    STATE.entries=STATE.entries.filter(e=>e.subtheme!==id); await persist('deleteSubtheme',{id}); },
   async avUpsert(tri, subj, level){ await persist('avUpsertLevel', {tri, subj, level}); },
   async avDelete(tri, subj, id){ await persist('avDeleteLevel', {tri, subj, id}); },
   async attToggle(name, absent){ await persist('attToggle', {name, absent}); },
@@ -1490,6 +1539,7 @@ function updateSyncBadge(){
     b.title='Canvis pendents d\u2019enviar. Toca per tornar-ho a provar.';
     b.oncontextmenu=(ev)=>{ ev.preventDefault(); mostraDiagnostic(); };
     b.onclick=async()=>{ b.disabled=true; b.textContent='Enviant\u2026';
+      PENDING.forEach(p=>{ p.tries=0; });   // ho demanes tu: torna-ho a provar TOT, tamb\u00e9 l'apartat
       const ok=await flushPending(); updateSyncBadge(); b.disabled=false;
       if(PENDING.length) mostraDiagnostic(); else toast('Tot desat \u2713');
       if(ok && !PENDING.length){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } }catch(e){} }
@@ -1501,7 +1551,8 @@ function updateSyncBadge(){
   b.style.display='';
   b.textContent='\u21BB '+n+' sense desar';
 }
-const PENDING_MAX_TRIES = 2;   // intents per sessió abans d'apartar una acció
+const PENDING_MAX_TRIES = 2;    // el servidor la rebutja: l'apartem de seguida
+const PENDING_MAX_RETRY = 25;   // xarxa o servidor ocupat: insistim molt més abans d'apartar-la
 let _flushing = null;          // només una execució alhora (si no, es trepitgen els índexs)
 async function flushPending(){
   if(_flushing) return _flushing;
@@ -1510,27 +1561,34 @@ async function flushPending(){
 }
 async function _flushPendingReal(){
   if(DEMO_MODE || !PENDING.length) return true;
+  const maxDe = it => (it.retryable ? PENDING_MAX_RETRY : PENDING_MAX_TRIES);
   let i=0, rebutjades=0;
   while(i < PENDING.length){
     const it=PENDING[i];
-    if((it.tries||0) >= PENDING_MAX_TRIES){ i++; continue; }   // apartada: no bloqueja la resta
+    if((it.tries||0) >= maxDe(it)){ i++; continue; }   // apartada: no bloqueja la resta
     try{ await request(it.action, it.payload); PENDING.splice(i,1); _savePending(); }
     catch(e){
+      // Comptem SEMPRE l'intent. Si no ho fèiem, una acció que falla sempre es
+      // reintentava infinitament, flushPending() no tornava mai `true` i
+      // startCloudSync deixava de baixar l'estat: el dispositiu es quedava SORD
+      // als canvis dels altres tutors, per sempre i sense dir res.
+      it.tries=(it.tries||0)+1;
+      it.retryable=!!(e && e.retryable);
       if(e && e.retryable){
         it.err=(e&&e.message)||'error';
         window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
         _savePending();
-        return false;   // xarxa o servidor ocupat: ho tornarem a provar TOT
+        break;   // xarxa o servidor ocupat: ho tornarem a provar TOT, en ordre
       }
       // El servidor l'ha rebutjada. NO l'esborrem (seria perdre feina teva):
       // l'apartem perquè no encalli la sincronització i es reintenta a la propera obertura.
-      it.tries=(it.tries||0)+1; it.err=(e&&e.message)||'error'; rebutjades++; _savePending(); i++;
+      it.err=(e&&e.message)||'error'; rebutjades++; _savePending(); i++;
       window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
       try{ console.warn('Acció rebutjada:', it.action, e && e.message); }catch(_){}
     }
   }
   if(rebutjades) toast('\u26A0\uFE0F '+rebutjades+' canvi(s) no s\u2019han pogut desar. Es tornarà a provar.');
-  return !PENDING.some(x=>(x.tries||0) < PENDING_MAX_TRIES);
+  return !PENDING.some(x=>(x.tries||0) < maxDe(x));
 }
 let _inflight = 0;              // escriptures en curs (per no trepitjar-les amb un pull)
 let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esperar la pantalla
@@ -1650,6 +1708,20 @@ function repaintAfterSync(){
   try{ if(CURRENT_SUB) openSubtheme(CURRENT, CURRENT_SUB); else openSection(CURRENT); }catch(e){ return; }
   window.scrollTo(0,y);
 }
+/* Refresc manual (botons «Actualitza», generar la llista d'absents, pícnics…).
+   Baixa l'estat del núvol NOMÉS si abans s'ha pogut enviar tot el que hi havia
+   pendent. Si no ho comprovéssim, el getState substituiria l'estat local i les
+   marques que encara no han sortit del mòbil (absències, pícnics) desapareixerien
+   de la pantalla: la llista que es copia i s'envia sortiria incompleta. */
+async function refrescaEstat(){
+  if(DEMO_MODE) return true;
+  if(_inflight) return false;
+  if(PENDING.length && !(await flushPending())) return false;
+  try{ const s=await request('getState');
+    if(s){ STATE=s; normalizeState(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} }
+    return true;
+  }catch(e){ return false; }
+}
 function startCloudSync(){
   if(DEMO_MODE) return;
   const pull=async()=>{
@@ -1766,7 +1838,10 @@ function sanitizeHtml(html){
         if(!allowed.has(ch.nodeName)){ node.replaceChild(document.createTextNode(ch.textContent), ch); return; }
         Array.from(ch.attributes).forEach(a=>{
           const n=a.name.toLowerCase();
-          const keep = (ch.nodeName==='A' && n==='href' && !/^\s*javascript:/i.test(a.value));
+          // Els navegadors ignoren tabuladors i salts de línia dins d'un URL, així que
+          // "java&#9;script:" s'executava igualment. Els traiem abans de comprovar-ho.
+          const v = String(a.value||'').replace(/[\x00-\x20]/g,'');
+          const keep = (ch.nodeName==='A' && n==='href' && !/^(javascript|data|vbscript):/i.test(v));
           if(!keep) ch.removeAttribute(a.name);
         });
         if(ch.nodeName==='A'){ ch.setAttribute('target','_blank'); ch.setAttribute('rel','noopener'); }
@@ -2139,9 +2214,8 @@ function markNovRead(nov,card){
   //    o el refresc la cancel·la, la novetat s'ha de marcar igualment)
   const desat=(async()=>{
     if(nov.kind==='comment'){ await api.commentSeen(nov.id); return; }
-    nov.ref.readBy=[...new Set([...(nov.ref.readBy||[]), ME])];
-    if(nov.kind==='task'){ await api.updateTask(nov.ref); return; }
-    await api.updateEntry(nov.ref);
+    if(nov.kind==='task'){ await api.taskRead(nov.ref.id); return; }
+    await api.entryRead(nov.ref.id);
     // els comentaris d'aquesta entrada anaven dins la mateixa targeta
     if(entryHasUnseenComments(nov.ref.id)) await api.commentSeen(nov.ref.id);
   })();
@@ -2439,10 +2513,16 @@ function progBuildWeeks(){
   while(cur<=end){
     const mon=new Date(cur); const fri=new Date(cur); fri.setDate(fri.getDate()+4);
     let nonLect=0, vacDays=0; const festius=[]; let vacName=null;
+    let primerLect=null, darrerLect=null;
     for(let k=0;k<5;k++){ const dd=new Date(mon); dd.setDate(dd.getDate()+k); const iso=progDateToISO(dd);
       const v=progVacOn(iso), f=progFestiuOn(iso);
-      if(v){ nonLect++; vacDays++; vacName=v.name; }
+      // Fora del curs (el dilluns 7 de set. de la S1, o després del darrer dia)
+      // tampoc és lectiu: si no, la S1 sortia com «7–11 set.» i 4 dies lectius.
+      if(iso<COURSE_START || iso>COURSE_END){ nonLect++; }
+      else if(v){ nonLect++; vacDays++; vacName=v.name; }
       else if(f){ nonLect++; festius.push(f); }
+      else if(!primerLect) primerLect=iso;
+      if(iso>=COURSE_START && iso<=COURSE_END && !v && !f) darrerLect=iso;
     }
     const isVac = nonLect===5;
     const wStart=new Date(mon), wEnd=new Date(mon); wEnd.setDate(wEnd.getDate()+6);
@@ -2452,7 +2532,8 @@ function progBuildWeeks(){
       else if(a.from){ const f=progIsoToDate(a.from), t=progIsoToDate(a.to); if(f<=wEnd && t>=wStart && acts.indexOf(a.name)<0) acts.push(a.name); }
     });
     weeks.push({monday:progDateToISO(mon), mondayDate:new Date(mon), friday:new Date(fri),
-      isVac:isVac, vacName:vacName, vacDays:vacDays, festius:festius, activitats:acts, teachingN:null});
+      isVac:isVac, vacName:vacName, vacDays:vacDays, festius:festius, activitats:acts, teachingN:null,
+      lectDe:primerLect, lectA:darrerLect, diesLect:5-nonLect});
     cur.setDate(cur.getDate()+7);
   }
   let tn=0; weeks.forEach(w=>{ if(!w.isVac){ tn++; w.teachingN=tn; } });
@@ -2465,7 +2546,11 @@ const PROG_MEDI_PROJ=[{"key":"proj-cos","nom":"El cos humà","tri":1,"ini":"2026
 const PROG_REDUIDES={"2026-12-21":2,"2027-01-04":1};
 const PROG_MEDI_SESS_SETM=2;
 
-function progWeekLabel(w){ const m=w.mondayDate, f=w.friday;
+function progWeekLabel(w){
+  // Acota l'etiqueta als dies que realment s\u00f3n de curs (la S1 comen\u00e7a dimarts 8).
+  let m=w.mondayDate, f=w.friday;
+  if(!w.isVac && w.lectDe && w.lectA){ m=progIsoToDate(w.lectDe); f=progIsoToDate(w.lectA); }
+  if(m.getTime()===f.getTime()) return m.getDate()+' '+PROG_MESU[m.getMonth()];
   if(m.getMonth()===f.getMonth()) return m.getDate()+'\u2013'+f.getDate()+' '+PROG_MESU[m.getMonth()];
   return m.getDate()+' '+PROG_MESU[m.getMonth()]+' \u2013 '+f.getDate()+' '+PROG_MESU[f.getMonth()];
 }
@@ -2506,7 +2591,19 @@ const CV_START='2026-09-16';   // primer dimecres que es dona
 function _cvGrid(){ const out=[]; let d=progIsoToDate(CV_START); const end=progIsoToDate(COURSE_END);
   while(d<=end){ const iso=progDateToISO(d); if(!progVacOn(iso)) out.push(iso); d=new Date(d); d.setDate(d.getDate()+14); } return out; }
 const CV_GIVES=_cvGrid();
-function cvCollectOf(g){ const d=progIsoToDate(g); d.setDate(d.getDate()+7); return progDateToISO(d); }
+/* Es recull el dimecres següent… però no si cau en vacances o festiu (passava amb
+   el cicle del 17 de març: la recollida queia dins de Setmana Santa i l'app
+   avisava «Recollir la carpeta» un dia que l'escola era tancada). */
+function cvCollectOf(g){
+  const d=progIsoToDate(g); d.setDate(d.getDate()+7);
+  for(let i=0;i<14;i++){
+    const iso=progDateToISO(d);
+    if(!progVacOn(iso) && !progFestiuOn(iso) && d.getDay()!==0 && d.getDay()!==6) return iso;
+    d.setDate(d.getDate()+1);
+  }
+  return progDateToISO(d);
+}
+function _cvCollectOfAntic(g){ const d=progIsoToDate(g); d.setDate(d.getDate()+7); return progDateToISO(d); }
 function cvCurrentGive(){ const today=progDateToISO(new Date());
   for(let i=0;i<CV_GIVES.length;i++){ const next=CV_GIVES[i+1]||'9999'; if(CV_GIVES[i]<=today && today<next) return CV_GIVES[i]; }
   if(CV_GIVES.length && today<CV_GIVES[0]) return CV_GIVES[0];
@@ -2552,10 +2649,16 @@ function progSeedItems(subject, key){
   const s=(typeof PROG_SEED!=='undefined' && PROG_SEED[subject]) ? PROG_SEED[subject][String(key)] : null;
   return s ? s.map(progNormItem) : null;
 }
-/* Ítems a mostrar: els desats si n'hi ha; si no, la sembra */
+/* Ítems a mostrar: els desats si n'hi ha; si no, la sembra.
+   IMPORTANT: si la cel·la ja existeix amb una llista d'ítems (encara que sigui
+   buida), vol dir que algú l'ha buidada a posta (esborrant-les totes o passant-les
+   a la setmana següent). En aquest cas NO s'ha de tornar a mostrar la sembra: si
+   no, la setmana semblava intacta i la feina sortia duplicada a dues setmanes. */
 function progItemsView(subject, key){
-  const stored=progItemsOf(progCell(subject,key));
+  const cell=progCell(subject,key);
+  const stored=progItemsOf(cell);
   if(stored.length) return stored;
+  if(cell && Array.isArray(cell.items)) return [];
   return progSeedItems(subject,key) || [];
 }
 function progPlanFilledAt(subject, key){ return progItemsView(subject,key).some(i=>i.t && String(i.t).trim()); }
@@ -2632,12 +2735,15 @@ async function doProgCarry(subject, fromMonday, items){
   const T=progTeachingMondays(); const fi=T.indexOf(fromMonday);
   if(fi<0 || fi>=T.length-1){ toast('No hi ha setmana seg\u00fcent'); return; }
   const nextKey=T[fi+1];
-  const pending=items.filter(it=>!progItemDoneBy(it, ME) && String(it.t).trim()).map(it=>({t:it.t, done:Object.assign({}, it.done||{}), c:true}));
+  /* Es conserva l'objecte sencer (id estable + tipus, pàgina, llibre, dictat,
+     sessions…). Abans es reconstruïa com a {t,done,c} i cada trasllat esborrava
+     les etiquetes i canviava l'id. */
+  const pending=items.filter(it=>!progItemDoneBy(it, ME) && String(it.t).trim()).map(it=>Object.assign({}, it, {done:Object.assign({}, it.done||{}), c:true}));
   if(!pending.length){ toast('No hi ha res pendent'); return; }
-  const remain=items.filter(it=>progItemDoneBy(it, ME) && String(it.t).trim()).map(it=>({t:it.t, done:Object.assign({}, it.done||{}), c:!!it.c}));
+  const remain=items.filter(it=>progItemDoneBy(it, ME) && String(it.t).trim()).map(it=>Object.assign({}, it, {done:Object.assign({}, it.done||{})}));
   const thisCell=progCell(subject, fromMonday);
   const nextCell=progCell(subject, nextKey);
-  const nextItems=progItemsOf(nextCell).map(x=>({t:x.t||'',done:Object.assign({},x.done||{}),c:!!x.c})).concat(pending);
+  const nextItems=progItemsView(subject, nextKey).map(x=>Object.assign({}, x, {done:Object.assign({},x.done||{})})).concat(pending);
   try{
     await api.progSetCell(subject, fromMonday, {items:remain, notes:thisCell.notes||'', link:thisCell.link||''});
     await api.progSetCell(subject, nextKey, {items:nextItems, notes:nextCell.notes||'', link:nextCell.link||''});
@@ -2909,8 +3015,10 @@ function renderProgramacio(S, sec){
   card.appendChild(cap);
   const warn=progWeekWarn(w);
   if(warn.length){ const wb=el('div','prog-fest'); wb.innerHTML=warn.map(x=>'<span class="pf-tag">'+esc(x)+'</span>').join(''); card.appendChild(wb); }
-  if(typeof PROG_REDUIDES!=='undefined' && PROG_REDUIDES[w.monday]!=null){
-    const d=Math.max(0, 5-(w.vacDays||0)-((w.festius&&w.festius.length)||0)); const rb=el('div','prog-red');
+  // Es calcula del calendari real: la llista fixa PROG_REDUIDES no coneixia els
+  // dies de lliure disposició i es deixava setmanes de 3 dies sense marcar.
+  if(!w.isVac && w.diesLect!=null && w.diesLect>0 && w.diesLect<=3){
+    const d=w.diesLect; const rb=el('div','prog-red');
     rb.innerHTML='<span class="pr-tag">\u2702\uFE0F Setmana redu\u00EFda \u00B7 '+d+(d===1?' dia lectiu':' dies lectius')+'</span>';
     card.appendChild(rb);
   }
@@ -3151,10 +3259,15 @@ function renderProgOverview(S, subj, curIdx){
       d.innerHTML='<i></i>';
       d.onclick=(e)=>{ e.stopPropagation();
         const cur=progCell(PROG_SUBJECT, w.monday);
-        const its=progItemsOf(cur).filter(i=>i.t&&String(i.t).trim());
+        /* Es fa servir progItemsView (sembra inclosa), igual que el pintat del punt.
+           Amb progItemsOf, a les setmanes encara no materialitzades la llista sortia
+           buida, s'escrivia un `done` solt a la cel·la i el punt tornava a apagar-se
+           al primer repintat: el clic no marcava res. */
+        const base=progItemsView(PROG_SUBJECT, w.monday);
+        const its=base.filter(i=>i.t&&String(i.t).trim());
         if(its.length){
           const all=its.every(i=>progItemDoneBy(i,u.id));
-          const newItems=progItemsOf(cur).map(i=>{ const nd=Object.assign({}, i.done||{}); if(all) delete nd[u.id]; else nd[u.id]=true; return {t:i.t, done:nd, c:!!i.c}; });
+          const newItems=base.map(i=>{ const nd=Object.assign({}, i.done||{}); if(all) delete nd[u.id]; else nd[u.id]=true; return Object.assign({}, i, {done:nd}); });
           d.classList.toggle('on', !all);
           api.progSetCell(PROG_SUBJECT, w.monday, {items:newItems, notes:cur.notes||'', link:cur.link||''}).catch(()=>{});
         }else{
@@ -3275,7 +3388,7 @@ function renderPicnic(S, section, subId, sub){
   const actions=el('div','att-actions');
   const cp=el('button','btn btn-primary'); cp.type='button';
   cp.innerHTML=`<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia la llista de pícnics`;
-  cp.onclick=async()=>{ if(!DEMO_MODE){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); } }catch(e){} }
+  cp.onclick=async()=>{ await refrescaEstat();
     PICNIC_RESULT=buildPicnicText(subId, sub);
     if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(PICNIC_RESULT).then(()=>toast('Llista de pícnics copiada!')).catch(()=>{});
     openSubtheme(section, subId); };
@@ -3495,7 +3608,8 @@ function renderComandaForm(S, sec, editData){
   // Data
   const fData=el('div','field'); fData.innerHTML=`<label>Data de la comanda</label>`;
   const dateInp=el('input','input'); dateInp.type='date';
-  dateInp.value=(isEdit && editData.date) ? editData.date : new Date().toISOString().slice(0,10);
+  /* isoDate() i no toISOString(): entre mitjanit i les 2:00 el segon donava ahir. */
+  dateInp.value=(isEdit && editData.date) ? editData.date : isoDate(new Date());
   fData.appendChild(dateInp); form.appendChild(fData);
 
   // Material sol·licitat (files dinàmiques)
@@ -3871,7 +3985,7 @@ function renderReptesAlumneManage(S){
     bulk.onclick=()=>{ const sel=[...document.querySelectorAll('#section .rept-sel:checked')]; if(!sel.length){ toast('Marca alguna caixa en curs primer'); return; }
       sel.forEach(cb=>{ const r=reptRegDe(cb.dataset.caixa,REPTES_ALUMNE); if(r) reptRegSet(r,'fet'); }); openSection('eines'); toast(sel.length+' caixa(es) passades a fet'); };
     S.appendChild(bulk); }
-  const fets=reptFetsAlumne(REPTES_ALUMNE); const tot=REPTES.caixes.length;
+  const fets=reptFetsAlumne(REPTES_ALUMNE); const tot=REPTES.caixes.filter(c=>!reptEsTema(c)).length;   /* només els nivells són fetibles (110), no els 36 temes */
   const sum=el('div','rept-alu-sum'); sum.innerHTML='<b>'+fets+'</b> de '+tot+' caixes fetes'; S.appendChild(sum);
 }
 /* Classificació d'alumnes per nombre de caixes fetes (a Evolució) */
@@ -3903,7 +4017,7 @@ function reptEvolGrups(S){
   });
 }
 function renderReptesEvol(S){
-  const tot=REPTES.caixes.length;
+  const tot=REPTES.caixes.filter(c=>!reptEsTema(c)).length;   /* només els nivells són fetibles (110), no els 36 temes */
   const totFets=REPTES.registres.filter(r=>r.estat==='fet').length;
   const roster=reptAllStudents();
   const alumnesActius=roster.filter(a=>reptFetsAlumne(a)>=1).length;
@@ -3962,7 +4076,7 @@ function buildAbsentText(){
   return lines.join('\n');
 }
 async function attGenerate(){
-  if(!DEMO_MODE){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); } }catch(e){ toast('No s\u2019ha pogut refrescar'); } }
+  if(!(await refrescaEstat())) toast('No s\u2019ha pogut refrescar: la llista pot no tenir els canvis m\u00e9s nous');
   ATT_RESULT=buildAbsentText();
   if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ATT_RESULT).then(()=>toast('Llista d\u2019absents copiada!')).catch(()=>{}); }
   openSection('eines');
@@ -3996,7 +4110,7 @@ function attEmail(){
       });
   };
   // refresca l'estat abans d'obrir el popup, així la llista té les marques dels tres grups
-  if(!DEMO_MODE){ request('getState').then(s=>{ if(s){ STATE=s; normalizeState(); safeSave(); } go(); }).catch(go); }
+  if(!DEMO_MODE){ refrescaEstat().then(go).catch(go); }
   else go();
 }
 function renderAttendance(S){
@@ -4018,7 +4132,7 @@ function renderAttendance(S){
   });
   const refresh=el('button','att-refresh'); refresh.type='button'; refresh.title='Actualitza l\u2019estat';
   refresh.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.4"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v5h-5"/></svg>`;
-  refresh.onclick=async()=>{ if(!DEMO_MODE){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); } }catch(e){} } openSection('eines'); };
+  refresh.onclick=async()=>{ if(!(await refrescaEstat())) toast('No s’ha pogut refrescar'); openSection('eines'); };
   status.appendChild(refresh);
   S.appendChild(status);
 
@@ -4507,7 +4621,7 @@ function entryCard(e,sec,subId){
   if(unread){
     const rb=el('button','btn btn-ghost'); rb.style.padding='.5em .9em'; rb.style.fontSize='.82rem';
     rb.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em;stroke-width:3"><path d="M5 12l5 5L20 7"/></svg>Marca com a llegida`;
-    rb.onclick=async()=>{ e.readBy=[...(e.readBy||[]),ME]; await api.updateEntry(e); reopen(sec,subId); };
+    rb.onclick=async()=>{ await api.entryRead(e.id); reopen(sec,subId); };
     foot.appendChild(rb);
   }
   card.appendChild(foot);
@@ -4690,7 +4804,9 @@ function schoolDayInfo(iso){
 }
 function renderAgendaList(S,sec){
   const feed=el('div','feed');
-  const list=STATE.entries.filter(e=>e.section===sec.id)
+  // Només les que tenen data. Les de «Per agendar» sortien aquí les primeres,
+  // amb el dia en què es van apuntar pintat com si fos el dia de l'acte.
+  const list=STATE.entries.filter(e=>e.section===sec.id && e.eventDate)
     .sort((a,b)=> (a.eventDate||'').localeCompare(b.eventDate||'') || (a.time||'').localeCompare(b.time||''));
   if(!list.length){ const em=el('div','empty-feed'); em.innerHTML=`<div class="big">📅</div>Cap data encara.`; feed.appendChild(em); }
   list.forEach(e=>feed.appendChild(e.id===EDITING ? agendaEditForm(e,sec) : agendaCard(e,sec)));
@@ -5289,6 +5405,8 @@ function provaRecarregar(){
   if(!window._needsReload) return;
   try{ if(typeof sectionBusy==='function' && sectionBusy()) return; }catch(e){}
   if(PENDING && PENDING.length) return;      // primer que s'enviï el que hi ha pendent
+  if(_inflight) return;                      // hi ha una desada en vol: recarregar l'avortaria
+                                             // i el canvi no arribaria ni al servidor ni a la cua
   window._needsReload=false; location.reload();
 }
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){

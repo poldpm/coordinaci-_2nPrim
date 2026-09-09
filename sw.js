@@ -6,7 +6,7 @@
      actualització en segon pla.
    - Les crides a Apps Script (POST, cross-origin) NO es toquen mai.
    Per forçar una actualització d'assets, puja la versió de CACHE. */
-const CACHE = 'coord-2n-v2';
+const CACHE = 'coord-2n-v3';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './img/logo.webp', './img/icon-192.png', './img/icon-512.png',
@@ -48,6 +48,6 @@ self.addEventListener('fetch', (e) => {
     caches.match(req).then((m) => m || fetch(req).then((res) => {
       if (res && res.ok && res.type === 'basic') { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(req, cp)); }
       return res;
-    }).catch(() => m))
+    }).catch(() => new Response('', { status: 504, statusText: 'Sense connexió' })))
   );
 });
