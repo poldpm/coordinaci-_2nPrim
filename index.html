@@ -95,7 +95,9 @@ a{color:var(--teal)}
 .burst span,.t-burst span{position:absolute;width:3px;border-radius:3px;background:var(--sun);transform-origin:center;opacity:.9}
 
 /* ======================================================= LOGIN */
-#login{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:26px;
+/* overflow-y + align-items:safe center: amb el mòbil de costat el contingut no cabia
+   i, com que estava centrat, dos dels tres perfils quedaven fora sense poder-hi arribar. */
+#login{position:fixed;inset:0;z-index:60;display:grid;place-items:safe center;padding:26px;overflow-y:auto;overscroll-behavior:contain;
   background:radial-gradient(900px 600px at 50% -10%,#EAF8FC,transparent 65%),var(--paper);
   transition:opacity .5s ease, visibility .5s}
 #login.gone{opacity:0;visibility:hidden;pointer-events:none}
@@ -1064,10 +1066,33 @@ textarea.input{resize:vertical;min-height:74px}
 /* --- Text llarg sense espais (un enllaç enganxat com a títol, una paraula molt
    llarga) inflava la targeta i feia que TOTA l'app es pogués desplaçar de costat.
    Amb overflow-wrap:anywhere el text es parteix i la targeta respecta l'amplada. --- */
-.entry h4,.entry .body,.entry .body *,.task h5,.task .body,.cc-body,.cb-text,
+.entry h4,.entry .body,.entry .body p,.entry .body li,.entry .body a,.entry .body span,
+.task h5,.task .body,.cc-body,.cb-text,
 .agenda-card .body,.sres,.nov-card,.subtheme-card,.prog-row-txt,.rept-card,
 .hrow,.loose-row,.st-name{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+/* Les taules NO es parteixen lletra a lletra: es desplacen dins del seu contenidor. */
+.entry .body table,.rich-ed table{word-break:normal;overflow-wrap:normal;min-width:max-content}
+.entry .body td,.entry .body th,.rich-ed td,.rich-ed th{word-break:normal;overflow-wrap:break-word;min-width:6em}
+.entry .body,.rich-ed{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .entry .link,.cb-text a,.entry .body a{overflow-wrap:anywhere}
+
+/* --- Contenidors que ara son <button> per poder-hi arribar amb teclat --- */
+button.subtheme-card,button.rept-card{
+  font:inherit;color:inherit;text-align:left;width:100%;appearance:none;cursor:pointer}
+[role="button"]{cursor:pointer}
+[role="button"]:focus-visible,button.subtheme-card:focus-visible,button.rept-card:focus-visible{
+  outline:3px solid var(--pol);outline-offset:2px}
+/* --- Contrast: el text blanc no arribava ni a 2:1 sobre els colors clars.
+       Es canvia el color del TEXT, no la paleta de l'equip. --- */
+.hstatus{color:#12222B;text-shadow:none}
+.avatar{color:#fff;text-shadow:none;font-weight:800}
+.chip.sec-tag{font-weight:800}
+/* --- Missatge d'error dins d'un modal --- */
+.modal-err{color:#A8201A;font-weight:800;font-size:.88rem;margin:-8px 0 14px;text-align:left}
+
+/* La taula ampla es desplaça DINS de l'entrada; la pàgina no es mou de costat. */
+.entry,.entry-main,.entry .body{min-width:0;max-width:100%}
+.entry .body{overflow-x:auto}
 </style>
 </head>
 <body>
@@ -1202,11 +1227,13 @@ document.getElementById('heroLogo').src = LOGO;
 
 /* ---------- USUARIS ---------- */
 const USERS = [
-  {id:'mireia',   name:'Mireia',   accent:'var(--mireia)',   role:'Tutora de 2n'},
-  {id:'cristina', name:'Cristina', accent:'var(--cristina)', role:'Tutora de 2n'},
-  {id:'pol',      name:'Pol',      accent:'var(--pol)',      role:'Tutor de 2n'},
+  /* `accent` es el color de marca; `ink` es el mateix to enfosquit fins a complir
+     el contrast quan hi ha text blanc a sobre (avatars i xips). */
+  {id:'mireia',   name:'Mireia',   accent:'var(--mireia)',   ink:'#9C5C12', role:'Tutora de 2n'},
+  {id:'cristina', name:'Cristina', accent:'var(--cristina)', ink:'#B84371', role:'Tutora de 2n'},
+  {id:'pol',      name:'Pol',      accent:'var(--pol)',      ink:'#4356C9', role:'Tutor de 2n'},
 ];
-const userById = id => USERS.find(u=>u.id===id) || {id,name:id,accent:'var(--muted)'};
+const userById = id => USERS.find(u=>u.id===id) || {id,name:id,accent:'var(--muted)',ink:'#41626F'};
 
 /* ---------- GRUPS (per al calendari) ---------- */
 const GROUPS = [
@@ -1368,10 +1395,18 @@ const api = {
     STATE.entries=STATE.entries.filter(e=>e.subtheme!==id); await persist('deleteSubtheme',{id}); },
   async avUpsert(tri, subj, level){ await persist('avUpsertLevel', {tri, subj, level}); },
   async avDelete(tri, subj, id){ await persist('avDeleteLevel', {tri, subj, id}); },
-  async attToggle(name, absent){ await persist('attToggle', {name, absent}); },
+  /* La clau ara és CLASSE|NOM. En desmarcar, esborrem també la clau antiga (només
+     el nom) si encara hi és al servidor, si no una marca vella no es podria treure. */
+  async attToggle(name, absent){ await persist('attToggle', {name, absent});
+    if(!absent){ const b=String(name).split('|').pop();
+      if(b!==name && ((STATE.attendance&&STATE.attendance.absents)||{})[b]!==undefined){
+        delete STATE.attendance.absents[b]; await persist('attToggle', {name:b, absent:false}); } } },
   async attDone(cls, done){ await persist('attDone', {cls, done}); },
   async attReset(){ await persist('attReset', {}); },
-  async picnicToggle(sub, name, on){ await persist('picnicToggle', {sub, name, on}); },
+  async picnicToggle(sub, name, on){ await persist('picnicToggle', {sub, name, on});
+    if(!on){ const b=String(name).split('|').pop();
+      if(b!==name && (((STATE.picnics||{})[sub])||{})[b]!==undefined){
+        delete STATE.picnics[sub][b]; await persist('picnicToggle', {sub, name:b, on:false}); } } },
   async listComandes(){
     if(DEMO_MODE) return DEMO_COMANDES.slice();
     const d = await request('listComandes');
@@ -1439,6 +1474,8 @@ const api = {
     const m = STATE.cvLliurat[key] = STATE.cvLliurat[key] || {};
     if(on) m[alumne]=true; else delete m[alumne];
     await persist('cvLliurat', {key, alumne, on:!!on});
+    if(!on){ const b=String(alumne).split('|').pop();          // esborra també la clau antiga
+      if(b!==alumne && m[b]!==undefined){ delete m[b]; await persist('cvLliurat', {key, alumne:b, on:false}); } }
   },
   async correuUpsert(c){
     STATE.correus = STATE.correus || [];
@@ -1517,7 +1554,14 @@ let DEMO_COMANDES = [
 ];
 /* ---- Cua de mutacions no sincronitzades (robustesa davant talls de xarxa) ---- */
 let PENDING = [];
-function _loadPending(){ try{ return JSON.parse(localStorage.getItem('coord_pending')||'[]'); }catch(e){ return []; } }
+/* SEMPRE una llista. Si la clau es corromp (versió antiga, escriptura a mitges),
+   PENDING deixava de ser un array, PENDING.push llançava dins del catch de persist()
+   i la cadena d'enviament quedava enverinada: l'app no tornava a desar RES, sense avisar. */
+function _loadPending(){
+  try{ const x=JSON.parse(localStorage.getItem('coord_pending')||'[]');
+    return Array.isArray(x) ? x.filter(i=>i && typeof i==='object' && i.action) : []; }
+  catch(e){ return []; }
+}
 function _savePending(){ try{ localStorage.setItem('coord_pending', JSON.stringify(PENDING)); }catch(e){}
   try{ updateSyncBadge(); }catch(e){} }
 /* Avís permanent mentre hi hagi canvis pendents d'enviar (per no confiar a cegues) */
@@ -1546,13 +1590,18 @@ function updateSyncBadge(){
     };
     document.body.appendChild(b);
   }
-  const n=PENDING.length;
-  if(!n){ b.style.display='none'; return; }
-  b.style.display='';
+  // Les que estan en vol no compten: nom\u00E9s molestar\u00EDem durant el mig segon que triga.
+  const n=PENDING.filter(x=>!x.sending).length;
+  if(!n){ b.hidden=true; b.style.display='none'; return; }
+  b.hidden=false; b.style.display='';
+  b.setAttribute('aria-live','polite');
   b.textContent='\u21BB '+n+' sense desar';
 }
 const PENDING_MAX_TRIES = 2;    // el servidor la rebutja: l'apartem de seguida
 const PENDING_MAX_RETRY = 25;   // xarxa o servidor ocupat: insistim molt més abans d'apartar-la
+const maxDe = it => (it.retryable ? PENDING_MAX_RETRY : PENDING_MAX_TRIES);
+/* Una acció es pot enviar si no està ja en vol i encara no s'ha apartat. */
+const enviable = it => !it.sending && (it.tries||0) < maxDe(it);
 let _flushing = null;          // només una execució alhora (si no, es trepitgen els índexs)
 async function flushPending(){
   if(_flushing) return _flushing;
@@ -1561,11 +1610,10 @@ async function flushPending(){
 }
 async function _flushPendingReal(){
   if(DEMO_MODE || !PENDING.length) return true;
-  const maxDe = it => (it.retryable ? PENDING_MAX_RETRY : PENDING_MAX_TRIES);
   let i=0, rebutjades=0;
   while(i < PENDING.length){
     const it=PENDING[i];
-    if((it.tries||0) >= maxDe(it)){ i++; continue; }   // apartada: no bloqueja la resta
+    if(!enviable(it)){ i++; continue; }   // en vol o apartada: no bloqueja la resta
     try{ await request(it.action, it.payload); PENDING.splice(i,1); _savePending(); }
     catch(e){
       // Comptem SEMPRE l'intent. Si no ho fèiem, una acció que falla sempre es
@@ -1588,7 +1636,7 @@ async function _flushPendingReal(){
     }
   }
   if(rebutjades) toast('\u26A0\uFE0F '+rebutjades+' canvi(s) no s\u2019han pogut desar. Es tornarà a provar.');
-  return !PENDING.some(x=>(x.tries||0) < maxDe(x));
+  return !PENDING.some(enviable);
 }
 let _inflight = 0;              // escriptures en curs (per no trepitjar-les amb un pull)
 let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esperar la pantalla
@@ -1599,23 +1647,102 @@ let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esp
 function persist(action, payload){
   safeSave();                                  // còpia local immediata (optimista)
   if(DEMO_MODE) return Promise.resolve();
+  /* Encuem ABANS d'enviar (write-ahead). Si l'app es tanca, es recarrega o es
+     mata mentre la petició és en vol, el canvi es recupera a la propera obertura
+     en comptes de perdre's. Marcat com a `sending` perquè la cua no el reenviï. */
+  const it={action, payload, tries:0, sending:true};
+  PENDING.push(it); _savePending();
+  const treu=()=>{ const k=PENDING.indexOf(it); if(k>-1) PENDING.splice(k,1); _savePending(); };
   _inflight++;
-  _chain = _chain.then(async ()=>{
+  /* .catch() abans del .then(): una excepció dins d'aquesta cadena no la pot deixar
+     rebutjada per sempre. Sense això, un sol error deixava el dispositiu sense enviar
+     res mai més, en silenci i amb _inflight encallat. */
+  _chain = _chain.catch(()=>{}).then(async ()=>{
     try{
-      if(PENDING.length) await flushPending();  // primer, el que hi hagués pendent (en ordre)
+      if(PENDING.some(enviable)){                 // primer, el que hi hagués pendent (en ordre)
+        if(!(await flushPending())){ it.sending=false; _savePending(); return; }
+      }
       await request(action, payload);
+      treu();
     }catch(err){
-      PENDING.push({action, payload, tries:0, err:(err&&err.message)||'error'}); _savePending();
-      window._ultimError={ accio:action, missatge:(err&&err.message)||'error', quan:new Date().toLocaleTimeString('ca-ES') };
+      it.sending=false;
+      it.err=(err&&err.message)||'error';
+      it.retryable=!!(err && err.retryable);
+      _savePending();
+      window._ultimError={ accio:action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
       const now=Date.now();
       if(now-(window._offAt||0)>6000){ window._offAt=now;
         const senseXarxa = !navigator.onLine;
         toast(senseXarxa ? '⚠️ Sense connexió: es desarà sol quan torni'
                          : '⚠️ El servidor no ha respost: es tornarà a provar sol');
       }
-    } finally { _inflight--; }
+    } finally { _inflight--; try{ updateSyncBadge(); }catch(e){} }
   });
   return Promise.resolve();                    // la pantalla no espera el servidor
+}
+/* ---- Tornar a aplicar el que encara no ha arribat al servidor ----
+   Quan baixem l'estat del núvol, aquest encara no conté els nostres canvis pendents.
+   Sense això, el canvi desapareixia de la pantalla, el mestre el tornava a escriure
+   i, quan la cua es buidava, quedava duplicat. Aquí es reapliquen a sobre.
+   És una còpia curta de la lògica del backend: si divergissin, el servidor mana,
+   perquè aquestes mateixes accions s'hi acabaran enviant igualment. */
+function aplicaLocal(S, action, p){
+  if(!S || !p) return;
+  const upsert=(arr,x,alDavant)=>{ const i=arr.findIndex(y=>y.id===x.id);
+    if(i>-1) arr[i]=x; else if(alDavant) arr.unshift(x); else arr.push(x); };
+  const uneix=(arr,v)=>{ if(arr.indexOf(v)<0) arr.push(v); };
+  switch(action){
+    case 'addEntry': case 'updateEntry': upsert(S.entries=S.entries||[], p, true); break;
+    case 'deleteEntry': S.entries=(S.entries||[]).filter(x=>x.id!==p.id); if(S.comments) delete S.comments[p.id]; break;
+    case 'addTask': case 'updateTask': upsert(S.tasks=S.tasks||[], p, true); break;
+    case 'deleteTask': S.tasks=(S.tasks||[]).filter(x=>x.id!==p.id); break;
+    case 'entryRead': { const e=(S.entries||[]).find(x=>x.id===p.id); if(e) uneix(e.readBy=e.readBy||[], p.tutor); break; }
+    case 'taskRead': { const t=(S.tasks||[]).find(x=>x.id===p.id); if(t) uneix(t.readBy=t.readBy||[], p.tutor); break; }
+    case 'addSubtheme': upsert(S.subthemes=S.subthemes||[], p, false); break;
+    case 'deleteSubtheme': S.subthemes=(S.subthemes||[]).filter(x=>x.id!==p.id);
+      (S.entries||[]).filter(e=>e.subtheme===p.id).forEach(e=>{ if(S.comments) delete S.comments[e.id]; });
+      S.entries=(S.entries||[]).filter(e=>e.subtheme!==p.id); break;
+    case 'correuUpsert': { const c=p.correu; if(!c) break; S.correus=S.correus||[];
+      const i=S.correus.findIndex(x=>x.id===c.id);
+      if(i>-1){ c.sent=Object.assign({}, S.correus[i].sent||{}, c.sent||{}); S.correus[i]=c; } else S.correus.push(c); break; }
+    case 'correuDelete': S.correus=(S.correus||[]).filter(x=>x.id!==p.id); break;
+    case 'correuSent': { const c=(S.correus||[]).find(x=>x.id===p.id); if(c){ c.sent=c.sent||{};
+      if(p.on) c.sent[p.tutor]=true; else delete c.sent[p.tutor]; } break; }
+    case 'attToggle': { S.attendance=S.attendance||{absents:{},done:{}}; S.attendance.absents=S.attendance.absents||{};
+      if(p.absent) S.attendance.absents[p.name]=true; else delete S.attendance.absents[p.name]; break; }
+    case 'attDone': { S.attendance=S.attendance||{absents:{},done:{}}; S.attendance.done=S.attendance.done||{};
+      S.attendance.done[p.cls]=!!p.on; break; }
+    case 'attReset': S.attendance={absents:{},done:{}}; break;
+    case 'picnicToggle': { S.picnics=S.picnics||{}; S.picnics[p.sub]=S.picnics[p.sub]||{};
+      if(p.on) S.picnics[p.sub][p.name]=true; else delete S.picnics[p.sub][p.name]; break; }
+    case 'cvLliurat': { S.cvLliurat=S.cvLliurat||{}; S.cvLliurat[p.key]=S.cvLliurat[p.key]||{};
+      if(p.on) S.cvLliurat[p.key][p.alumne]=true; else delete S.cvLliurat[p.key][p.alumne]; break; }
+    case 'progSetCell': { S.programacio=S.programacio||{}; S.programacio[p.subject]=S.programacio[p.subject]||{};
+      const c=S.programacio[p.subject][String(p.key)]||{}; const d=p.data||p.patch||{};
+      if(d.items!==undefined) c.items=d.items; if(d.notes!==undefined) c.notes=d.notes;
+      if(d.link!==undefined) c.link=d.link; if(d.title!==undefined) c.title=d.title;
+      S.programacio[p.subject][String(p.key)]=c; break; }
+    case 'progSetDone': { S.programacio=S.programacio||{}; S.programacio[p.subject]=S.programacio[p.subject]||{};
+      const c=S.programacio[p.subject][String(p.key)]||{}; c.done=c.done||{};
+      if(p.on) c.done[p.tutor]=true; else delete c.done[p.tutor];
+      S.programacio[p.subject][String(p.key)]=c; break; }
+    case 'progSetSubject': S.programacio=S.programacio||{}; S.programacio[p.subject]=p.map||{}; break;
+    case 'setEmailReminder': S.emailReminders=S.emailReminders||{}; S.emailReminders[p.tutor]=!!p.on; break;
+    case 'comandaStatus': S.comandaStatus=S.comandaStatus||{}; S.comandaStatus[p.id]=p.status; break;
+    default: break;   // comentaris, reptes i avaluació: el servidor ja hi és idempotent
+  }
+}
+/* ---- Marques per alumne: clau composta CLASSE|NOM ----
+   Abans la clau era només el nom. Amb dos alumnes homònims a classes diferents,
+   marcar-ne un marcava l'altre, i desmarcar-lo esborrava l'absència del primer:
+   la llista que s'envia a l'escola sortia amb un nen equivocat.
+   `stLlegeix` accepta també la clau antiga perquè les marques ja desades segueixin valent. */
+function stKey(cls, name){ return (cls? cls+'|' : '')+name; }
+function stLlegeix(map, cls, name){ if(!map) return false; return !!(map[stKey(cls,name)] || map[name]); }
+function stEsborra(map, cls, name){ if(!map) return; delete map[stKey(cls,name)]; delete map[name]; }
+function reaplicaPendents(){
+  if(!PENDING.length) return;
+  PENDING.forEach(it=>{ try{ aplicaLocal(STATE, it.action, it.payload); }catch(e){} });
 }
 /* Evita duplicats quan algú repeteix l'acció perquè creu que no ha funcionat.
    Mira si ja existeix un element igual (mateix títol i autor) fet fa menys de 2 min. */
@@ -1716,10 +1843,10 @@ function repaintAfterSync(){
 async function refrescaEstat(){
   if(DEMO_MODE) return true;
   if(_inflight) return false;
-  if(PENDING.length && !(await flushPending())) return false;
+  const totEnviat = PENDING.length ? await flushPending() : true;
   try{ const s=await request('getState');
-    if(s){ STATE=s; normalizeState(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} }
-    return true;
+    if(s){ STATE=s; normalizeState(); reaplicaPendents(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} }
+    return totEnviat;                            // false = la llista pot no tenir els canvis més nous
   }catch(e){ return false; }
 }
 function startCloudSync(){
@@ -1727,10 +1854,15 @@ function startCloudSync(){
   const pull=async()=>{
     if(document.hidden) return;                  // en segon pla no cal
     if(_inflight) return;                        // s'està desant alguna cosa: no baixis estat vell
-    if(!(await flushPending())) return;          // si hi ha canvis locals sense enviar, NO sobreescriguis res
+    /* Provem d'enviar el que queda, però NO abandonem si no se'n surt: llegir no ha
+       de dependre de poder escriure. Si no, una acció encallada deixava el dispositiu
+       sense rebre els avisos dels altres tutors durant minuts. */
+    await flushPending();
     try{ const s=await request('getState');
       if(s){ const sig=JSON.stringify(s);
-        if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } } }catch(e){}
+        if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState();
+          reaplicaPendents();                    // el que encara no ha arribat no pot desaparèixer de la pantalla
+          safeSave(); repaintAfterSync(); } } }catch(e){}
   };
   setInterval(pull, 20000);
   window.addEventListener('focus', ()=>{ flushPending(); pull(); });
@@ -1921,19 +2053,67 @@ function tableDelCol(ed){
 
 function avatarEl(id,size){
   const u=userById(id); const a=el('span','avatar');
-  a.style.background=u.accent; a.textContent=u.name[0]; if(size){a.style.width=a.style.height=size+'px';}
+  a.style.background=u.ink||u.accent; a.textContent=u.name[0]; a.title=u.name; if(size){a.style.width=a.style.height=size+'px';}
   return a;
 }
 function personChip(id){
   if(id==='general'){const c=el('span','chip');c.style.background='var(--panel-2)';c.style.color='var(--teal)';c.textContent='General';return c;}
   const u=userById(id); const c=el('span','chip');
-  c.style.background=u.accent; c.style.color='#fff';
+  c.style.background=u.ink||u.accent; c.style.color='#fff';
   c.innerHTML='<span style="width:.5em;height:.5em;border-radius:50%;background:#fff;opacity:.85"></span>'+u.name; return c;
 }
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
 
 /* ---------- popup de confirmació global ---------- */
 let _confirmCb=null;
+/* ---- Diàlegs accessibles ----
+   Abans el focus no entrava mai al diàleg: amb el teclat calien 17 tabulacions per
+   arribar-hi i, pel camí, Enter activava el que hi havia a sota amb el diàleg obert.
+   `wireModal` marca la caixa com a diàleg, hi porta el focus, l'hi reté, fa inert
+   el fons i el retorna al botó d'origen en tancar. Retorna la funció de desmuntatge. */
+/* Fa que un contenidor clicable també funcioni amb teclat. S'usa quan a dins hi ha
+   altres botons i, per tant, no es pot convertir en un <button> sense imbricar-los.
+   Abans, subtemes, eines, dies del calendari i les files de la portada només
+   s'obrien amb el ratolí: amb teclat no s'hi arribava mai. */
+function femClicable(node, fn, etiqueta){
+  node.setAttribute('tabindex','0');
+  node.setAttribute('role','button');
+  if(etiqueta) node.setAttribute('aria-label', etiqueta);
+  node.style.cursor='pointer';
+  node.addEventListener('keydown', e=>{
+    if(e.target!==node) return;                       // deixa passar les tecles dels botons de dins
+    if(e.key==='Enter' || e.key===' ' || e.key==='Spacebar'){ e.preventDefault(); fn(e); }
+  });
+  return node;
+}
+let _dlgN=0;
+function wireModal(box, closeFn, titolEl){
+  if(!box) return ()=>{};
+  const previ=document.activeElement;
+  box.setAttribute('role','dialog');
+  box.setAttribute('aria-modal','true');
+  if(titolEl){ const id='dlg'+(++_dlgN); titolEl.id=titolEl.id||id; box.setAttribute('aria-labelledby',titolEl.id); }
+  const app=document.getElementById('app');
+  if(app && !box.closest('#app')) app.setAttribute('inert','');
+  const focusables=()=>[...box.querySelectorAll('button,input,textarea,select,a[href],[tabindex]:not([tabindex="-1"])')]
+    .filter(x=>!x.disabled && x.offsetParent!==null);
+  setTimeout(()=>{ const f=focusables(); if(f.length) (box.querySelector('input,textarea')||f[0]).focus(); },40);
+  const onKey=(e)=>{
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeFn(); return; }
+    if(e.key!=='Tab') return;
+    const f=focusables(); if(!f.length) return;
+    const primer=f[0], ultim=f[f.length-1];
+    if(e.shiftKey && (document.activeElement===primer || !box.contains(document.activeElement))){ e.preventDefault(); ultim.focus(); }
+    else if(!e.shiftKey && (document.activeElement===ultim || !box.contains(document.activeElement))){ e.preventDefault(); primer.focus(); }
+  };
+  box.addEventListener('keydown', onKey);
+  return ()=>{
+    box.removeEventListener('keydown', onKey);
+    if(app) app.removeAttribute('inert');
+    try{ if(previ && previ.focus && document.contains(previ)) previ.focus(); }catch(e){}
+  };
+}
+let _desmuntaConfirm=null;
 function askConfirm(message, onYes, opts){
   opts=opts||{};
   $('#confirmTitle').textContent=opts.title||'Segur que ho vols esborrar?';
@@ -1941,8 +2121,13 @@ function askConfirm(message, onYes, opts){
   $('#confirmYes').textContent=opts.confirmLabel||'Esborra';
   _confirmCb=onYes;
   $('#confirm').classList.add('open');
+  if(_desmuntaConfirm) _desmuntaConfirm();
+  _desmuntaConfirm=wireModal($('#confirm').querySelector('.modal-box'), closeConfirm, $('#confirmTitle'));
 }
-function closeConfirm(){ $('#confirm').classList.remove('open'); _confirmCb=null; }
+function closeConfirm(){
+  $('#confirm').classList.remove('open'); _confirmCb=null;
+  if(_desmuntaConfirm){ _desmuntaConfirm(); _desmuntaConfirm=null; }
+}
 (function wireConfirm(){
   $('#confirmNo').onclick=closeConfirm;
   $('#confirmYes').onclick=()=>{ const cb=_confirmCb; closeConfirm(); if(cb)cb(); };
@@ -1964,12 +2149,22 @@ function askPrompt(opts, onConfirm){
   const no=el('button','btn btn-ghost'); no.type='button'; no.textContent=opts.cancelLabel||'Cancel\u00b7la';
   const yes=el('button','btn btn-primary'); yes.type='button'; yes.textContent=opts.confirmLabel||'D\u2019acord';
   acts.appendChild(no); acts.appendChild(yes); box.appendChild(acts);
+  const err=el('p','modal-err'); err.setAttribute('role','alert'); err.hidden=true; box.insertBefore(err, acts);
   modal.appendChild(box); document.body.appendChild(modal);
-  const close=()=>modal.remove();
-  const submit=()=>{ const r=onConfirm?onConfirm(inp.value):true; if(r!==false) close(); };
+  let desmunta=()=>{};
+  const close=()=>{ desmunta(); modal.remove(); };
+  /* Si la validació rebutja el valor, abans no passava absolutament res i semblava
+     que el botó estigués trencat. Ara es diu què falla i el focus torna al camp. */
+  const submit=()=>{
+    err.hidden=true; inp.removeAttribute('aria-invalid');
+    const r=onConfirm?onConfirm(inp.value):true;
+    if(r===false){ err.textContent=opts.errorMsg||'Aquest valor no és vàlid. Torna-ho a provar.';
+      err.hidden=false; inp.setAttribute('aria-invalid','true'); inp.focus(); return; }
+    close();
+  };
   no.onclick=close; scrim.onclick=close; yes.onclick=submit;
-  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } else if(e.key==='Escape'){ close(); } });
-  setTimeout(()=>inp.focus(),40);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+  desmunta=wireModal(box, close, box.querySelector('h3'));
 }
 
 /* burst dashes generator */
@@ -1993,7 +2188,7 @@ function buildLogin(){
   const list=$('#whoList'); list.innerHTML='';
   USERS.forEach(u=>{
     const b=el('button','who-btn');
-    b.innerHTML=`<span class="avatar" style="background:${u.accent}">${u.name[0]}</span>
+    b.innerHTML=`<span class="avatar" style="background:${u.ink||u.accent}">${u.name[0]}</span>
       <span><b>${u.name}</b><small>${u.role}</small></span>
       <svg class="icon go" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>`;
     b.onclick=()=>login(u.id);
@@ -2008,7 +2203,7 @@ async function login(id){
   $('#launcher').classList.remove('hidden');
   const u=userById(id);
   $('#meName').textContent=u.name;
-  const av=$('#meAv'); av.textContent=u.name[0]; av.style.background=u.accent;
+  const av=$('#meAv'); av.textContent=u.name[0]; av.style.background=u.ink||u.accent;
   goHome();
   armBack();
   try{ reptApplyPending(); }catch(e){}
@@ -2018,6 +2213,10 @@ function armBack(){ try{ history.pushState({coord:1}, ''); }catch(e){} }
 window.addEventListener('popstate', function(){
   const appOn = !$('#app').classList.contains('hidden');
   const inSection = $('#home').classList.contains('hidden');
+  const sh=$('#sheet');
+  if(sh && sh.classList.contains('open')){   // el calaix obert es tanca primer
+    sh.classList.remove('open'); armBack(); return;
+  }
   if(appOn && inSection){        // dins un tema → torna a l'inici i re-arma
     goHome();
     armBack();
@@ -2079,7 +2278,9 @@ function buildMyTasksPanel(){
   card.appendChild(head);
   mine.forEach(t=>{
     const st=statusInfo(t.status);
-    const row=el('div','hrow');
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const box=el('button','hbox'); box.title='Marca com a fet';
     box.innerHTML=`<svg class="icon" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>`;
     box.onclick=async(ev)=>{ ev.stopPropagation(); t.status='acabada'; t.updatedAt=nowISO(); await api.updateTask(t); renderDash(); renderBento(); toast('Fet!'); };
@@ -2107,7 +2308,9 @@ function buildWeekPanel(){
   evs.forEach(e=>{
     const g=groupById(e.group);
     const parts=e.eventDate.split('-').map(Number); const dd=new Date(parts[0],parts[1]-1,parts[2]);
-    const row=el('div','hrow');
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const day=el('div','wk-day'); day.style.background=g.color;
     day.innerHTML=`<div class="wd">${dd.toLocaleDateString('ca-ES',{weekday:'short'})}</div><div class="dn">${parts[2]}</div>`;
     row.appendChild(day);
@@ -2138,7 +2341,9 @@ function buildReptesPanel(){
   card.appendChild(head);
   low.forEach(c=>{
     const q=reptQueden(c);
-    const row=el('div','hrow');
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const title=el('div','htitle'); title.textContent=reptLabel(c); row.appendChild(title);
     const st=el('span','hstatus'); st.style.background=(q===0?'var(--cristina)':'#EE9B4C'); st.textContent=(q===0?'sense còpies':q+' còpies'); row.appendChild(st);
     row.title='Imprimeix la fitxa i suma les còpies';
@@ -2180,7 +2385,9 @@ function renderNovetats(){
 }
 function buildNovCard(nov){
   const sec=secById(nov.section);
-  const c=el('div','nov-card');
+  const c=el('div','nov-card'); c.setAttribute('tabindex','0'); c.setAttribute('role','button');
+  c.addEventListener('keydown',e=>{ if(e.target!==c) return;
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(c.onclick) c.onclick(e); } });
   const tag=el('span','chip sec-tag'); tag.style.background=sec.color+'22'; tag.style.color=sec.color;
   let label = sec.name;
   if(nov.kind==='task') label='Tasca · '+sec.name;
@@ -2669,7 +2876,9 @@ async function progMaterializeSeed(subject){
   const map=Object.assign({}, old); let changed=false;
   progTeachingMondays().forEach(k=>{
     const cur=map[k];
-    if(cur && cur.items && cur.items.length) return;
+    // Array.isArray i no .length: una cel·la amb items:[] és una setmana buidada A POSTA.
+    // Amb .length hi tornàvem a escriure la sembra i la feina buidada reapareixia.
+    if(cur && Array.isArray(cur.items)) return;
     const seed=progSeedItems(subject,k);
     if(!seed || !seed.length) return;
     map[k]=Object.assign({}, cur||{}, {items:seed}); changed=true;
@@ -2710,19 +2919,25 @@ function progComputeShift(subject, fromMonday, dir){
   if(fi<0) return null;
   const old=(STATE.programacio&&STATE.programacio[subject])||{};
   const cells=T.map(k=> old[k]?JSON.parse(JSON.stringify(old[k])):null );
-  let dropped=false;
+  /* La cel·la que es buida es desa com a {items:[]}, no com a null. Amb null la clau
+     desapareixia del mapa i la sembra hi tornava: «Setmana sencera no feta» semblava
+     no fer res i la feina quedava duplicada a dues setmanes. */
+  const BUIDA=()=>({items:[],notes:'',link:''});
+  let dropped=false, perduda=null;
   if(dir>0){
-    if(progCellHasContent(cells[cells.length-1])) dropped=true;
+    if(progCellHasContent(cells[cells.length-1])){ dropped=true; perduda=T[T.length-1]; }
     for(let i=cells.length-1;i>fi;i--) cells[i]=cells[i-1];
-    cells[fi]=null;
+    cells[fi]=BUIDA();
   }else{
+    // en recuperar, el que hi havia a la setmana d'origen es perd: cal poder avisar-ne
+    if(progCellHasContent(cells[fi])){ dropped=true; perduda=T[fi]; }
     for(let i=fi;i<cells.length-1;i++) cells[i]=cells[i+1];
-    cells[cells.length-1]=null;
+    cells[cells.length-1]=BUIDA();
   }
   const map={};
   Object.keys(old).forEach(k=>{ if(T.indexOf(k)<0) map[k]=old[k]; });
   T.forEach((k,i)=>{ if(cells[i]) map[k]=cells[i]; });
-  return {map, dropped};
+  return {map, dropped, perduda};
 }
 async function doProgShift(subject, fromMonday, dir){
   const r=progComputeShift(subject, fromMonday, dir);
@@ -2856,25 +3071,25 @@ function cvLliuratBlock(give){
   const selRow=el('div','att-classsel');
   classes.forEach(c=>{ const t=el('button','att-tab'+(c===CV_CLASS?' on':'')); t.type='button';
     if(c===CV_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
-    const n=(STATE.students[c]||[]).filter(x=>marks[x]).length;
+    const n=(STATE.students[c]||[]).filter(x=>stLlegeix(marks,c,x)).length;
     t.textContent=c+' ('+n+'/'+(STATE.students[c]||[]).length+')';
     t.onclick=()=>{ CV_CLASS=c; openSection('programacio'); }; selRow.appendChild(t); });
   box.appendChild(selRow);
   const roster=STATE.students[CV_CLASS]||[];
   const info=el('div','att-info');
   const cnt=el('span','att-count');
-  const setCnt=()=>{ const f=roster.filter(n=>cvLliuratsDe(give)[n]).length;
+  const setCnt=()=>{ const f=roster.filter(n=>stLlegeix(cvLliuratsDe(give),CV_CLASS,n)).length;
     cnt.innerHTML='<b>'+f+'</b> entregades · <b class="att-cabs">'+(roster.length-f)+'</b> pendents'; };
   setCnt(); info.appendChild(cnt);
   const hint=el('span','att-hint'); hint.textContent='Toca els que te l’han entregada'; info.appendChild(hint);
   box.appendChild(info);
   const grid=el('div','att-grid');
   roster.forEach(name=>{
-    const on=!!cvLliuratsDe(give)[name];
+    const on=stLlegeix(cvLliuratsDe(give),CV_CLASS,name);
     const chip=el('button','att-chip cv-chip'+(on?' fet':'')); chip.type='button'; chip.textContent=name;
     chip.onclick=async()=>{ const nou=!chip.classList.contains('fet');
       chip.classList.toggle('fet', nou);
-      await api.cvLliurat(give, name, nou);
+      await api.cvLliurat(give, stKey(CV_CLASS,name), nou);
       setCnt();
       const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(CV_CLASS)===0);
       if(tab){ const f=roster.filter(n=>cvLliuratsDe(give)[n]).length; tab.textContent=CV_CLASS+' ('+f+'/'+roster.length+')'; }
@@ -2932,7 +3147,9 @@ function buildCarpetaPanel(){
   head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><h3>Carpeta viatgera</h3><span class="hpanel-count">'+up.length+'</span>';
   card.appendChild(head);
   up.forEach(u=>{
-    const row=el('div','hrow');
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const ico=el('span','hcv-ico'); ico.textContent = u.type==='programar' ? '\uD83D\uDCDD' : (u.type==='donar' ? '\uD83D\uDCE4' : '\uD83D\uDCE5');
     row.appendChild(ico);
     const t=el('div','htitle'); const tt=(progCell('carpeta', u.give).title||'').trim();
@@ -3117,9 +3334,10 @@ function showInfoModal(opts){
   const ok=el('button','btn btn-primary'); ok.type='button'; ok.textContent=opts.okLabel||'D\u2019acord';
   acts.appendChild(ok); box.appendChild(acts);
   modal.appendChild(box); document.body.appendChild(modal);
-  const close=()=>{ modal.remove(); document.removeEventListener('keydown', onEsc); };
-  function onEsc(e){ if(e.key==='Escape') close(); }
-  ok.onclick=close; scrim.onclick=close; document.addEventListener('keydown', onEsc);
+  let desmunta=()=>{};
+  const close=()=>{ desmunta(); modal.remove(); };
+  ok.onclick=close; scrim.onclick=close;
+  desmunta=wireModal(box, close, box.querySelector('h3'));
 }
 function openProfileMenu(){
   const modal=el('div','modal open');
@@ -3129,7 +3347,7 @@ function openProfileMenu(){
   const who=el('div','pm-who');
   USERS.forEach(u=>{
     const b=el('button','pm-user'+(u.id===ME?' on':'')); b.type='button'; b.style.setProperty('--c', u.accent);
-    b.innerHTML='<span class="avatar" style="background:'+u.accent+'">'+esc((u.name||'?')[0])+'</span><b>'+esc(u.name)+'</b>'+(u.id===ME?'<span class="pm-cur">Actual</span>':'');
+    b.innerHTML='<span class="avatar" style="background:'+(u.ink||u.accent)+'">'+esc((u.name||'?')[0])+'</span><b>'+esc(u.name)+'</b>'+(u.id===ME?'<span class="pm-cur">Actual</span>':'');
     b.onclick=()=>{ if(u.id!==ME){ close(); login(u.id); } };
     who.appendChild(b);
   });
@@ -3146,9 +3364,10 @@ function openProfileMenu(){
   nsec.appendChild(hint); box.appendChild(nsec);
   const acts=el('div','modal-actions'); const ok=el('button','btn btn-ghost'); ok.type='button'; ok.textContent='Tanca'; ok.onclick=close; acts.appendChild(ok); box.appendChild(acts);
   modal.appendChild(box); document.body.appendChild(modal);
-  function close(){ modal.remove(); document.removeEventListener('keydown', onEsc); }
-  function onEsc(e){ if(e.key==='Escape') close(); }
-  scrim.onclick=close; document.addEventListener('keydown', onEsc);
+  let desmunta=()=>{};
+  function close(){ desmunta(); modal.remove(); }
+  scrim.onclick=close;
+  desmunta=wireModal(box, close, h);
 }
 /* ---------- MEDI per projectes i sessions ----------
    Reutilitza el magatzem `programacio` amb claus de projecte ('proj-…') en lloc de
@@ -3335,7 +3554,7 @@ function buildPicnicText(subId, sub){
   const lines=['Pícnics — '+(sub?sub.name:'')+':',''];
   let total=0;
   classes.forEach(c=>{
-    const list=(STATE.students[c]||[]).filter(n=>pic[n]);
+    const list=(STATE.students[c]||[]).filter(n=>stLlegeix(pic,c,n));
     lines.push(c+':');
     if(list.length){ list.forEach(n=>lines.push('- '+n)); total+=list.length; }
     else lines.push('- (cap)');
@@ -3357,7 +3576,7 @@ function buildPicnicEmailBody(subId, sub, dia){
   const classes=Object.keys(STATE.students||{}).filter(c=>STATE.students[c]&&STATE.students[c].length);
   const parts=[]; let total=0;
   classes.forEach(c=>{
-    const list=(STATE.students[c]||[]).filter(n=>pic[n]);
+    const list=(STATE.students[c]||[]).filter(n=>stLlegeix(pic,c,n));
     if(list.length){ parts.push(c+':'); list.forEach(n=>parts.push('- '+n)); total+=list.length; parts.push(''); }
   });
   const llista=parts.join('\n').trim() || '(cap pícnic demanat)';
@@ -3372,7 +3591,7 @@ function renderPicnic(S, section, subId, sub){
   if(!classes.length){ const e=el('div','empty-feed'); e.innerHTML=`<div class="big">🧺</div>No hi ha alumnes. Omple la pestanya \u201cAlumnes\u201d del full.`; S.appendChild(e); return; }
   STATE.picnics=STATE.picnics||{}; const pic=STATE.picnics[subId]=STATE.picnics[subId]||{};
   const info=el('div','att-info');
-  const cnt=el('span','att-count'); const setCnt=()=>{ let t=0; classes.forEach(c=>(STATE.students[c]||[]).forEach(n=>{ if(pic[n]) t++; })); cnt.innerHTML=`<b>${t}</b> demanen pícnic`; }; setCnt(); info.appendChild(cnt);
+  const cnt=el('span','att-count'); const setCnt=()=>{ let t=0; classes.forEach(c=>(STATE.students[c]||[]).forEach(n=>{ if(stLlegeix(pic,c,n)) t++; })); cnt.innerHTML=`<b>${t}</b> demanen pícnic`; }; setCnt(); info.appendChild(cnt);
   const hint=el('span','att-hint'); hint.textContent='Toca els que en demanen'; info.appendChild(hint);
   S.appendChild(info);
   classes.forEach(c=>{
@@ -3380,7 +3599,7 @@ function renderPicnic(S, section, subId, sub){
     const grid=el('div','att-grid');
     (STATE.students[c]||[]).forEach(name=>{
       const chip=el('button','pic-chip'+(pic[name]?' on':'')); chip.type='button'; chip.textContent=name;
-      chip.onclick=async()=>{ const now=!chip.classList.contains('on'); chip.classList.toggle('on',now); if(now) pic[name]=true; else delete pic[name]; setCnt(); await api.picnicToggle(subId, name, now); };
+      chip.onclick=async()=>{ const now=!chip.classList.contains('on'); chip.classList.toggle('on',now); if(now) pic[stKey(c,name)]=true; else stEsborra(pic,c,name); setCnt(); await api.picnicToggle(subId, stKey(c,name), now); };
       grid.appendChild(chip);
     });
     S.appendChild(grid);
@@ -3518,7 +3737,9 @@ function buildCorreusPanel(){
   head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><h3>Correus per enviar</h3><span class="hpanel-count">'+mine.length+'</span>';
   card.appendChild(head);
   mine.forEach(c=>{
-    const row=el('div','hrow');
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const box=el('button','hbox'); box.title='Marca com a enviat';
     box.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
     box.onclick=(ev)=>{ ev.stopPropagation(); api.correuSent(c.id, ME, true).then(()=>renderDash()).catch(()=>{}); toast('Enviat!'); };
@@ -3771,7 +3992,7 @@ function renderEinesList(S){
     {id:'assistencia', name:'🚌 Assistència d\u2019excursió', desc:'Passa llista del teu grup i treu els absents per administració.'},
   ];
   tools.forEach(t=>{
-    const card=el('div','subtheme-card'); card.style.cursor='pointer';
+    const card=el('button','subtheme-card'); card.type='button';
     const name=el('div','st-name'); name.innerHTML=t.name; card.appendChild(name);
     const meta=el('div','st-meta'); meta.textContent=t.desc; card.appendChild(meta);
     card.onclick=()=>{ EINA=t.id; openSection('eines'); };
@@ -3844,10 +4065,18 @@ function reptTemaCard(t){
     ()=>{ reptNivellsDe(t.codi).forEach(n=>reptCaixaDelete(n.id)); reptCaixaDelete(t.id); openSection('eines'); },{confirmLabel:'Esborra'});
   acts.appendChild(del);
   box.appendChild(acts);
+  /* Una caixa creada a mà no té nivells i, per tant, no tenia cap targeta clicable:
+     no s'hi podia registrar cap alumne. Ara el tema mateix obre la pantalla d'escaneig. */
+  if(!reptNivellsDe(t.codi).length){
+    const obre=el('button','btn btn-ghost rept-obre'); obre.type='button';
+    obre.textContent='Obre la caixa';
+    obre.onclick=()=>{ REPTES_CAIXA=t.id; openSection('eines'); };
+    acts.insertBefore(obre, acts.firstChild);
+  }
   return box;
 }
 function reptCaixaCard(c){
-  const card=el('div','rept-card'); card.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
+  const card=el('button','rept-card'); card.type='button'; card.style.setProperty('--c',(REPT_MAT[c.materia]||REPT_MAT.mat).color);
   const top=el('div','rept-card-top');
   const nom=el('div','rept-card-nom');
   if(c.nivell){ nom.innerHTML='<span class="rept-stars">'+reptStars(c.nivell)+'</span> '+esc(c.nn||('Nivell '+c.nivell)); }
@@ -4066,7 +4295,7 @@ function buildAbsentText(){
   const lines=['Absents de l\u2019excursió:',''];
   let total=0;
   classes.forEach(c=>{
-    const abs=(STATE.students[c]||[]).filter(n=>absents[n]);
+    const abs=(STATE.students[c]||[]).filter(n=>stLlegeix(absents,c,n));
     lines.push(c+':');
     if(abs.length){ abs.forEach(n=>lines.push('- '+n)); total+=abs.length; }
     else lines.push('- (cap absent)');
@@ -4087,7 +4316,7 @@ function buildAbsentBody(){
   const classes=Object.keys(STATE.students||{}).filter(c=>STATE.students[c] && STATE.students[c].length);
   const lines=[]; let total=0;
   classes.forEach(c=>{
-    const abs=(STATE.students[c]||[]).filter(n=>absents[n]);
+    const abs=(STATE.students[c]||[]).filter(n=>stLlegeix(absents,c,n));
     lines.push(c+':');
     if(abs.length){ abs.forEach(n=>lines.push('- '+n)); total+=abs.length; }
     else lines.push('- (cap absent)');
@@ -4125,7 +4354,7 @@ function renderAttendance(S){
   const status=el('div','att-status');
   classes.forEach(c=>{
     const cc=classColor(c);
-    const nAbs=(STATE.students[c]||[]).filter(n=>absents[n]).length;
+    const nAbs=(STATE.students[c]||[]).filter(n=>stLlegeix(absents,c,n)).length;
     const chip=el('div','att-stat'+(done[c]?' done':''));
     chip.innerHTML=`<span class="grp-dot" style="background:${cc}"></span><b>${esc(c)}</b>${done[c]?' <span class="att-ok">✓ fet</span>':' <span class="att-pend">pendent</span>'} · <span class="att-n">${nAbs}</span> absents`;
     status.appendChild(chip);
@@ -4147,7 +4376,7 @@ function renderAttendance(S){
   const roster=STATE.students[ATT_CLASS]||[];
   const info=el('div','att-info');
   const cntEl=el('span','att-count');
-  const setCnt=()=>{ const a=roster.filter(n=>absents[n]).length; cntEl.innerHTML=`<b>${roster.length-a}</b> presents · <b class="att-cabs">${a}</b> absents`; };
+  const setCnt=()=>{ const a=roster.filter(n=>stLlegeix(absents,ATT_CLASS,n)).length; cntEl.innerHTML=`<b>${roster.length-a}</b> presents · <b class="att-cabs">${a}</b> absents`; };
   setCnt(); info.appendChild(cntEl);
   const hint=el('span','att-hint'); hint.textContent='Toca els que NO han vingut'; info.appendChild(hint);
   S.appendChild(info);
@@ -4155,13 +4384,13 @@ function renderAttendance(S){
   // graella d'alumnes
   const grid=el('div','att-grid');
   roster.forEach(name=>{
-    const chip=el('button','att-chip'+(absents[name]?' absent':'')); chip.type='button'; chip.textContent=name;
+    const chip=el('button','att-chip'+(stLlegeix(absents,ATT_CLASS,name)?' absent':'')); chip.type='button'; chip.textContent=name;
     chip.onclick=async()=>{
       const now=!chip.classList.contains('absent');
       chip.classList.toggle('absent', now);
-      if(now) absents[name]=true; else delete absents[name];
+      if(now) absents[stKey(ATT_CLASS,name)]=true; else stEsborra(absents,ATT_CLASS,name);
       setCnt();
-      await api.attToggle(name, now);
+      await api.attToggle(stKey(ATT_CLASS,name), now);
     };
     grid.appendChild(chip);
   });
@@ -4309,7 +4538,7 @@ function renderAvTrimesters(S){
 function renderAvSubjects(S){
   const grid=el('div','subtheme-grid');
   subjectsForTri(AV_TRI).forEach(subj=>{
-    const card=el('div','subtheme-card'); card.style.cursor='pointer';
+    const card=el('button','subtheme-card'); card.type='button';
     const name=el('div','st-name'); name.textContent=subj.name; card.appendChild(name);
     const data=(STATE.avaluacio&&STATE.avaluacio[AV_TRI])?STATE.avaluacio[AV_TRI][subj.id]:null;
     const filled=data?data.filter(l=>l.phrase&&l.phrase.trim()).length:0;
@@ -4396,6 +4625,7 @@ function subthemeCard(sub,sec){
   };
   card.appendChild(del);
   card.onclick=()=>{ PICNIC_SUB=null; PICNIC_RESULT=null; openSubtheme(sec.id,sub.id); };
+  femClicable(card, ()=>card.onclick(), 'Obre '+sub.name);
   return card;
 }
 
@@ -4833,6 +5063,10 @@ function renderMonthGrid(S,sec){
     const dstr=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const hol=schoolDayInfo(dstr);
     const cell=el('div','cal-cell'+(dstr===todayStr?' today':'')+(hol?(hol.t==='tarda'?' cal-tarda-cell':' cal-hol-cell'):''));
+    cell.setAttribute('tabindex','0'); cell.setAttribute('role','button');
+    cell.setAttribute('aria-label','Dia '+day+': afegeix-hi una data');
+    cell.addEventListener('keydown',e=>{ if(e.target!==cell) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(cell.onclick) cell.onclick(e); } });
     const num=el('div','cal-num'); num.textContent=day; cell.appendChild(num);
     if(hol){ const hc=el('div','cal-hol'+(hol.t==='tarda'?' tarda':''));
       hc.textContent=(hol.t==='tarda'?'🌓 ':'')+hol.name+(hol.t==='tarda'?' (tarda)':'');
@@ -5188,8 +5422,12 @@ function taskEditForm(t){
 }
 
 /* ---------- LAUNCHER (quick switch) ---------- */
+/* El calaix és la navegació principal del mòbil. Abans no es tancava amb Escape i,
+   amb el botó enrere, l'app anava a la portada però el calaix hi quedava a sobre. */
+function tancaSheet(){ $('#sheet').classList.remove('open'); }
 $('#launchBtn').onclick=()=>{ buildQuick(); $('#sheet').classList.add('open'); };
-$('#sheet').addEventListener('click',e=>{ if(e.target.dataset.close!==undefined) $('#sheet').classList.remove('open'); });
+$('#sheet').addEventListener('click',e=>{ if(e.target.dataset.close!==undefined) tancaSheet(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('#sheet').classList.contains('open')) tancaSheet(); });
 function buildQuick(){
   const g=$('#qgrid'); g.innerHTML='';
   // Inici
