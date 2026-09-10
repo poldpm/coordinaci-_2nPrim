@@ -6,7 +6,7 @@
      actualització en segon pla.
    - Les crides a Apps Script (POST, cross-origin) NO es toquen mai.
    Per forçar una actualització d'assets, puja la versió de CACHE. */
-const CACHE = 'coord-2n-v3';
+const CACHE = 'coord-2n-v4';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './img/logo.webp', './img/icon-192.png', './img/icon-512.png',
