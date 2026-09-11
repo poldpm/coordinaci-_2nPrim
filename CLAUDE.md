@@ -108,7 +108,12 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   cada 20 s el servidor no parava mai i les escriptures morien per temps esgotat
   («signal is aborted without reason»). La llista d'alumnes també es cacheja 5 min
   (`_loadStudentsCache`) i l'espera de torn de les escriptures va de 20 s a 8 s.
-- **`startCloudSync()`:** cada 20s fa `getState` **a tota l'app** (abans només a la
+- **Ritme adaptatiu:** 20 s quan passen coses; si no en passen, s'estira ×1,5 fins a un
+  topall de 2 min (mesurat: 31→45→69→103→120 s). Tornar a l'app, escriure o rebre un
+  canvi ho torna a posar a 20 s (`window._syncDesperta`). `pull()` retorna si hi ha hagut
+  canvis. Motiu: Apps Script té latències molt irregulars (mesurat de 1 a 18 s per a la
+  MATEIXA crida trivial) i cada petició és una execució sencera al servidor.
+- **`startCloudSync()`:** fa `getState` **a tota l'app** (abans només a la
   portada → si eres dins d'una secció no s'actualitzava mai i calia tancar i tornar
   a obrir). També en `focus`, en **`visibilitychange`** (al mòbil el `focus` sovint
   no arriba) i en tornar la connexió. **Només re-renderitza si l'estat ha canviat**

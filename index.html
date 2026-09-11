@@ -1718,6 +1718,7 @@ let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esp
 function persist(action, payload){
   window._ultimaMutacio = Date.now();   // marca que aquest clic SI ha canviat alguna cosa
   _revVista = '';   // hem canviat alguna cosa: la propera comprovacio ha de baixar l'estat sencer
+  try{ if(window._syncDesperta) window._syncDesperta(); }catch(e){}
   safeSave();                                  // còpia local immediata (optimista)
   if(DEMO_MODE) return Promise.resolve();
   /* Encuem ABANS d'enviar (write-ahead). Si l'app es tanca, es recarrega o es
@@ -1930,8 +1931,8 @@ async function refrescaEstat(){
 function startCloudSync(){
   if(DEMO_MODE) return;
   const pull=async()=>{
-    if(document.hidden) return;                  // en segon pla no cal
-    if(_inflight) return;                        // s'està desant alguna cosa: no baixis estat vell
+    if(document.hidden) return false;            // en segon pla no cal
+    if(_inflight) return false;                  // s'està desant alguna cosa: no baixis estat vell
     /* Provem d'enviar el que queda, però NO abandonem si no se'n surt: llegir no ha
        de dependre de poder escriure. Si no, una acció encallada deixava el dispositiu
        sense rebre els avisos dels altres tutors durant minuts. */
@@ -1944,7 +1945,7 @@ function startCloudSync(){
       const ara=Date.now();
       if(_revVista && (ara-_ultimaCompleta) < 300000){
         const r=await request('getRev');
-        if(r && r.rev && String(r.rev)===String(_revVista)) return;   // res de nou
+        if(r && r.rev && String(r.rev)===String(_revVista)) return false;   // res de nou
       }
     }catch(e){}
     try{ const s=await request('getState');
@@ -1953,13 +1954,31 @@ function startCloudSync(){
         try{ const rr=await request('getRev'); if(rr && rr.rev) _revVista=String(rr.rev); }catch(e){}
         if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState();
           reaplicaPendents();                    // el que encara no ha arribat no pot desaparèixer de la pantalla
-          safeSave(); repaintAfterSync(); } } }catch(e){}
+          safeSave(); repaintAfterSync(); return true; } } }catch(e){}
+    return false;
   };
-  setInterval(pull, 20000);
-  window.addEventListener('focus', ()=>{ flushPending(); pull(); });
+  /* Ritme adaptatiu. Apps Script té latències molt irregulars (mesurat: de 1 a 18 s per
+     a la MATEIXA crida trivial) i cada petició, per barata que sigui, és una execució
+     sencera al servidor. Amb tres dispositius preguntant cada 20 s de manera fixa, hi
+     havia peticions constants fins i tot de nit o en caps de setmana.
+     Ara: 20 s quan passen coses, i s'espaia fins a 2 min si fa estona que no canvia res.
+     Qualsevol canvi, tornar a l'app o escriure alguna cosa ho torna a posar a 20 s. */
+  const RITME_MIN=20000, RITME_MAX=120000;
+  let ritme=RITME_MIN, temporitzador=null;
+  window._syncDesperta=()=>{ ritme=RITME_MIN; programa(); };
+  const programa=()=>{ clearTimeout(temporitzador); temporitzador=setTimeout(cicle, ritme); };
+  const cicle=async()=>{
+    const canvis = await pull();
+    if(canvis) ritme=RITME_MIN;
+    else ritme=Math.min(Math.round(ritme*1.5), RITME_MAX);
+    programa();
+  };
+  programa();
+  const desperta=()=>{ ritme=RITME_MIN; flushPending(); pull().then(programa); };
+  window.addEventListener('focus', desperta);
   // Al mòbil el 'focus' no sempre arriba: aquest és el que dispara en tornar a l'app
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ flushPending(); pull(); } });
-  window.addEventListener('online', ()=>{ flushPending().then(pull); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) desperta(); });
+  window.addEventListener('online', ()=>{ flushPending().then(desperta); });
 }
 
 /* ---------- DADES D'EXEMPLE (rescatades del caos del doc) ---------- */
