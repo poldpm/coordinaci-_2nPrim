@@ -6,7 +6,7 @@
      actualització en segon pla.
    - Les crides a Apps Script (POST, cross-origin) NO es toquen mai.
    Per forçar una actualització d'assets, puja la versió de CACHE. */
-const CACHE = 'coord-2n-v4';
+const CACHE = 'coord-2n-v5';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './img/logo.webp', './img/icon-192.png', './img/icon-512.png',
@@ -35,11 +35,18 @@ self.addEventListener('fetch', (e) => {
 
   const isDoc = req.mode === 'navigate' || req.destination === 'document';
   if (isDoc) {
-    // Xarxa primer; si falla, la cau; últim recurs, l'index.
+    /* Xarxa primer; si falla, la cau.
+       La còpia es desa SEMPRE amb la mateixa clau: l'app és un sol fitxer i cada
+       adreça amb paràmetres (?v=3, ?repte=mat-t01-n2 de cada adhesiu NFC) en desava
+       una còpia sencera de 440 KB. Amb 110 caixes això eren desenes de MB al mòbil. */
+    const DOC_KEY = './index.html';
     e.respondWith(
       fetch(req)
-        .then((res) => { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(req, cp)); return res; })
-        .catch(() => caches.match(req).then((m) => m || caches.match('./index.html')))
+        .then((res) => {
+          if (res && res.ok) { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(DOC_KEY, cp)); }
+          return res;
+        })
+        .catch(() => caches.match(DOC_KEY).then((m) => m || caches.match('./')))
     );
     return;
   }

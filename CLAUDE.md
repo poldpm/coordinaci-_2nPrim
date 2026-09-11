@@ -36,7 +36,10 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
 Config al principi de `index.html` (objecte `CONFIG`):
 - `WEB_APP_URL` → URL del desplegament d'Apps Script (és pública; ja surt al
   frontend desplegat).
-- `SECRET` → buit (sense secret compartit).
+- `SECRET` → `2nPrim!vedruna`, el **mateix text** a `index.html` i a `Codi_AppsScript.gs`.
+  No és una contrasenya (el frontend és públic), però evita que qualsevol que només
+  tingui l'URL del Web App hi escrigui. Si es canvia, s'ha de canviar als dos costats
+  i tornar a desplegar les dues coses.
 - `DEMO_MODE = !CONFIG.WEB_APP_URL` → fals en producció.
 - `STORE_KEY = 'coordinacio_2n_demo_v17'` → clau de la còpia local (localStorage).
 
@@ -84,7 +87,7 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
 - **Optimista:** les mutacions actualitzen `STATE` localment i criden
   `persist(action, payload)`. `safeSave()` desa una còpia a localStorage a
   l'instant.
-- **`request(action, payload)`:** POST a `WEB_APP_URL` amb **timeout de 15s**
+- **`request(action, payload)`:** POST a `WEB_APP_URL` amb **timeout de 25s**
   (AbortController).
 - **Cua de reintents `PENDING`:** si falla la xarxa, la mutació s'encua a
   localStorage i es reintenta (en ordre) a `flushPending()` — abans de cada pull,
