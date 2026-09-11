@@ -101,6 +101,13 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   **sense sincronitzar per sempre**; després es va "arreglar" descartant-la, i això
   **feia perdre canvis** quan el backend petava per contenció del lock (retornava
   HTML, no JSON). Cap de les dues coses pot tornar a passar.
+- **Revisió (`getRev`) — llegir surt molt barat:** cada desada puja un comptador
+  (`_tocaRev` a ScriptProperties). La comprovació periòdica pregunta **només el comptador**
+  (mil·lisegons, no toca cap full) i només baixa l'estat sencer si ha canviat, o cada 5 min.
+  ⚠️ Mesurat el 12-09-2026: un `getState` trigava **14 s** per a 50 KB; amb tres dispositius
+  cada 20 s el servidor no parava mai i les escriptures morien per temps esgotat
+  («signal is aborted without reason»). La llista d'alumnes també es cacheja 5 min
+  (`_loadStudentsCache`) i l'espera de torn de les escriptures va de 20 s a 8 s.
 - **`startCloudSync()`:** cada 20s fa `getState` **a tota l'app** (abans només a la
   portada → si eres dins d'una secció no s'actualitzava mai i calia tancar i tornar
   a obrir). També en `focus`, en **`visibilitychange`** (al mòbil el `focus` sovint

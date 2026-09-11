@@ -1717,6 +1717,7 @@ let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esp
    formulari obert i semblava que el botó no funcionés. */
 function persist(action, payload){
   window._ultimaMutacio = Date.now();   // marca que aquest clic SI ha canviat alguna cosa
+  _revVista = '';   // hem canviat alguna cosa: la propera comprovacio ha de baixar l'estat sencer
   safeSave();                                  // còpia local immediata (optimista)
   if(DEMO_MODE) return Promise.resolve();
   /* Encuem ABANS d'enviar (write-ahead). Si l'app es tanca, es recarrega o es
@@ -1853,7 +1854,7 @@ function normalizeState(){
 /* crida a l'Apps Script (POST text/plain → sense preflight de CORS) */
 async function request(action, payload){
   const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), 25000);
+  const timer = setTimeout(()=>ctrl.abort(), 45000);
   try{
     let res;
     try{
@@ -1882,6 +1883,8 @@ async function request(action, payload){
 /* refresc en viu quan estàs a l'inici (perquè vegis els canvis dels altres) */
 function refreshHome(){ if(!$('#home').classList.contains('hidden')){ renderDash(); renderNovetats(); renderBento(); } }
 let _lastSig = '';
+let _revVista = '';        // revisió del servidor que ja tenim
+let _ultimaCompleta = 0;   // quan vam baixar l'estat sencer per última vegada
 /* Es pot repintar la secció sense destrossar res que l'usuari estigui fent? */
 function sectionBusy(){
   try{
@@ -1933,8 +1936,21 @@ function startCloudSync(){
        de dependre de poder escriure. Si no, una acció encallada deixava el dispositiu
        sense rebre els avisos dels altres tutors durant minuts. */
     await flushPending();
+    /* Preguntar "ha canviat res?" costa mil·lisegons; baixar l'estat sencer costava
+       10-14 s i, amb tres dispositius cada 20 s, saturava el servidor i les escriptures
+       es quedaven sense torn. Només baixem tot si la revisió ha canviat (o cada 5 min,
+       per si algú toca el full a mà). */
+    try{
+      const ara=Date.now();
+      if(_revVista && (ara-_ultimaCompleta) < 300000){
+        const r=await request('getRev');
+        if(r && r.rev && String(r.rev)===String(_revVista)) return;   // res de nou
+      }
+    }catch(e){}
     try{ const s=await request('getState');
       if(s){ const sig=JSON.stringify(s);
+        _ultimaCompleta=Date.now();
+        try{ const rr=await request('getRev'); if(rr && rr.rev) _revVista=String(rr.rev); }catch(e){}
         if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState();
           reaplicaPendents();                    // el que encara no ha arribat no pot desaparèixer de la pantalla
           safeSave(); repaintAfterSync(); } } }catch(e){}
