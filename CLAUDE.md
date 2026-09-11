@@ -119,6 +119,13 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   15 min; quan n'entra una versió nova, `provaRecarregar()` recarrega **si no
   s'està escrivint res ni queden canvis pendents**. Sense això, una PWA oberta
   dies seguits es quedava amb codi antic i no rebia cap arreglament.
+- **Escriptures endarrerides:** una cua que s'envia molt més tard porta una còpia ANTIGA de
+  l'element. `_arribaTard(vell,nou)` compara `updatedAt` i **descarta** el que arriba tard;
+  `_conservaLlegits(vell,nou)` fa la unió de `readBy` si no és una edició deliberada (que es
+  reconeix per `editedBy` + `updatedAt` més nou, i sí que ha de tornar a sortir a Novetats).
+  ⚠️ Bug real (10-09-2026): en Pol marcava totes les novetats de la Mireia com a llegides i li
+  tornaven a sortir, perquè el mòbil d'ella enviava més tard un `updateEntry` amb el `readBy`
+  antic i esborrava el seu nom.
 - **Backend:** `_handle` aplica cada acció amb `LockService` (serialitza
   escriptures concurrents). Si no obté el torn en 12s retorna
   `{error, retry:true}` (mai una excepció), i `doPost`/`doGet` **sempre** retornen
