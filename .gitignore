@@ -9,3 +9,6 @@ Codi_AppsScript.gs
 Thumbs.db
 *.log
 /tmp/
+
+# informes de QA locals
+.qa/
