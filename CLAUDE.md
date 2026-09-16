@@ -41,7 +41,7 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
   **Recuperar des del full:** executar `copiaDeSeguretatAra` NO; per tornar al full, esborrar la
   propietat `db_n` (Configuració del projecte → Propietats de l'script) i la propera lectura
   agafarà el full. Concurrència protegida amb **`LockService`** (només per escriure).
-- **FIREBASE (Firestore) — migració preparada el 16-09-2026.** Projecte `coordinapp-26-27`
+- **FIREBASE (Firestore) — MIGRAT el 16-09-2026 (verificat: idèntic a la còpia d’abans). Font de veritat de les dades.** Projecte `coordinapp-26-27`
   (mateix compte de Google). Motiu: Apps Script tenia latències de 1 a 30 s que no depenien del
   codi (mesurat). Amb Firestore: desar ~0,8-1,3 s i l'altre dispositiu ho veu en ~1 s (mesurat).
   - **Col·lecció `coord`** (producció) · **`coord_proves`** (proves; en `localhost`/`127.0.0.1` l'app
