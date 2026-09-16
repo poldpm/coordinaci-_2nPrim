@@ -1099,6 +1099,9 @@ textarea.input{resize:vertical;min-height:74px}
 .entry .body td,.entry .body th,.rich-ed td,.rich-ed th{word-break:normal;overflow-wrap:break-word;min-width:6em}
 .entry .body,.rich-ed{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .entry .link,.cb-text a,.entry .body a{overflow-wrap:anywhere}
+.entry .body a,.cal-body a{color:var(--teal);text-decoration:underline;text-underline-offset:2px;font-weight:700;cursor:pointer}
+.entry .body a:hover,.cal-body a:hover{color:var(--teal-ink)}
+.entry .body a:focus-visible,.cal-body a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:3px}
 
 /* --- Contenidors que ara son <button> per poder-hi arribar amb teclat --- */
 button.subtheme-card,button.rept-card{
@@ -2112,6 +2115,43 @@ const el = (t,c)=>{const n=document.createElement(t);if(c)n.className=c;return n
 const fmtDate = iso => new Date(iso).toLocaleDateString('ca-ES',{day:'numeric',month:'short'});
 const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const stripHtml = s => (s||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+/* Converteix en clicables els enllaços escrits dins d'un text (http://, https:// o www.).
+   Treballa sobre els nodes de text ja pintats, així serveix tant per al text pla com per al
+   text enriquit ja netejat, i no toca els enllaços que ja existien. No pot injectar res:
+   l'adreça només pot contenir caràcters d'URL i sempre és http o https. */
+const URL_EN_TEXT=/\b((?:https?:\/\/|www\.)[^\s<>"'\u00AB\u00BB]+)/gi;
+function linkifica(arrel){
+  if(!arrel) return arrel;
+  const w=document.createTreeWalker(arrel, NodeFilter.SHOW_TEXT, { acceptNode:t=>
+    (t.parentNode && t.parentNode.closest && t.parentNode.closest('a')) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const textos=[]; while(w.nextNode()) textos.push(w.currentNode);
+  textos.forEach(t=>{
+    const s=t.nodeValue; URL_EN_TEXT.lastIndex=0;
+    if(!URL_EN_TEXT.test(s)) return;
+    URL_EN_TEXT.lastIndex=0;
+    const frag=document.createDocumentFragment(); let ultim=0, m;
+    while((m=URL_EN_TEXT.exec(s))){
+      let url=m[1], cua='';
+      // la puntuació del final («mireu https://x.cat.») no forma part de l'adreça
+      while(/[.,;:!?)\]]$/.test(url)){
+        if(url.endsWith(')')){ const obre=url.split('(').length-1, tanca=url.split(')').length-1; if(tanca<=obre) break; }
+        cua=url.slice(-1)+cua; url=url.slice(0,-1);
+      }
+      if(m.index>ultim) frag.appendChild(document.createTextNode(s.slice(ultim,m.index)));
+      const a=document.createElement('a');
+      a.href=/^www\./i.test(url) ? 'https://'+url : url;
+      a.textContent=url; a.target='_blank'; a.rel='noopener noreferrer'; a.className='auto-link';
+      frag.appendChild(a);
+      if(cua) frag.appendChild(document.createTextNode(cua));
+      ultim=m.index+m[1].length;
+    }
+    if(ultim<s.length) frag.appendChild(document.createTextNode(s.slice(ultim)));
+    t.parentNode.replaceChild(frag,t);
+  });
+  // obrir l'enllaç no ha d'activar el clic de la targeta que el conté
+  arrel.addEventListener('click', ev=>{ if(ev.target && ev.target.closest && ev.target.closest('a')) ev.stopPropagation(); });
+  return arrel;
+}
 function sanitizeHtml(html){
   const tpl=document.createElement('template'); tpl.innerHTML=html||'';
   const allowed=new Set(['P','BR','B','STRONG','I','EM','U','UL','OL','LI','TABLE','THEAD','TBODY','TR','TH','TD','DIV','SPAN','A','H4','H5']);
@@ -5247,6 +5287,7 @@ function entryCard(e,sec,subId){
   const body=el('div','body');
   if(sec.rich || e.rich){ body.classList.add('rich-body'); body.innerHTML=sanitizeHtml(e.body); }
   else body.textContent=e.body;
+  linkifica(body);
   card.appendChild(body);
   if(e.url){ const a=el('a','link'); a.href=e.url; a.target='_blank'; a.rel='noopener';
     a.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>Obre l\u2019enllaç`; card.appendChild(a); }
@@ -5542,10 +5583,11 @@ function agendaCard(e,sec){
         <span class="grp-pill" style="background:${g.color}">${g.name}</span>
       </div>
       ${timeStr?`<div class="cal-time"><svg class="icon" viewBox="0 0 24 24" style="width:.9em;height:.9em;stroke-width:2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>${esc(timeStr)}</div>`:''}
-      ${e.body?`<div style="font-weight:600;color:#4a6d77;font-size:.88rem">${esc(e.body)}</div>`:''}
+      ${e.body?`<div class="cal-body" style="font-weight:600;color:#4a6d77;font-size:.88rem">${esc(e.body)}</div>`:''}
       <div style="color:var(--muted);font-weight:700;font-size:.76rem;margin-top:2px">Afegit per ${userById(e.author).name}${edited?' · <span style="color:var(--sun-deep)">editada</span>':''}</div>
     </div>
   </div>`;
+  linkifica(card.querySelector('.cal-body'));
   if(e.url){ const a=el('a','link'); a.href=e.url; a.target='_blank'; a.rel='noopener'; a.style.marginTop='10px'; a.style.marginLeft='78px';
     a.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>Obre l\u2019enllaç`; card.appendChild(a); }
   const tools=el('div','card-tools');
@@ -5627,7 +5669,7 @@ function agendarCard(e,sec){
   if(unread){ const nd=el('span','newdot'); head.appendChild(nd); }
   card.appendChild(head);
   const h=el('h4'); h.textContent=e.title; card.appendChild(h);
-  if(e.body){ const bd=el('div','body'); bd.textContent=e.body; card.appendChild(bd); }
+  if(e.body){ const bd=el('div','body'); bd.textContent=e.body; linkifica(bd); card.appendChild(bd); }
   if(e.url){ const a=el('a','link'); a.href=e.url; a.target='_blank'; a.rel='noopener';
     a.innerHTML=`<svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>Obre l\u2019enllaç`; card.appendChild(a); }
   const foot=el('div','foot-actions');
