@@ -28,9 +28,19 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
 ## 3. Arquitectura i stack
 - **Frontend:** un únic fitxer `index.html` (HTML + CSS + JS, **sense frameworks**,
   sense build). Es serveix per **GitHub Pages**.
-- **Backend:** **Google Apps Script** (Web App) + **Google Sheets**. Tot l'estat
-  es desa com un **blob JSON** a la pestanya `DB` del full (partit en trosses per
-  files si creix). Concurrència protegida amb **`LockService`**.
+- **Backend:** **Google Apps Script** (Web App). Des del 16-09-2026 l'estat viu a
+  **ScriptProperties**, en JSON **comprimit (gzip+base64)** i partit en trossos de 8,5 KB
+  (`db_0..db_n`, `db_n`, `rev`). El full `DB` de **Google Sheets** és la **còpia de seguretat**:
+  s'hi escriu com a molt cada 10 min (`db_copia_t`) o a mà amb `copiaDeSeguretatAra()`.
+  Motiu: llegir i reescriure el full costava 4-8 s per escriptura amb pics de 20-30 s (Google
+  llençava la resposta: 404 «No s'ha pogut obrir el fitxer»). Estat real: 56 KB → 17 KB
+  comprimit (3,4% de la quota de 500 KB). Cada escriptura fa 2 operacions d'emmagatzematge
+  (quota de compte gratuït: 50.000/dia). Seguretat: la compressió només s'usa si la ida i
+  tornada és idèntica; si falla, es desa al full. Si en ESCRIURE les dades no es poden llegir,
+  es respon reintentable (mai es continua amb la còpia del full, que pot anar 10 min enrere).
+  **Recuperar des del full:** executar `copiaDeSeguretatAra` NO; per tornar al full, esborrar la
+  propietat `db_n` (Configuració del projecte → Propietats de l'script) i la propera lectura
+  agafarà el full. Concurrència protegida amb **`LockService`** (només per escriure).
 - **PWA:** `manifest.webmanifest` + icones a `img/`. Instal·lable al mòbil.
 
 Config al principi de `index.html` (objecte `CONFIG`):
