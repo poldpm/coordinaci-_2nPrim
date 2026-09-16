@@ -1442,8 +1442,10 @@ const api = {
       /* Firebase no respon (o l'espai de proves és buit): mai tornem a Apps Script, que ja
          no és la font de veritat. Es treballa amb la còpia local i la cua espera. */
       const cached = safeLoad();
+      /* Amb connexió no s'avisa: l'escolta en temps real (startFirebaseSync) porta les dades en
+         arribar, i un avís de «servidor» per una arrencada lenta només espantava. */
       if(cached){ STATE=cached; normalizeState(); reaplicaPendents();
-        toast(navigator.onLine ? 'El servidor no ha respost: mostrant l’última còpia' : 'Sense connexió: mostrant l’última còpia');
+        if(!navigator.onLine) toast('Sense connexió: mostrant l’última còpia');
         return STATE; }
       STATE={entries:[],tasks:[],subthemes:[],avaluacio:{}}; normalizeState();
       toast(FB_PROVES && fb ? 'Espai de proves buit' : 'No s’ha pogut connectar: torna-ho a provar d’aquí una estona');
@@ -1755,7 +1757,7 @@ function persist(action, payload){
   if(DEMO_MODE) return Promise.resolve();
   /* Encuem ABANS d'enviar (write-ahead): si l'app es tanca a mig enviar, el canvi es
      recupera a la propera obertura. */
-  PENDING.push({action, payload, tries:0, t:Date.now()});
+  PENDING.push({action, payload, op:uid()+uid(), tries:0, t:Date.now()});   // op: identificador únic (s'aplica un sol cop)
   _savePending();
   _esperaRetry = 0;             // una acció nova de l'usuari: no esperis el reintent anterior
   programaEnviament(300);       // agrupa els clics seguits (p. ex. marcar 20 alumnes) en UN sol enviament
@@ -1789,7 +1791,7 @@ async function _enviaCuaReal(){
   try{
     if(!_senseBatch){
       let r;
-      const ops = lot.map(it=>({action:it.action, payload:it.payload}));
+      const ops = lot.map(it=>({action:it.action, payload:it.payload, op:it.op}));
       try{ r = TRANSPORT==='firebase' ? await fbEnviaLot(ops) : await request('batch', {ops}); }
       catch(e){
         /* El servidor antic respon «Acció desconeguda: batch» marcat com a REINTENTABLE (el seu
@@ -1837,54 +1839,15 @@ async function _enviaCuaReal(){
    Quan baixem l'estat del núvol, aquest encara no conté els nostres canvis pendents.
    Sense això, el canvi desapareixia de la pantalla, el mestre el tornava a escriure
    i, quan la cua es buidava, quedava duplicat. Aquí es reapliquen a sobre.
-   És una còpia curta de la lògica del backend: si divergissin, el servidor mana,
-   perquè aquestes mateixes accions s'hi acabaran enviant igualment. */
+   Es fa amb fbApply: EXACTAMENT la mateixa lògica que desa el servidor.
+   ⚠️ Abans era una còpia curta feta a mà que s'havia desfasat (QA 16-09-2026): 24 de 45 tipus
+   d'acció no donaven el mateix. Els canvis de programació es desaven a la clau «undefined»
+   (el payload porta week, no key), l'estat de les comandes i «passat llista» es desfeien a la
+   pantalla, i comentaris, reptes i avaluació desapareixien fins que arribaven al servidor.
+   El payload es copia: fbApply el desa dins l'estat i no pot quedar enllaçat amb la cua. */
 function aplicaLocal(S, action, p){
   if(!S || !p) return;
-  const upsert=(arr,x,alDavant)=>{ const i=arr.findIndex(y=>y.id===x.id);
-    if(i>-1) arr[i]=x; else if(alDavant) arr.unshift(x); else arr.push(x); };
-  const uneix=(arr,v)=>{ if(arr.indexOf(v)<0) arr.push(v); };
-  switch(action){
-    case 'addEntry': case 'updateEntry': upsert(S.entries=S.entries||[], p, true); break;
-    case 'deleteEntry': S.entries=(S.entries||[]).filter(x=>x.id!==p.id); if(S.comments) delete S.comments[p.id];
-      S.tasks=(S.tasks||[]).filter(t=>!(t.origin && t.origin.entryId===p.id)); break;
-    case 'addTask': case 'updateTask': upsert(S.tasks=S.tasks||[], p, true); break;
-    case 'deleteTask': S.tasks=(S.tasks||[]).filter(x=>x.id!==p.id); break;
-    case 'entryRead': { const e=(S.entries||[]).find(x=>x.id===p.id); if(e) uneix(e.readBy=e.readBy||[], p.tutor); break; }
-    case 'taskRead': { const t=(S.tasks||[]).find(x=>x.id===p.id); if(t) uneix(t.readBy=t.readBy||[], p.tutor); break; }
-    case 'addSubtheme': upsert(S.subthemes=S.subthemes||[], p, false); break;
-    case 'deleteSubtheme': S.subthemes=(S.subthemes||[]).filter(x=>x.id!==p.id);
-      (S.entries||[]).filter(e=>e.subtheme===p.id).forEach(e=>{ if(S.comments) delete S.comments[e.id]; });
-      S.entries=(S.entries||[]).filter(e=>e.subtheme!==p.id); break;
-    case 'correuUpsert': { const c=p.correu; if(!c) break; S.correus=S.correus||[];
-      const i=S.correus.findIndex(x=>x.id===c.id);
-      if(i>-1){ c.sent=Object.assign({}, S.correus[i].sent||{}, c.sent||{}); S.correus[i]=c; } else S.correus.push(c); break; }
-    case 'correuDelete': S.correus=(S.correus||[]).filter(x=>x.id!==p.id); break;
-    case 'correuSent': { const c=(S.correus||[]).find(x=>x.id===p.id); if(c){ c.sent=c.sent||{};
-      if(p.on) c.sent[p.tutor]=true; else delete c.sent[p.tutor]; } break; }
-    case 'attToggle': { S.attendance=S.attendance||{absents:{},done:{}}; S.attendance.absents=S.attendance.absents||{};
-      if(p.absent) S.attendance.absents[p.name]=true; else delete S.attendance.absents[p.name]; break; }
-    case 'attDone': { S.attendance=S.attendance||{absents:{},done:{}}; S.attendance.done=S.attendance.done||{};
-      S.attendance.done[p.cls]=!!p.on; break; }
-    case 'attReset': S.attendance={absents:{},done:{}}; break;
-    case 'picnicToggle': { S.picnics=S.picnics||{}; S.picnics[p.sub]=S.picnics[p.sub]||{};
-      if(p.on) S.picnics[p.sub][p.name]=true; else delete S.picnics[p.sub][p.name]; break; }
-    case 'cvLliurat': { S.cvLliurat=S.cvLliurat||{}; S.cvLliurat[p.key]=S.cvLliurat[p.key]||{};
-      if(p.on) S.cvLliurat[p.key][p.alumne]=true; else delete S.cvLliurat[p.key][p.alumne]; break; }
-    case 'progSetCell': { S.programacio=S.programacio||{}; S.programacio[p.subject]=S.programacio[p.subject]||{};
-      const c=S.programacio[p.subject][String(p.key)]||{}; const d=p.data||p.patch||{};
-      if(d.items!==undefined) c.items=d.items; if(d.notes!==undefined) c.notes=d.notes;
-      if(d.link!==undefined) c.link=d.link; if(d.title!==undefined) c.title=d.title;
-      S.programacio[p.subject][String(p.key)]=c; break; }
-    case 'progSetDone': { S.programacio=S.programacio||{}; S.programacio[p.subject]=S.programacio[p.subject]||{};
-      const c=S.programacio[p.subject][String(p.key)]||{}; c.done=c.done||{};
-      if(p.on) c.done[p.tutor]=true; else delete c.done[p.tutor];
-      S.programacio[p.subject][String(p.key)]=c; break; }
-    case 'progSetSubject': S.programacio=S.programacio||{}; S.programacio[p.subject]=p.map||{}; break;
-    case 'setEmailReminder': S.emailReminders=S.emailReminders||{}; S.emailReminders[p.tutor]=!!p.on; break;
-    case 'comandaStatus': S.comandaStatus=S.comandaStatus||{}; S.comandaStatus[p.id]=p.status; break;
-    default: break;   // comentaris, reptes i avaluació: el servidor ja hi és idempotent
-  }
+  fbApply(S, action, JSON.parse(JSON.stringify(p)));
 }
 /* ---- Marques per alumne: clau composta CLASSE|NOM ----
    Abans la clau era només el nom. Amb dos alumnes homònims a classes diferents,
@@ -2135,23 +2098,41 @@ function fbMunta(m){
 /* Llegeix tot del servidor. meta.migrat diu si Firestore ja és la font de veritat. */
 async function fbLlegeix(){
   const F = await fbCarrega(); const fs=F.fs;
-  const snap = await fs.getDocsFromServer(fs.collection(F.db, FIREBASE.col));
-  const m={}; snap.forEach(d=>{ m[d.id]=d.data(); });
+  /* ⚠️ Mesurat (QA 16-09-2026): llegir just després de desar pot tornar la versió d'ABANS (amb
+     l'escolta activa, la lectura va lligada a la mateixa connexió i pot anar un pas enrere).
+     La llista d'absents/pícnics es genera amb aquesta lectura: sortia sense l'últim alumne
+     marcat. Si algun document té un `v` menor que el que ja hem desat, s'espera i es rellegeix. */
+  let m={};
+  for(let k=0;k<8;k++){
+    const snap = await fs.getDocsFromServer(fs.collection(F.db, FIREBASE.col));
+    m={}; snap.forEach(d=>{ m[d.id]=d.data(); });
+    if(!FB_DOCS.some(d=>((m[d]&&m[d].v)||0) < (FB.minV[d]||0))) break;
+    await new Promise(r=>setTimeout(r, 250));
+  }
   return { m, meta:m.meta||null, state:fbMunta(m) };
 }
-/* Un lot d'accions = UNA transacció. Retorna {ok, results:[{ok}|{error}]} com el backend. */
+/* Un lot d'accions = UNA transacció. Retorna {ok, results:[{ok}|{error}]} com el backend.
+   S'APLICA UN SOL COP: si el servidor desa el lot però la resposta es perd (tall de cobertura),
+   la cua el reenvia. Gairebé tot és idempotent, però «+ còpies» (estocSuma) sumaria dues vegades.
+   Per això cada acció porta `op` i el document `fets` recorda les aplicades els últims 3 dies. */
 async function fbEnviaLot(ops){
   const F = await ambTemps(fbCarrega(), 20000, 'No s’ha pogut connectar amb Firebase');
   const fs=F.fs; let results=[], nousV={};
   await ambTemps(fs.runTransaction(F.db, async tx=>{
     const refs = FB_DOCS.map(d=>fs.doc(F.db, FIREBASE.col, d));
     const snaps = await Promise.all(refs.map(r=>tx.get(r)));
+    const refFets = fs.doc(F.db, FIREBASE.col, 'fets');
+    const sFets = await tx.get(refFets);
+    const fets = (sFets.exists() && sFets.data().j) ? JSON.parse(sFets.data().j) : {};
     const vell={}, vs={}; let state={};
     snaps.forEach((s,i)=>{ const d=FB_DOCS[i]; const x=s.exists()?s.data():null;
       vell[d]=(x&&x.j)||null; vs[d]=(x&&x.v)||0; if(vell[d]) Object.assign(state, JSON.parse(vell[d])); });
     results=[]; nousV={};                       // la transacció es pot repetir: comença de zero
+    const ara = Date.now(); let nousFets = false;
+    Object.keys(fets).forEach(k=>{ if(ara - fets[k] > 3*864e5){ delete fets[k]; nousFets = true; } });
     ops.forEach(op=>{
-      try{ state = fbApply(state, op.action, op.payload); results.push({ok:true}); }
+      if(op.op && fets[op.op]){ results.push({ok:true, repetit:true}); return; }   // ja aplicada abans
+      try{ state = fbApply(state, op.action, op.payload); results.push({ok:true}); if(op.op){ fets[op.op] = ara; nousFets = true; } }
       catch(e){ results.push({error:String((e&&e.message)||e)}); }
     });
     const trossos = fbTrosseja(state);
@@ -2162,6 +2143,7 @@ async function fbEnviaLot(ops){
       nousV[d] = vs[d]+1;
       tx.set(refs[i], { j, v:nousV[d], t:fs.serverTimestamp(), by:ME||'' });
     });
+    if(nousFets) tx.set(refFets, { j: JSON.stringify(fets), t: fs.serverTimestamp() });
   }), 30000, 'Firebase no ha respost a temps');
   Object.keys(nousV).forEach(d=>{ FB.minV[d]=Math.max(FB.minV[d]||0, nousV[d]); });
   return { ok:true, results };
@@ -3850,7 +3832,8 @@ function cvLliuratBlock(give){
   const classes=Object.keys(STATE.students||{}).filter(c=>STATE.students[c] && STATE.students[c].length);
   const marks=cvLliuratsDe(give);
   const totalTots=classes.reduce((n,c)=>n+(STATE.students[c]||[]).length,0);
-  const fetsTots=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>marks[x]).length,0);
+  // stLlegeix: les marques es desen com a CLASSE|NOM (amb marks[x] el total sortia sempre 0)
+  const fetsTots=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>stLlegeix(marks,c,x)).length,0);
   const btn=el('button','btn btn-ghost cv-lliurat-btn'); btn.type='button';
   btn.innerHTML='🎒 Qui l’ha entregada <span class="cv-cnt">'+fetsTots+'/'+totalTots+'</span>';
   btn.onclick=()=>{ CV_LLIURAT_OPEN=!CV_LLIURAT_OPEN; openSection('programacio'); };
@@ -3884,9 +3867,9 @@ function cvLliuratBlock(give){
       await api.cvLliurat(give, stKey(CV_CLASS,name), nou);
       setCnt();
       const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(CV_CLASS)===0);
-      if(tab){ const f=roster.filter(n=>cvLliuratsDe(give)[n]).length; tab.textContent=CV_CLASS+' ('+f+'/'+roster.length+')'; }
+      if(tab){ const f=roster.filter(n=>stLlegeix(cvLliuratsDe(give),CV_CLASS,n)).length; tab.textContent=CV_CLASS+' ('+f+'/'+roster.length+')'; }
       const c2=btn.querySelector('.cv-cnt'); if(c2){ const m2=cvLliuratsDe(give);
-        c2.textContent=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>m2[x]).length,0)+'/'+totalTots; }
+        c2.textContent=classes.reduce((n,c)=>n+(STATE.students[c]||[]).filter(x=>stLlegeix(m2,c,x)).length,0)+'/'+totalTots; }
     };
     grid.appendChild(chip);
   });

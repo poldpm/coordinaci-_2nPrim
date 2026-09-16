@@ -67,6 +67,13 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
   - **Regles de Firestore:** lectura/escriptura a `coord/{doc}` (i `coord_proves/{doc}` mentre calgui)
     amb `request.auth != null` (inici de sessió anònim). La config web de Firebase és pública per disseny.
   - **Service worker:** la llibreria de Firebase (gstatic, versió fixa) va cau-primer.
+  - **QA 16-09-2026 (post-migració), corregit:** (1) `aplicaLocal` ara és `fbApply` (la còpia a mà
+    s'havia desfasat: 24/45 accions no coincidien, p. ex. programació a la clau «undefined»);
+    (2) **s'aplica un sol cop**: cada acció de la cua porta `op` i el document `fets` (3 dies) evita
+    que un lot reenviat després d'una resposta perduda sumi dues vegades (`estocSuma`);
+    (3) `fbLlegeix` espera si llegeix un `v` menor que el que ja hem desat (la lectura just després
+    de desar podia tornar la versió d'abans → llista d'absents incompleta); (4) sense avís de
+    «servidor» en una arrencada lenta amb connexió; (5) comptadors de 🎒 amb `stLlegeix` (CLASSE|NOM).
 - **PWA:** `manifest.webmanifest` + icones a `img/`. Instal·lable al mòbil.
 
 Config al principi de `index.html` (objecte `CONFIG`):
