@@ -101,6 +101,27 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   **sense sincronitzar per sempre**; després es va "arreglar" descartant-la, i això
   **feia perdre canvis** quan el backend petava per contenció del lock (retornava
   HTML, no JSON). Cap de les dues coses pot tornar a passar.
+- **Enviament per LOTS (`batch`):** `persist()` només encua; `enviaCua()` agrupa fins a 40
+  accions en UNA petició (`batch`) → al servidor, una lectura i una desada. Marcar 20 alumnes
+  eren 20 execucions de ~5 s; ara n'és una. Cada operació té el seu resultat (una de dolenta
+  no tomba les altres). Si falla la xarxa o Google llença la resposta (404 «No s'ha pogut obrir
+  el fitxer», passa quan una execució passa dels ~30 s), el lot sencer torna a la cua i es
+  reintenta sol amb espera creixent (3→30 s). Totes les accions són idempotents, així que
+  reenviar un lot que sí que s'havia desat no duplica res. Si el servidor és antic i respon
+  «Acció desconeguda: batch» (ve marcat com a REINTENTABLE pel seu doPost), `_senseBatch` passa
+  a enviar un per un.
+- ⚠️ **Bug greu arreglat (16-09-2026):** `persist` marcava l'acció com a `sending` i la desava així
+  a la cua; si l'app es tancava a mig enviar, en tornar-la a obrir aquella acció quedava «en vol»
+  per sempre: no s'enviava MAI i `reaplicaPendents` la tornava a pintar a cada sincronització.
+  Aquell dispositiu veia coses que els altres no. Ara l'arrencada posa `sending=false` a tot.
+- **Revisió atòmica:** `getState` porta `rev` DINS la resposta (`prenRev(s)` la treu de l'estat).
+  Abans es demanava en una petició a part DESPRÉS de l'estat: si algú escrivia entremig, el
+  dispositiu apuntava la revisió nova amb dades velles i no veia el canvi fins al refresc dels
+  5 min. El servidor llegeix la revisió ABANS que les dades.
+- **Lectures sense torn i des de memòria cau:** `getState` no demana `LockService`; llegeix
+  `CacheService` (`_loadStateRapid`) si l'etiqueta de revisió coincideix, i si no, el full. Només
+  `_saveState` (dins del torn) escriu la cau. Si una lectura enxampa el full a mig desar, `_loadState`
+  avisa i el client ho reintenta.
 - **Revisió (`getRev`) — llegir surt molt barat:** cada desada puja un comptador
   (`_tocaRev` a ScriptProperties). La comprovació periòdica pregunta **només el comptador**
   (mil·lisegons, no toca cap full) i només baixa l'estat sencer si ha canviat, o cada 5 min.
@@ -108,8 +129,8 @@ per defecte); `correus/comandes/eines/avaluacio` SÍ.
   cada 20 s el servidor no parava mai i les escriptures morien per temps esgotat
   («signal is aborted without reason»). La llista d'alumnes també es cacheja 5 min
   (`_loadStudentsCache`) i l'espera de torn de les escriptures va de 20 s a 8 s.
-- **Ritme adaptatiu:** 20 s quan passen coses; si no en passen, s'estira ×1,5 fins a un
-  topall de 2 min (mesurat: 31→45→69→103→120 s). Tornar a l'app, escriure o rebre un
+- **Ritme adaptatiu:** 15 s quan passen coses; si no en passen, s'estira ×1,5 fins a un
+  topall de 30 s (abans 2 min: massa per a dos ordinadors l'un al costat de l'altre). Tornar a l'app, escriure o rebre un
   canvi ho torna a posar a 20 s (`window._syncDesperta`). `pull()` retorna si hi ha hagut
   canvis. Motiu: Apps Script té latències molt irregulars (mesurat de 1 a 18 s per a la
   MATEIXA crida trivial) i cada petició és una execució sencera al servidor.
@@ -219,9 +240,13 @@ i substituir el bloc a `index.html`.
   de *La ciutat* amb `sessions:null` porten `p:1` → etiqueta "⏳ a concretar".
 
 ### Carpeta viatgera (dins Programació, pestanya "Carpeta viatgera")
-Deures quinzenals que es donen els **dimecres**. `CV_START='2026-09-16'`; es dona
-cada **14 dies** (`_cvGrid()`, salta vacances → **18 cicles**); es **recull** el
-dimecres següent (`cvCollectOf` = +7 dies). Model: reaprofita `programacio`
+Deures quinzenals que es donen els **DILLUNS** (canviat el 16-09-2026; abans dimecres).
+`CV_START='2026-09-14'`; cada **14 dies** (`_cvGrid()`): si el dilluns és de vacances no hi ha
+cicle; si és festiu o de lliure disposició es dona el primer dia lectiu de la setmana
+(12 oct → dt 13; 7-8 des → dc 9) → **18 cicles**. Es **recull** el dilluns següent
+(`cvCollectOf`, comptant des del dilluns de la setmana), o el primer dia lectiu si no ho és.
+`cvMigraDilluns()` (a l'arrencada) mou les dades desades amb dates de dimecres al cicle de la
+mateixa setmana; és idempotent. Model: reaprofita `programacio`
 amb `subject='carpeta'` i `key=dataISO_de_dona`. Cada cicle té: **títol**
 (ex. "Carpeta Viatgera 1 · La tardor"), **deures** (llista amb 3 punts per tutor),
 **enllaç al Google Doc** (a Drive). Dues vistes: **"Aquest cicle" / "Tots els

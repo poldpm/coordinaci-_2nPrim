@@ -1404,7 +1404,7 @@ const api = {
     }
     // ---------- MODE NÚVOL (Google Sheets) ----------
     try{
-      const state = await request('getState');
+      const state = prenRev(await request('getState'));
       STATE = state || {entries:[],tasks:[],subthemes:[],avaluacio:{}};
       normalizeState();
       // primera arrencada: si el full és buit, hi sembra els subtemes per defecte
@@ -1657,12 +1657,19 @@ function updateSyncBadge(){
       PENDING.forEach(p=>{ p.tries=0; });   // ho demanes tu: torna-ho a provar TOT, tamb\u00e9 l'apartat
       const ok=await flushPending(); updateSyncBadge(); b.disabled=false;
       if(PENDING.length) mostraDiagnostic(); else toast('Tot desat \u2713');
-      if(ok && !PENDING.length){ try{ const s=await request('getState'); if(s){ STATE=s; normalizeState(); safeSave(); repaintAfterSync(); } }catch(e){} }
+      if(ok && !PENDING.length){ try{ const s=prenRev(await request('getState')); if(s){ STATE=s; normalizeState(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} repaintAfterSync(); } }catch(e){} }
     };
     document.body.appendChild(b);
   }
-  // Les que estan en vol no compten: nom\u00E9s molestar\u00EDem durant el mig segon que triga.
-  const n=PENDING.filter(x=>!x.sending).length;
+  /* Un reintent automàtic que funciona al cap de 3 s no ha d'espantar ningú. La píndola
+     surt quan un canvi porta més de 20 s sense poder-se enviar, i l'avís quan en porta 60. */
+  const vells=PENDING.filter(x=>!x.sending && (Date.now()-(x.t||0))>20000);
+  const n=vells.length;
+  if(PENDING.some(x=>!x.sending && (Date.now()-(x.t||0))>60000) && Date.now()-(window._offAt||0)>120000){
+    window._offAt=Date.now();
+    toast(!navigator.onLine ? '\u26A0\uFE0F Sense connexi\u00f3: es desar\u00e0 sol quan torni'
+                            : '\u26A0\uFE0F Encara hi ha canvis per desar: es va reintentant sol');
+  }
   if(!n){ b.hidden=true; b.style.display='none'; return; }
   b.hidden=false; b.style.display='';
   b.setAttribute('aria-live','polite');
@@ -1670,44 +1677,20 @@ function updateSyncBadge(){
 }
 const PENDING_MAX_TRIES = 2;    // el servidor la rebutja: l'apartem de seguida
 const PENDING_MAX_RETRY = 25;   // xarxa o servidor ocupat: insistim molt més abans d'apartar-la
-const maxDe = it => (it.retryable ? PENDING_MAX_RETRY : PENDING_MAX_TRIES);
+const maxDe = it => (it.retryable ? Infinity : PENDING_MAX_TRIES);   // xarxa/servidor: s'insisteix sempre (amb espera creixent)
 /* Una acció es pot enviar si no està ja en vol i encara no s'ha apartat. */
 const enviable = it => !it.sending && (it.tries||0) < maxDe(it);
-let _flushing = null;          // només una execució alhora (si no, es trepitgen els índexs)
+/* Envia tot el que es pugui ara mateix i diu si ha quedat la cua buida. La fan servir
+   els refrescos manuals i la píndola. Mai no queda penjada: com a molt fa uns quants lots. */
 async function flushPending(){
-  if(_flushing) return _flushing;
-  _flushing = _flushPendingReal().finally(()=>{ _flushing=null; });
-  return _flushing;
-}
-async function _flushPendingReal(){
-  if(DEMO_MODE || !PENDING.length) return true;
-  let i=0, rebutjades=0;
-  while(i < PENDING.length){
-    const it=PENDING[i];
-    if(!enviable(it)){ i++; continue; }   // en vol o apartada: no bloqueja la resta
-    try{ await request(it.action, it.payload); PENDING.splice(i,1); _savePending(); }
-    catch(e){
-      // Comptem SEMPRE l'intent. Si no ho fèiem, una acció que falla sempre es
-      // reintentava infinitament, flushPending() no tornava mai `true` i
-      // startCloudSync deixava de baixar l'estat: el dispositiu es quedava SORD
-      // als canvis dels altres tutors, per sempre i sense dir res.
-      it.tries=(it.tries||0)+1;
-      it.retryable=!!(e && e.retryable);
-      if(e && e.retryable){
-        it.err=(e&&e.message)||'error';
-        window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
-        _savePending();
-        break;   // xarxa o servidor ocupat: ho tornarem a provar TOT, en ordre
-      }
-      // El servidor l'ha rebutjada. NO l'esborrem (seria perdre feina teva):
-      // l'apartem perquè no encalli la sincronització i es reintenta a la propera obertura.
-      it.err=(e&&e.message)||'error'; rebutjades++; _savePending(); i++;
-      window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
-      try{ console.warn('Acció rebutjada:', it.action, e && e.message); }catch(_){}
-    }
+  if(DEMO_MODE) return true;
+  for(let k=0;k<6;k++){
+    if(!PENDING.some(enviable)) break;
+    const abans = PENDING.length;
+    await enviaCua();
+    if(PENDING.length >= abans) break;          // no ha avançat (xarxa): no insisteixis aquí
   }
-  if(rebutjades) toast('⚠️ '+(rebutjades===1?'1 canvi no s’ha pogut desar':rebutjades+' canvis no s’han pogut desar')+'. Es tornarà a provar.');
-  return !PENDING.some(enviable);
+  return !PENDING.some(x=>!x.tries || x.retryable);
 }
 let _inflight = 0;              // escriptures en curs (per no trepitjar-les amb un pull)
 let _chain = Promise.resolve(); // cua d'enviament: manté l'ORDRE sense fer esperar la pantalla
@@ -1721,38 +1704,84 @@ function persist(action, payload){
   try{ if(window._syncDesperta) window._syncDesperta(); }catch(e){}
   safeSave();                                  // còpia local immediata (optimista)
   if(DEMO_MODE) return Promise.resolve();
-  /* Encuem ABANS d'enviar (write-ahead). Si l'app es tanca, es recarrega o es
-     mata mentre la petició és en vol, el canvi es recupera a la propera obertura
-     en comptes de perdre's. Marcat com a `sending` perquè la cua no el reenviï. */
-  const it={action, payload, tries:0, sending:true};
-  PENDING.push(it); _savePending();
-  const treu=()=>{ const k=PENDING.indexOf(it); if(k>-1) PENDING.splice(k,1); _savePending(); };
-  _inflight++;
-  /* .catch() abans del .then(): una excepció dins d'aquesta cadena no la pot deixar
-     rebutjada per sempre. Sense això, un sol error deixava el dispositiu sense enviar
-     res mai més, en silenci i amb _inflight encallat. */
-  _chain = _chain.catch(()=>{}).then(async ()=>{
-    try{
-      if(PENDING.some(enviable)){                 // primer, el que hi hagués pendent (en ordre)
-        if(!(await flushPending())){ it.sending=false; _savePending(); return; }
+  /* Encuem ABANS d'enviar (write-ahead): si l'app es tanca a mig enviar, el canvi es
+     recupera a la propera obertura. */
+  PENDING.push({action, payload, tries:0, t:Date.now()});
+  _savePending();
+  _esperaRetry = 0;             // una acció nova de l'usuari: no esperis el reintent anterior
+  programaEnviament(300);       // agrupa els clics seguits (p. ex. marcar 20 alumnes) en UN sol enviament
+  return Promise.resolve();     // la pantalla no espera el servidor
+}
+/* ---- Enviament per LOTS ----
+   Abans, cada clic era una execució completa al servidor (torn + llegir 50 KB + desar
+   50 KB, uns 5 s). Marcar 20 alumnes eren 20 execucions seguides competint amb les
+   lectures dels altres ordinadors; quan s'encavalcaven, alguna passava dels ~30 s i
+   Google la matava («No s'ha pogut obrir el fitxer»). Ara s'envien en un sol lot. */
+let _enviant = false;          // hi ha un lot en vol
+let _senseBatch = false;       // el servidor encara no sap fer lots (desplegament antic)
+let _timerEnvia = null;
+let _esperaRetry = 0;          // espera abans del proper reintent automàtic (creix fins a 30 s)
+let _genEnviament = 0;         // puja cada cop que un lot arriba bé (per no aplicar lectures velles)
+let _promEnviament = null;
+function programaEnviament(ms){ clearTimeout(_timerEnvia); _timerEnvia=setTimeout(()=>{ enviaCua(); }, ms||0); }
+function enviaCua(){
+  if(DEMO_MODE) return Promise.resolve();
+  if(_enviant) return _promEnviament;
+  _promEnviament = _enviaCuaReal().finally(()=>{ _enviant=false; _inflight=0; _promEnviament=null; try{ updateSyncBadge(); }catch(e){} });
+  return _promEnviament;
+}
+async function _enviaCuaReal(){
+  const disponibles = PENDING.filter(enviable);
+  if(!disponibles.length){ updateSyncBadge(); return; }
+  const lot = _senseBatch ? disponibles.slice(0,1) : disponibles.slice(0,40);
+  _enviant = true; _inflight = 1;
+  lot.forEach(it=>{ it.sending=true; });
+  const treu = it=>{ const k=PENDING.indexOf(it); if(k>-1) PENDING.splice(k,1); };
+  try{
+    if(!_senseBatch){
+      let r;
+      try{ r = await request('batch', {ops: lot.map(it=>({action:it.action, payload:it.payload}))}); }
+      catch(e){
+        /* El servidor antic respon «Acció desconeguda: batch» marcat com a REINTENTABLE (el seu
+           doPost ho embolica tot així). Si només miréssim les rebutjades, reintentaríem el lot
+           per sempre i no es desaria res fins a redesplegar. Es mira el text. */
+        if(e && /desconeguda/i.test(String(e.message||'')) && /batch/i.test(String(e.message||''))){
+          _senseBatch = true;                       // backend antic: un per un
+          lot.forEach(it=>{ it.sending=false; });
+          programaEnviament(0);
+          return;
+        }
+        throw e;
       }
-      await request(action, payload);
-      treu();
-    }catch(err){
-      it.sending=false;
-      it.err=(err&&err.message)||'error';
-      it.retryable=!!(err && err.retryable);
-      _savePending();
-      window._ultimError={ accio:action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
-      const now=Date.now();
-      if(now-(window._offAt||0)>6000){ window._offAt=now;
-        const senseXarxa = !navigator.onLine;
-        toast(senseXarxa ? '⚠️ Sense connexió: es desarà sol quan torni'
-                         : '⚠️ El servidor no ha respost: es tornarà a provar sol');
+      const res = (r && r.results) || [];
+      lot.forEach((it,i)=>{
+        const x = res[i];
+        if(x && x.error){ it.sending=false; it.tries=(it.tries||0)+1; it.retryable=false; it.err=x.error;
+          window._ultimError={ accio:it.action, missatge:x.error, quan:new Date().toLocaleTimeString('ca-ES') }; }
+        else treu(it);
+      });
+    } else {
+      const it = lot[0];
+      try{ await request(it.action, it.payload); treu(it); }
+      catch(e){
+        if(e && e.retryable) throw e;
+        it.sending=false; it.tries=(it.tries||0)+1; it.retryable=false; it.err=(e&&e.message)||'error';
+        window._ultimError={ accio:it.action, missatge:it.err, quan:new Date().toLocaleTimeString('ca-ES') };
       }
-    } finally { _inflight--; try{ updateSyncBadge(); }catch(e){} }
-  });
-  return Promise.resolve();                    // la pantalla no espera el servidor
+    }
+    _genEnviament++;
+    _esperaRetry = 0;
+    _savePending();
+    if(PENDING.some(enviable)) programaEnviament(0);     // queda feina: el següent lot
+  }catch(err){
+    // Xarxa, temps esgotat o Google ha llençat la resposta: TOT torna a la cua i es
+    // reintenta sol, cada cop amb una mica més d'espera. Res es perd ni s'aparta.
+    lot.forEach(it=>{ it.sending=false; it.retryable=true; it.err=(err&&err.message)||'error'; });
+    window._ultimError={ accio:lot.map(x=>x.action).join(', '), missatge:(err&&err.message)||'error', quan:new Date().toLocaleTimeString('ca-ES') };
+    _savePending();
+    _esperaRetry = Math.min(Math.max(3000, _esperaRetry*2), 30000);
+    programaEnviament(_esperaRetry);
+  }
 }
 /* ---- Tornar a aplicar el que encara no ha arribat al servidor ----
    Quan baixem l'estat del núvol, aquest encara no conté els nostres canvis pendents.
@@ -1855,7 +1884,7 @@ function normalizeState(){
 /* crida a l'Apps Script (POST text/plain → sense preflight de CORS) */
 async function request(action, payload){
   const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), 45000);
+  const timer = setTimeout(()=>ctrl.abort(), 40000);   // Google llença la resposta als ~30 s
   try{
     let res;
     try{
@@ -1914,6 +1943,13 @@ function repaintAfterSync(){
   try{ if(CURRENT_SUB) openSubtheme(CURRENT, CURRENT_SUB); else openSection(CURRENT); }catch(e){ return; }
   window.scrollTo(0,y);
 }
+/* La resposta de getState porta la revisió a dins (atòmica). La traiem de l'estat. */
+function prenRev(s){
+  if(!s || typeof s!=='object') return s;
+  if(s.rev!=null){ _revVista=String(s.rev); } else { _revVista=''; }
+  delete s.rev;
+  return s;
+}
 /* Refresc manual (botons «Actualitza», generar la llista d'absents, pícnics…).
    Baixa l'estat del núvol NOMÉS si abans s'ha pogut enviar tot el que hi havia
    pendent. Si no ho comprovéssim, el getState substituiria l'estat local i les
@@ -1923,39 +1959,43 @@ async function refrescaEstat(){
   if(DEMO_MODE) return true;
   if(_inflight) return false;
   const totEnviat = PENDING.length ? await flushPending() : true;
-  try{ const s=await request('getState');
+  try{ const s=prenRev(await request('getState'));
     if(s){ STATE=s; normalizeState(); reaplicaPendents(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} }
     return totEnviat;                            // false = la llista pot no tenir els canvis més nous
   }catch(e){ return false; }
 }
 function startCloudSync(){
   if(DEMO_MODE) return;
+  let _llegint = false;
   const pull=async()=>{
-    if(document.hidden) return false;            // en segon pla no cal
-    if(_inflight) return false;                  // s'està desant alguna cosa: no baixis estat vell
-    /* Provem d'enviar el que queda, però NO abandonem si no se'n surt: llegir no ha
-       de dependre de poder escriure. Si no, una acció encallada deixava el dispositiu
-       sense rebre els avisos dels altres tutors durant minuts. */
-    await flushPending();
-    /* Preguntar "ha canviat res?" costa mil·lisegons; baixar l'estat sencer costava
-       10-14 s i, amb tres dispositius cada 20 s, saturava el servidor i les escriptures
-       es quedaven sense torn. Només baixem tot si la revisió ha canviat (o cada 5 min,
-       per si algú toca el full a mà). */
+    if(document.hidden || _llegint) return false;
+    _llegint = true;
     try{
-      const ara=Date.now();
-      if(_revVista && (ara-_ultimaCompleta) < 300000){
-        const r=await request('getRev');
-        if(r && r.rev && String(r.rev)===String(_revVista)) return false;   // res de nou
-      }
-    }catch(e){}
-    try{ const s=await request('getState');
-      if(s){ const sig=JSON.stringify(s);
-        _ultimaCompleta=Date.now();
-        try{ const rr=await request('getRev'); if(rr && rr.rev) _revVista=String(rr.rev); }catch(e){}
-        if(sig!==_lastSig){ _lastSig=sig; STATE=s; normalizeState();
-          reaplicaPendents();                    // el que encara no ha arribat no pot desaparèixer de la pantalla
-          safeSave(); repaintAfterSync(); return true; } } }catch(e){}
-    return false;
+      if(PENDING.some(enviable)) programaEnviament(0);   // enviar no bloqueja llegir
+      const gen = _genEnviament;
+      /* Pregunta curta: només si ja tenim una revisió fiable i no fa 5 min de l'última
+         lectura completa. */
+      try{
+        if(_revVista && (Date.now()-_ultimaCompleta) < 300000){
+          const r=await request('getRev');
+          if(r && r.rev!=null && String(r.rev)===String(_revVista)) return false;   // res de nou
+        }
+      }catch(e){}
+      const s = await request('getState');
+      if(!s) return false;
+      /* Si mentre llegíem ha arribat un lot nostre, aquesta foto pot ser d'abans: no la
+         apliquem (faria desaparèixer el canvi un moment) i tornem a llegir de seguida. */
+      if(gen !== _genEnviament){ _revVista=''; setTimeout(()=>{ pull(); }, 1200); return false; }
+      prenRev(s);
+      _ultimaCompleta = Date.now();
+      const sig = JSON.stringify(s);
+      if(sig === _lastSig) return false;
+      _lastSig = sig; STATE = s; normalizeState();
+      reaplicaPendents();                    // el que encara no ha arribat no pot desaparèixer de la pantalla
+      safeSave(); repaintAfterSync();
+      return true;
+    }catch(e){ return false; }
+    finally{ _llegint = false; }
   };
   /* Ritme adaptatiu. Apps Script té latències molt irregulars (mesurat: de 1 a 18 s per
      a la MATEIXA crida trivial) i cada petició, per barata que sigui, és una execució
@@ -1963,7 +2003,7 @@ function startCloudSync(){
      havia peticions constants fins i tot de nit o en caps de setmana.
      Ara: 20 s quan passen coses, i s'espaia fins a 2 min si fa estona que no canvia res.
      Qualsevol canvi, tornar a l'app o escriure alguna cosa ho torna a posar a 20 s. */
-  const RITME_MIN=20000, RITME_MAX=120000;
+  const RITME_MIN=15000, RITME_MAX=30000;   // amb dos ordinadors davant, 2 min era massa: màxim 30 s
   let ritme=RITME_MIN, temporitzador=null;
   window._syncDesperta=()=>{ ritme=RITME_MIN; programa(); };
   const programa=()=>{ clearTimeout(temporitzador); temporitzador=setTimeout(cicle, ritme); };
@@ -1974,11 +2014,11 @@ function startCloudSync(){
     programa();
   };
   programa();
-  const desperta=()=>{ ritme=RITME_MIN; flushPending(); pull().then(programa); };
+  const desperta=()=>{ ritme=RITME_MIN; programaEnviament(0); pull().then(programa); };
   window.addEventListener('focus', desperta);
   // Al mòbil el 'focus' no sempre arriba: aquest és el que dispara en tornar a l'app
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) desperta(); });
-  window.addEventListener('online', ()=>{ flushPending().then(desperta); });
+  window.addEventListener('online', ()=>{ _esperaRetry=0; programaEnviament(0); desperta(); });
 }
 
 /* ---------- DADES D'EXEMPLE (rescatades del caos del doc) ---------- */
@@ -3000,16 +3040,30 @@ function progCurrentIdx(){
 let PROG_SUBJECT='mates', PROG_WEEK_IDX=progCurrentIdx(), PROG_VIEW='week';
 let PROG_NAV=false;   // ve d'un enllac que ja ha triat setmana o cicle
 let MEDI_VIEW='projectes';   // Medi: 'projectes' (per defecte) o 'setmanes'
-/* ---- Carpeta viatgera (quinzenal, dimecres) ---- */
-const CV_START='2026-09-16';   // primer dimecres que es dona
+/* ---- Carpeta viatgera (quinzenal, DILLUNS) ----
+   Es dona el dilluns cada 14 dies. Si aquell dilluns és de vacances, aquella setmana no
+   n'hi ha. Si és festiu o dia de lliure disposició (p. ex. 12 d'octubre, 7 de desembre),
+   es dona el primer dia lectiu d'aquella mateixa setmana. */
+const CV_START='2026-09-14';   // primer dilluns (setmana del 14 de setembre)
+function cvLectiu(iso){ const d=progIsoToDate(iso); const wd=d.getDay();
+  return wd!==0 && wd!==6 && !progVacOn(iso) && !progFestiuOn(iso); }
 function _cvGrid(){ const out=[]; let d=progIsoToDate(CV_START); const end=progIsoToDate(COURSE_END);
-  while(d<=end){ const iso=progDateToISO(d); if(!progVacOn(iso)) out.push(iso); d=new Date(d); d.setDate(d.getDate()+14); } return out; }
+  while(d<=end){
+    const iso=progDateToISO(d);
+    if(!progVacOn(iso)){
+      let x=new Date(d), triat=null;
+      for(let k=0;k<5;k++){ const xi=progDateToISO(x); if(cvLectiu(xi)){ triat=xi; break; } x.setDate(x.getDate()+1); }
+      if(triat) out.push(triat);
+    }
+    d=new Date(d); d.setDate(d.getDate()+14);
+  }
+  return out; }
 const CV_GIVES=_cvGrid();
-/* Es recull el dimecres següent… però no si cau en vacances o festiu (passava amb
-   el cicle del 17 de març: la recollida queia dins de Setmana Santa i l'app
-   avisava «Recollir la carpeta» un dia que l'escola era tancada). */
+/* Es recull el DILLUNS següent… però no si cau en vacances o festiu: llavors, el primer
+   dia lectiu que vingui (l'escola tancada no pot rebre carpetes). Es compta des del dilluns
+   de la setmana en què es va donar, encara que aquell cop s'hagués donat un dimarts. */
 function cvCollectOf(g){
-  const d=progIsoToDate(g); d.setDate(d.getDate()+7);
+  const d=progMondayOf(progIsoToDate(g)); d.setDate(d.getDate()+7);
   for(let i=0;i<14;i++){
     const iso=progDateToISO(d);
     if(!progVacOn(iso) && !progFestiuOn(iso) && d.getDay()!==0 && d.getDay()!==6) return iso;
@@ -3022,6 +3076,28 @@ function cvCurrentGive(){ const today=progDateToISO(new Date());
   for(let i=0;i<CV_GIVES.length;i++){ const next=CV_GIVES[i+1]||'9999'; if(CV_GIVES[i]<=today && today<next) return CV_GIVES[i]; }
   if(CV_GIVES.length && today<CV_GIVES[0]) return CV_GIVES[0];
   return CV_GIVES.length?CV_GIVES[CV_GIVES.length-1]:null; }
+/* Les carpetes i les entregues es desaven amb la data del DIMECRES. Cada dada es mou al cicle
+   de la mateixa setmana de la graella nova. És idempotent: si ho fan els tres dispositius
+   alhora, surt el mateix; i quan ja no queda res amb data antiga, no fa res. */
+function cvClauNova(k){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(k) || CV_GIVES.indexOf(k)>-1) return k;
+  const m=progDateToISO(progMondayOf(progIsoToDate(k)));
+  const g=CV_GIVES.find(x=>progDateToISO(progMondayOf(progIsoToDate(x)))===m);
+  return g || k;
+}
+function cvMigraDilluns(){
+  try{
+    const vella=(STATE.programacio||{}).carpeta||{};
+    let canvia=false; const nova={};
+    Object.keys(vella).forEach(k=>{ const nk=cvClauNova(k); if(nk!==k) canvia=true;
+      nova[nk] = nova[nk] ? Object.assign({}, vella[k], nova[nk]) : vella[k]; });
+    if(canvia) api.progSetSubject('carpeta', nova);
+    const lliur=STATE.cvLliurat||{};
+    Object.keys(lliur).forEach(k=>{ const nk=cvClauNova(k); if(nk===k) return;
+      Object.keys(lliur[k]||{}).forEach(al=>{ if(lliur[k][al]){ api.cvLliurat(nk, al, true); api.cvLliurat(k, al, false); } });
+    });
+  }catch(e){}
+}
 function cvHasContent(give){ const c=progCell('carpeta', give); return progCellHasContent(c) || !!(c.title && c.title.trim()); }
 function cvUpcoming(){
   const now=new Date(); now.setHours(0,0,0,0);
@@ -3032,7 +3108,7 @@ function cvUpcoming(){
     const gd=progIsoToDate(g); gd.setHours(0,0,0,0); const gdiff=Math.round((gd-now)/86400000);
     const giveThisWeek = gd>=monday && gd<=sunday;
     if(gdiff===0){ items.push({type:'donar', iso:g, give:g, days:0}); }
-    else if(giveThisWeek && gdiff>0 && !cvHasContent(g)){ items.push({type:'programar', iso:g, give:g, days:gdiff}); }
+    else if(gdiff>0 && gdiff<=7 && !cvHasContent(g)){ items.push({type:'programar', iso:g, give:g, days:gdiff}); }
     const c=cvCollectOf(g); const cd=progIsoToDate(c); cd.setHours(0,0,0,0); const cdiff=Math.round((cd-now)/86400000);
     if(cdiff===0){ items.push({type:'recollir', iso:c, give:g, days:0}); }
   });
@@ -5988,7 +6064,10 @@ function openAndFlash(itemId){
 (async function boot(){
   buildLogin();
   try{ const rp=new URLSearchParams(location.search).get('repte'); if(rp) PENDING_REPTE=rp; }catch(e){}
-  try{ PENDING=_loadPending(); PENDING.forEach(p=>{ p.tries=0; }); }catch(e){}
+  /* BUG GREU: si l'app es tancava amb un canvi a mig enviar, quedava desat com a "en vol"
+     i no s'enviava MAI més; a sobre, es tornava a aplicar a la pantalla a cada sincronització.
+     Aquell dispositiu veia coses que els altres no veien. Ara tot torna a ser enviable. */
+  try{ PENDING=_loadPending(); PENDING.forEach(p=>{ p.tries=0; p.sending=false; }); _savePending(); }catch(e){}
   try{ updateSyncBadge(); }catch(e){}
   let saved=null; try{ saved=localStorage.getItem('coord_me'); }catch(e){}
   const auto = saved && USERS.some(u=>u.id===saved);
@@ -5999,9 +6078,10 @@ function openAndFlash(itemId){
   }
   await api.init();           // baixa les dades fresques del núvol
   BOOTING=false;
-  try{ reptesLoad(); }catch(e){}   // sembra/actualitza les caixes DESPRÉS de tenir l'estat real
+  try{ reptesLoad(); }catch(e){}
+  try{ cvMigraDilluns(); }catch(e){}   // carpetes desades amb data de dimecres → dilluns   // sembra/actualitza les caixes DESPRÉS de tenir l'estat real
   startCloudSync();
-  try{ flushPending(); }catch(e){}
+  try{ programaEnviament(0); }catch(e){}
   if(auto){ refreshHome(); }  // repinta l'inici amb les dades ja actualitzades
   try{ reptApplyPending(); }catch(e){}   // NFC: obre la caixa un cop hi ha dades
 })();
