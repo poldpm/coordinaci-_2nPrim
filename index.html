@@ -1267,6 +1267,21 @@ const CONFIG = {
   SECRET: "2nPrim!vedruna",
 };
 const DEMO_MODE = !CONFIG.WEB_APP_URL;
+/* Firebase (Firestore): la configuració web és PÚBLICA per disseny (la protegeixen les
+   regles de Firestore, no aquestes claus). En local es treballa a la col·lecció de proves. */
+const FIREBASE = {
+  sdk: 'https://www.gstatic.com/firebasejs/12.19.0/',
+  col: /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'coord_proves' : 'coord',
+  config: {
+    apiKey: "AIzaSyDghSmpBbGTfDpYUMlzeOzkUBCyvzqvQzU",
+    authDomain: "coordinapp-26-27.firebaseapp.com",
+    projectId: "coordinapp-26-27",
+    storageBucket: "coordinapp-26-27.firebasestorage.app",
+    messagingSenderId: "716229880042",
+    appId: "1:716229880042:web:57e7affbb55f0e015dcf93"
+  },
+};
+const FB_PROVES = FIREBASE.col !== 'coord';
 
 /* ---------- LOGO (injectat) ---------- */
 const LOGO = "img/logo.webp";
@@ -1405,9 +1420,39 @@ const api = {
       if(!cached) safeSave();
       return STATE;
     }
-    // ---------- MODE NÚVOL (Google Sheets) ----------
+    // ---------- FIREBASE (si la migració ja està feta) ----------
+    let jaFirebase=false; try{ jaFirebase = localStorage.getItem('coord_transport')==='firebase'; }catch(e){}
+    let fb=null, fbError=null;
+    try{ fb = await ambTemps(fbLlegeix(), jaFirebase?20000:8000, 'Firebase no respon'); }catch(e){ fbError=e; }
+    if((fb && fb.meta && fb.meta.migrat) || jaFirebase || FB_PROVES){
+      TRANSPORT='firebase';
+      try{ localStorage.setItem('coord_transport','firebase'); }catch(e){}
+      if(fb && fb.meta && fb.meta.migrat){
+        STATE = fb.state; normalizeState();
+        try{ _lastSig = JSON.stringify(fb.state); }catch(e){}
+        try{
+          if((!STATE.subthemes || !STATE.subthemes.length) && !STATE.sembrat){
+            STATE.subthemes = buildDefaultSubthemes(); await enviaDirecte('setSubthemes', STATE.subthemes); }
+          if(!STATE.avaluacio || !Object.keys(STATE.avaluacio).length){
+            STATE.avaluacio = buildDefaultAvaluacio(); await enviaDirecte('setAvaluacio', STATE.avaluacio); }
+        }catch(e){}
+        reaplicaPendents(); safeSave();
+        return STATE;
+      }
+      /* Firebase no respon (o l'espai de proves és buit): mai tornem a Apps Script, que ja
+         no és la font de veritat. Es treballa amb la còpia local i la cua espera. */
+      const cached = safeLoad();
+      if(cached){ STATE=cached; normalizeState(); reaplicaPendents();
+        toast(navigator.onLine ? 'El servidor no ha respost: mostrant l’última còpia' : 'Sense connexió: mostrant l’última còpia');
+        return STATE; }
+      STATE={entries:[],tasks:[],subthemes:[],avaluacio:{}}; normalizeState();
+      toast(FB_PROVES && fb ? 'Espai de proves buit' : 'No s’ha pogut connectar: torna-ho a provar d’aquí una estona');
+      return STATE;
+    }
+    // ---------- MODE NÚVOL (Apps Script, abans de la migració) ----------
     try{
       const state = prenRev(await request('getState'));
+      if(state && state.migrat){ passaAFirebase(); }
       STATE = state || {entries:[],tasks:[],subthemes:[],avaluacio:{}};
       normalizeState();
       // primera arrencada: si el full és buit, hi sembra els subtemes per defecte
@@ -1601,7 +1646,7 @@ const api = {
     // La llista de caixes és regenerable: NO entra a la cua de reintents
     const R=reptesState(); R.caixes=caixes; R.v=v; safeSave();
     if(DEMO_MODE) return;
-    await request('reptSetCaixes', {caixes, v});
+    await enviaDirecte('reptSetCaixes', {caixes, v});
   },
   async reptCaixaUpsert(c){ await persist('reptCaixaUpsert', {caixa:c}); },
   async reptCaixaSet(id, patch){ await persist('reptCaixaSet', {id, patch}); },
@@ -1648,6 +1693,7 @@ function mostraDiagnostic(){
   const ue=window._ultimError;
   if(ue) linies.push('','Últim error ('+ue.quan+'):','“'+ue.missatge+'”','a l’acció: '+ue.accio);
   linies.push('', 'Connexió del navegador: '+(navigator.onLine?'sí':'NO'));
+  linies.push('Servidor: '+(TRANSPORT==='firebase' ? 'Firebase ('+FIREBASE.col+')' : 'Apps Script'));
   askConfirm(linies.join(' · '), ()=>{}, {title:'Què està fallant', confirmLabel:'D’acord'});
 }
 function updateSyncBadge(){
@@ -1660,7 +1706,7 @@ function updateSyncBadge(){
       PENDING.forEach(p=>{ p.tries=0; });   // ho demanes tu: torna-ho a provar TOT, tamb\u00e9 l'apartat
       const ok=await flushPending(); updateSyncBadge(); b.disabled=false;
       if(PENDING.length) mostraDiagnostic(); else toast('Tot desat \u2713');
-      if(ok && !PENDING.length){ try{ const s=prenRev(await request('getState')); if(s){ STATE=s; normalizeState(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} repaintAfterSync(); } }catch(e){} }
+      if(ok && !PENDING.length){ try{ const s=await llegeixEstatNuvol(); if(s){ STATE=s; normalizeState(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} repaintAfterSync(); } }catch(e){} }
     };
     document.body.appendChild(b);
   }
@@ -1743,7 +1789,8 @@ async function _enviaCuaReal(){
   try{
     if(!_senseBatch){
       let r;
-      try{ r = await request('batch', {ops: lot.map(it=>({action:it.action, payload:it.payload}))}); }
+      const ops = lot.map(it=>({action:it.action, payload:it.payload}));
+      try{ r = TRANSPORT==='firebase' ? await fbEnviaLot(ops) : await request('batch', {ops}); }
       catch(e){
         /* El servidor antic respon «Acció desconeguda: batch» marcat com a REINTENTABLE (el seu
            doPost ho embolica tot així). Si només miréssim les rebutjades, reintentaríem el lot
@@ -1906,6 +1953,7 @@ async function request(action, payload){
       const e=new Error('El servidor no ha respost bé'); e.retryable=true; throw e;
     }
     if(data && data.error){
+      if(/MIGRAT_FIREBASE/.test(String(data.error))) passaAFirebase();
       const e=new Error(data.error);
       if(data.retry) e.retryable=true; else e.fatal=true;
       throw e;
@@ -1962,13 +2010,14 @@ async function refrescaEstat(){
   if(DEMO_MODE) return true;
   if(_inflight) return false;
   const totEnviat = PENDING.length ? await flushPending() : true;
-  try{ const s=prenRev(await request('getState'));
+  try{ const s=await llegeixEstatNuvol();
     if(s){ STATE=s; normalizeState(); reaplicaPendents(); safeSave(); try{ _lastSig=JSON.stringify(s); }catch(e){} }
     return totEnviat;                            // false = la llista pot no tenir els canvis més nous
   }catch(e){ return false; }
 }
 function startCloudSync(){
   if(DEMO_MODE) return;
+  if(TRANSPORT==='firebase') return startFirebaseSync();
   let _llegint = false;
   const pull=async()=>{
     if(document.hidden || _llegint) return false;
@@ -1986,6 +2035,7 @@ function startCloudSync(){
       }catch(e){}
       const s = await request('getState');
       if(!s) return false;
+      if(s.migrat){ passaAFirebase(); return false; }
       /* Si mentre llegíem ha arribat un lot nostre, aquesta foto pot ser d'abans: no la
          apliquem (faria desaparèixer el canvi un moment) i tornem a llegir de seguida. */
       if(gen !== _genEnviament){ _revVista=''; setTimeout(()=>{ pull(); }, 1200); return false; }
@@ -2023,6 +2073,421 @@ function startCloudSync(){
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) desperta(); });
   window.addEventListener('online', ()=>{ _esperaRetry=0; programaEnviament(0); desperta(); });
 }
+
+/* ============================================================
+   FIREBASE (Firestore) — dades en temps real
+   Des de la migració, les dades viuen a Firestore i no a Apps Script: Apps Script tenia
+   latències de 1 a 30 s (mesurat) que no depenien del nostre codi.
+   - Cada clau de l'estat va a un document de la col·lecció (FB_DOCS), com a text JSON
+     (`j`) amb un comptador (`v`). Així cap document s'acosta al límit d'1 MB.
+   - ESCRIURE: la cua PENDING i els lots es queden igual; cada lot és UNA transacció que
+     llegeix els documents, aplica les accions amb fbApply (còpia exacta del backend,
+     generada per scripts/gen_fb_apply.js) i desa només els documents que han canviat.
+     Si dos dispositius escriuen alhora, Firestore repeteix la transacció: no es trepitgen.
+   - LLEGIR: onSnapshot. Els canvis dels altres arriben sols, en menys d'un segon.
+   - Una foto amb un `v` inferior al que acabem de desar és d'abans: s'ignora.
+   - Apps Script es queda per a: llista d'alumnes (document `alumnes`), comandes,
+     recordatoris i còpia de seguretat al full.
+   - En local (localhost) s'usa SEMPRE la col·lecció de proves `coord_proves`.
+   ============================================================ */
+let TRANSPORT = 'appsscript';           // 'firebase' quan la migració està feta
+const FB_DOCS = ['entries','tasks','subthemes','avaluacio','programacio','correus','comments','reptes','altres'];
+const FB_CLAU_DOC = { entries:'entries', tasks:'tasks', subthemes:'subthemes', sembrat:'subthemes', avaluacio:'avaluacio',
+  programacio:'programacio', correus:'correus', comments:'comments', reptes:'reptes' };
+const FB_NO_DESAR = { students:1, flags:1, rev:1, migrat:1 };
+const FB = { llest:null, fs:null, db:null, auth:null, minV:{}, unsub:null, ultimaFoto:0 };
+function fbErr(msg, retryable){ const e=new Error(msg); if(retryable) e.retryable=true; else e.fatal=true; return e; }
+function ambTemps(prom, ms, msg){
+  let t; return Promise.race([prom, new Promise((_,rej)=>{ t=setTimeout(()=>rej(fbErr(msg||'Temps esgotat', true)), ms); })])
+    .finally(()=>clearTimeout(t));
+}
+function fbCarrega(){
+  if(FB.llest) return FB.llest;
+  FB.llest = (async()=>{
+    const B = FIREBASE.sdk;
+    const [ap, au, fs] = await Promise.all([import(B+'firebase-app.js'), import(B+'firebase-auth.js'), import(B+'firebase-firestore.js')]);
+    const app = ap.getApps().length ? ap.getApp() : ap.initializeApp(FIREBASE.config);
+    FB.auth = au.getAuth(app);
+    await FB.auth.authStateReady();
+    if(!FB.auth.currentUser) await au.signInAnonymously(FB.auth);
+    FB.fs = fs; FB.db = fs.getFirestore(app);
+    return FB;
+  })();
+  FB.llest.catch(()=>{ FB.llest=null; });   // si falla (sense xarxa), es torna a provar la propera vegada
+  return FB.llest;
+}
+function fbDocDe(k){ return FB_CLAU_DOC[k] || 'altres'; }
+/* estat → {document: objecte} */
+function fbTrosseja(state){
+  const out={}; FB_DOCS.forEach(d=>{ out[d]={}; });
+  Object.keys(state||{}).forEach(k=>{ if(FB_NO_DESAR[k] || state[k]===undefined) return; out[fbDocDe(k)][k]=state[k]; });
+  return out;
+}
+/* {document: {j,v}} → estat (amb els alumnes, si n'hi ha) */
+function fbMunta(m){
+  const st={};
+  FB_DOCS.forEach(d=>{ const x=m[d]; if(x && x.j) Object.assign(st, JSON.parse(x.j)); });
+  const al=m.alumnes;
+  if(al && al.j){ const a=JSON.parse(al.j); st.students=a.students||{}; st.flags=a.flags||{}; }
+  else { st.students=(STATE&&STATE.students)||{}; st.flags=(STATE&&STATE.flags)||{}; }
+  return st;
+}
+/* Llegeix tot del servidor. meta.migrat diu si Firestore ja és la font de veritat. */
+async function fbLlegeix(){
+  const F = await fbCarrega(); const fs=F.fs;
+  const snap = await fs.getDocsFromServer(fs.collection(F.db, FIREBASE.col));
+  const m={}; snap.forEach(d=>{ m[d.id]=d.data(); });
+  return { m, meta:m.meta||null, state:fbMunta(m) };
+}
+/* Un lot d'accions = UNA transacció. Retorna {ok, results:[{ok}|{error}]} com el backend. */
+async function fbEnviaLot(ops){
+  const F = await ambTemps(fbCarrega(), 20000, 'No s’ha pogut connectar amb Firebase');
+  const fs=F.fs; let results=[], nousV={};
+  await ambTemps(fs.runTransaction(F.db, async tx=>{
+    const refs = FB_DOCS.map(d=>fs.doc(F.db, FIREBASE.col, d));
+    const snaps = await Promise.all(refs.map(r=>tx.get(r)));
+    const vell={}, vs={}; let state={};
+    snaps.forEach((s,i)=>{ const d=FB_DOCS[i]; const x=s.exists()?s.data():null;
+      vell[d]=(x&&x.j)||null; vs[d]=(x&&x.v)||0; if(vell[d]) Object.assign(state, JSON.parse(vell[d])); });
+    results=[]; nousV={};                       // la transacció es pot repetir: comença de zero
+    ops.forEach(op=>{
+      try{ state = fbApply(state, op.action, op.payload); results.push({ok:true}); }
+      catch(e){ results.push({error:String((e&&e.message)||e)}); }
+    });
+    const trossos = fbTrosseja(state);
+    FB_DOCS.forEach((d,i)=>{
+      const j = JSON.stringify(trossos[d]);
+      if(j===vell[d] || (!vell[d] && j==='{}')) return;          // no ha canviat: no s'escriu
+      if(j.length > 950000) throw fbErr('L’apartat «'+d+'» és massa gran per desar-lo', false);
+      nousV[d] = vs[d]+1;
+      tx.set(refs[i], { j, v:nousV[d], t:fs.serverTimestamp(), by:ME||'' });
+    });
+  }), 30000, 'Firebase no ha respost a temps');
+  Object.keys(nousV).forEach(d=>{ FB.minV[d]=Math.max(FB.minV[d]||0, nousV[d]); });
+  return { ok:true, results };
+}
+/* Aplica una foto del servidor a la pantalla (mateixes regles que el pull d'Apps Script) */
+function aplicaEstatRemot(s){
+  const sig = JSON.stringify(s);
+  if(sig === _lastSig) return false;
+  _lastSig = sig; STATE = s; normalizeState();
+  reaplicaPendents();                     // el que encara no ha arribat no pot desaparèixer de la pantalla
+  safeSave(); repaintAfterSync();
+  return true;
+}
+function fbEscolta(){
+  if(FB.unsub) return;
+  fbCarrega().then(F=>{
+    const fs=F.fs;
+    FB.unsub = fs.onSnapshot(fs.collection(F.db, FIREBASE.col), snap=>{
+      const m={}; snap.forEach(d=>{ m[d.id]=d.data(); });
+      // foto d'abans del nostre últim lot desat: n'arribarà una de més nova
+      if(FB_DOCS.some(d=>((m[d]&&m[d].v)||0) < (FB.minV[d]||0))) return;
+      if(!m.meta || !m.meta.migrat) return;
+      FB.ultimaFoto = Date.now();
+      try{ aplicaEstatRemot(fbMunta(m)); }catch(e){}
+    }, err=>{
+      window._ultimError={ accio:'escoltar canvis', missatge:(err&&(err.code||err.message))||'error', quan:new Date().toLocaleTimeString('ca-ES') };
+      FB.unsub=null; setTimeout(fbEscolta, 5000);           // el listener mor amb l'error: el tornem a obrir
+    });
+  }).catch(()=>{ setTimeout(fbEscolta, 10000); });
+}
+function startFirebaseSync(){
+  fbEscolta();
+  const desperta=()=>{ _esperaRetry=0; programaEnviament(0); fbEscolta(); };
+  window._syncDesperta=()=>{};
+  window.addEventListener('focus', desperta);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) desperta(); });
+  window.addEventListener('online', desperta);
+}
+/* Llegeix l'estat actual del núvol, sigui quin sigui el servidor */
+async function llegeixEstatNuvol(){
+  if(TRANSPORT==='firebase'){ const r=await ambTemps(fbLlegeix(), 20000); return r.state; }
+  return prenRev(await request('getState'));
+}
+/* Envia una acció sola sense passar per la cua (sembres regenerables) */
+async function enviaDirecte(action, payload){
+  if(TRANSPORT==='firebase'){ const r=await fbEnviaLot([{action, payload}]); const x=r.results[0]; if(x&&x.error) throw fbErr(x.error,false); return r; }
+  return request(action, payload);
+}
+/* Un dispositiu amb el codi nou però encara en mode Apps Script: quan el servidor diu que
+   ja s'ha migrat, passa a Firebase recarregant (la cua és a localStorage: no es perd res). */
+function passaAFirebase(){
+  try{ localStorage.setItem('coord_transport','firebase'); }catch(e){}
+  if(window._passantAFirebase) return; window._passantAFirebase=true;
+  setTimeout(()=>{ location.reload(); }, 300);
+}
+/* === PORT DEL BACKEND: inici (generat per scripts/gen_fb_apply.js; no editar a mà) === */
+function fbArribaTard(vell, nou){
+  if(!vell || !nou) return false;
+  var tv = Date.parse(vell.updatedAt || vell.date || 0) || 0;
+  var tn = Date.parse(nou.updatedAt  || nou.date  || 0) || 0;
+  return !!(tv && tn && tn < tv);
+}
+function fbConservaLlegits(vell, nou){
+  if(!vell || !nou) return nou;
+  var edicioDeliberada = nou.editedBy && (Date.parse(nou.updatedAt||0)||0) > (Date.parse(vell.updatedAt||0)||0);
+  if(edicioDeliberada) return nou;
+  var union = {};
+  (vell.readBy||[]).concat(nou.readBy||[]).forEach(function(t){ if(t) union[t]=true; });
+  nou.readBy = Object.keys(union);
+  return nou;
+}
+function fbApply(state, action, payload){
+  state.entries   = state.entries   || [];
+  state.tasks     = state.tasks     || [];
+  state.subthemes = state.subthemes || [];
+  state.avaluacio = state.avaluacio || {};
+  state.comandaStatus = state.comandaStatus || {};
+  state.programacio = state.programacio || {};
+  state.correus = state.correus || [];
+  state.emailReminders = state.emailReminders || {};
+  state.comments = state.comments || {};
+  state.cvLliurat = state.cvLliurat || {};
+  state.reptes = state.reptes || {caixes:[], registres:[], v:0};
+  state.reptes.caixes = state.reptes.caixes || [];
+  state.reptes.registres = state.reptes.registres || [];
+  state.esborrats = state.esborrats || {};
+  // purga les lapides de mes de 30 dies
+  var _ara = Date.now();
+  for(var _k in state.esborrats){ if(_ara - state.esborrats[_k] > 2592000000) delete state.esborrats[_k]; }
+  var _mort = function(id){ return !!state.esborrats[id]; };
+  switch(action){
+    case 'getState': break;
+    case 'addEntry':      { if(_mort(payload.id)) break;
+                            const i=state.entries.findIndex(x=>x.id===payload.id); if(i>-1) state.entries[i]=payload; else state.entries.unshift(payload); break; }
+    case 'updateEntry':   { if(_mort(payload.id)) break;
+                            const i=state.entries.findIndex(x=>x.id===payload.id);
+                            if(i>-1){
+                              if(fbArribaTard(state.entries[i], payload)) break;   // arriba tard: no trepitgis
+                              state.entries[i]=fbConservaLlegits(state.entries[i], payload);
+                            } else state.entries.unshift(payload);
+                            break; }
+    case 'deleteEntry':   state.entries = state.entries.filter(x=>x.id!==payload.id); if(state.comments) delete state.comments[payload.id];
+                          // les "coses a fer" que en penjaven no poden quedar orfes al taulell
+                          state.tasks = state.tasks.filter(function(t){ return !(t.origin && t.origin.entryId===payload.id); });
+                          state.esborrats[payload.id]=_ara; break;
+    case 'addTask':       { if(_mort(payload.id)) break;
+                            const i=state.tasks.findIndex(x=>x.id===payload.id); if(i>-1) state.tasks[i]=payload; else state.tasks.unshift(payload); break; }
+    case 'updateTask':    { if(_mort(payload.id)) break;
+                            const i=state.tasks.findIndex(x=>x.id===payload.id);
+                            if(i>-1){
+                              if(fbArribaTard(state.tasks[i], payload)) break;
+                              state.tasks[i]=fbConservaLlegits(state.tasks[i], payload);
+                            } else state.tasks.unshift(payload);
+                            break; }
+    case 'deleteTask':    state.tasks = state.tasks.filter(x=>x.id!==payload.id); state.esborrats[payload.id]=_ara; break;
+    /* Marcar «llegida»: unió idempotent, NO substitueix l'element sencer.
+       Així dos tutors poden marcar alhora i marcar-ho no reverteix cap edició. */
+    case 'entryRead': { const e=state.entries.find(function(x){ return x.id===payload.id; });
+      if(e){ e.readBy = e.readBy || []; if(e.readBy.indexOf(payload.tutor)<0) e.readBy.push(payload.tutor); } break; }
+    case 'taskRead':  { const t=state.tasks.find(function(x){ return x.id===payload.id; });
+      if(t){ t.readBy = t.readBy || []; if(t.readBy.indexOf(payload.tutor)<0) t.readBy.push(payload.tutor); } break; }
+    case 'addSubtheme':   { const i=state.subthemes.findIndex(x=>x.id===payload.id); if(i<0) state.subthemes.push(payload); break; }
+    case 'deleteSubtheme':state.subthemes = state.subthemes.filter(x=>x.id!==payload.id);
+                          state.sembrat = true;   // l'usuari ja els gestiona: no els tornis a sembrar
+                          // esborra també els comentaris de les entrades que hi penjaven
+                          state.entries.forEach(function(e){ if(e.subtheme===payload.id && state.comments) delete state.comments[e.id]; });
+                          state.tasks = state.tasks.filter(function(t){ return !(t.origin && t.origin.subtheme===payload.id); });
+                          state.entries   = state.entries.filter(e=>e.subtheme!==payload.id); break;
+    case 'setSubthemes':  state.subthemes = payload || []; state.sembrat = true; break;
+    case 'avUpsertLevel': {
+      const tri = payload.tri, subj = payload.subj, level = payload.level;
+      state.avaluacio[tri] = state.avaluacio[tri] || {};
+      const arr = state.avaluacio[tri][subj] = state.avaluacio[tri][subj] || [];
+      const i = arr.findIndex(function(x){ return x.id === level.id; });
+      if(i > -1) arr[i] = level; else arr.push(level);
+      break;
+    }
+    case 'avDeleteLevel': {
+      const tri = payload.tri, subj = payload.subj;
+      if(state.avaluacio[tri] && state.avaluacio[tri][subj])
+        state.avaluacio[tri][subj] = state.avaluacio[tri][subj].filter(function(x){ return x.id !== payload.id; });
+      break;
+    }
+    case 'setAvaluacio':  state.avaluacio = payload || {}; break;
+    case 'saveAvaluacio': state.avaluacio = payload || {}; break;
+    case 'attToggle': {
+      state.attendance = state.attendance || {absents:{}, done:{}};
+      state.attendance.absents = state.attendance.absents || {};
+      if(payload.absent) state.attendance.absents[payload.name] = true; else delete state.attendance.absents[payload.name];
+      break;
+    }
+    case 'attDone': {
+      state.attendance = state.attendance || {absents:{}, done:{}};
+      state.attendance.done = state.attendance.done || {};
+      if(payload.done) state.attendance.done[payload.cls] = true; else delete state.attendance.done[payload.cls];
+      break;
+    }
+    case 'attReset': state.attendance = {absents:{}, done:{}}; break;
+    case 'picnicToggle': {
+      state.picnics = state.picnics || {};
+      state.picnics[payload.sub] = state.picnics[payload.sub] || {};
+      if(payload.on) state.picnics[payload.sub][payload.name] = true; else delete state.picnics[payload.sub][payload.name];
+      break;
+    }
+    case 'comandaStatus': {
+      state.comandaStatus = state.comandaStatus || {};
+      state.comandaStatus[payload.id] = state.comandaStatus[payload.id] || {};
+      if(payload.on) state.comandaStatus[payload.id][payload.target] = true;
+      else delete state.comandaStatus[payload.id][payload.target];
+      break;
+    }
+    case 'progSetCell': {
+      var ps = payload.subject, pw = String(payload.week);
+      state.programacio[ps] = state.programacio[ps] || {};
+      var pcell = state.programacio[ps][pw] = state.programacio[ps][pw] || {};
+      if(payload.data){
+        if(payload.data.items !== undefined) pcell.items = payload.data.items;
+        if(payload.data.pla   !== undefined) pcell.pla   = payload.data.pla;
+        if(payload.data.notes !== undefined) pcell.notes = payload.data.notes;
+        if(payload.data.link  !== undefined) pcell.link  = payload.data.link;
+        if(payload.data.title !== undefined) pcell.title = payload.data.title;
+      }
+      break;
+    }
+    case 'progSetDone': {
+      var qs = payload.subject, qw = String(payload.week);
+      state.programacio[qs] = state.programacio[qs] || {};
+      var qcell = state.programacio[qs][qw] = state.programacio[qs][qw] || {};
+      qcell.done = qcell.done || {};
+      if(payload.on) qcell.done[payload.tutor] = true;
+      else delete qcell.done[payload.tutor];
+      break;
+    }
+    case 'progSetSubject': {
+      state.programacio[payload.subject] = payload.map || {};
+      break;
+    }
+    case 'correuUpsert': {
+      var cc = payload.correu; state.correus = state.correus || [];
+      var ci = -1; for(var k=0;k<state.correus.length;k++){ if(state.correus[k].id===cc.id){ ci=k; break; } }
+      // Si el client NO envia `sent`, es queda el del servidor. Abans, un {} (que en
+      // JavaScript es cert) el substituia i esborrava els "Enviat" dels altres tutors.
+      if(ci>=0){ if(cc.sent===undefined || cc.sent===null) cc.sent = state.correus[ci].sent || {}; state.correus[ci]=cc; }
+      else { cc.sent = cc.sent || {}; state.correus.push(cc); }
+      break;
+    }
+    case 'correuDelete': {
+      state.correus = (state.correus||[]).filter(function(x){ return x.id!==payload.id; });
+      break;
+    }
+    case 'correuSent': {
+      state.correus = state.correus || [];
+      for(var ck=0;ck<state.correus.length;ck++){ if(state.correus[ck].id===payload.id){
+        state.correus[ck].sent = state.correus[ck].sent || {};
+        if(payload.on) state.correus[ck].sent[payload.tutor]=true; else delete state.correus[ck].sent[payload.tutor];
+        break; } }
+      break;
+    }
+    case 'setEmailReminder': {
+      state.emailReminders = state.emailReminders || {};
+      if(payload.on) state.emailReminders[payload.tutor]=true; else delete state.emailReminders[payload.tutor];
+      break;
+    }
+    case 'commentAdd': {
+      state.comments = state.comments || {};
+      var arr = state.comments[payload.entryId] = state.comments[payload.entryId] || [];
+      var exists=false; for(var i=0;i<arr.length;i++){ if(arr[i].id===payload.comment.id){ arr[i]=payload.comment; exists=true; break; } }
+      if(!exists) arr.push(payload.comment);
+      break;
+    }
+    case 'commentReply': {
+      state.comments = state.comments || {};
+      var ra = state.comments[payload.entryId] || [];
+      for(var j=0;j<ra.length;j++){ if(ra[j].id===payload.commentId){
+        ra[j].replies = ra[j].replies || [];
+        var rex=false; for(var k=0;k<ra[j].replies.length;k++){ if(ra[j].replies[k].id===payload.reply.id){ rex=true; break; } }
+        if(!rex) ra[j].replies.push(payload.reply);
+        break; } }
+      break;
+    }
+    case 'commentResolve': {
+      state.comments = state.comments || {};
+      var sa = state.comments[payload.entryId] || [];
+      for(var m=0;m<sa.length;m++){ if(sa[m].id===payload.commentId){
+        sa[m].resolved = !!payload.resolved;
+        sa[m].resolvedBy = payload.resolved ? (payload.by||'') : null;
+        break; } }
+      break;
+    }
+    case 'commentDelete': {
+      if(state.comments && state.comments[payload.entryId])
+        state.comments[payload.entryId] = state.comments[payload.entryId].filter(function(x){ return x.id!==payload.commentId; });
+      break;
+    }
+    case 'commentReplyDelete': {
+      var da = (state.comments && state.comments[payload.entryId]) || [];
+      for(var p=0;p<da.length;p++){ if(da[p].id===payload.commentId && da[p].replies){
+        da[p].replies = da[p].replies.filter(function(x){ return x.id!==payload.replyId; });
+        break; } }
+      break;
+    }
+    case 'commentSeen': {
+      var xa = (state.comments && state.comments[payload.entryId]) || [];
+      for(var xi=0;xi<xa.length;xi++){
+        xa[xi].seenBy = xa[xi].seenBy || [];
+        if(xa[xi].seenBy.indexOf(payload.tutor)<0) xa[xi].seenBy.push(payload.tutor);
+        var xreps = xa[xi].replies || [];
+        for(var xj=0;xj<xreps.length;xj++){
+          xreps[xj].seenBy = xreps[xj].seenBy || [];
+          if(xreps[xj].seenBy.indexOf(payload.tutor)<0) xreps[xj].seenBy.push(payload.tutor);
+        }
+      }
+      break;
+    }
+    case 'cvLliurat': {   // qui ha entregat la carpeta viatgera d'un cicle
+      state.cvLliurat = state.cvLliurat || {};
+      var cvm = state.cvLliurat[payload.key] = state.cvLliurat[payload.key] || {};
+      if(payload.on) cvm[payload.alumne] = true; else delete cvm[payload.alumne];
+      break;
+    }
+    /* ---- El racó dels reptes ---- */
+    case 'reptSetCaixes': {
+      state.reptes.caixes = payload.caixes || [];
+      state.reptes.v = payload.v || 0;
+      break;
+    }
+    case 'reptCaixaUpsert': {
+      var rc = payload.caixa; var ra = state.reptes.caixes; var ri = -1;
+      for(var i0=0;i0<ra.length;i0++){ if(ra[i0].id===rc.id){ ri=i0; break; } }
+      if(ri>=0) ra[ri]=rc; else ra.push(rc);
+      break;
+    }
+    case 'reptCaixaSet': {   // fusiona camps d'una caixa (estoc, low, eval…)
+      var rs=state.reptes.caixes;
+      for(var i1=0;i1<rs.length;i1++){ if(rs[i1].id===payload.id){
+        var p1=payload.patch||{};
+        // estocSuma = increment. Si s'enviés el total, dos tutors sumant còpies
+        // alhora es trepitjarien i el segon esborraria el que havia sumat el primer.
+        if(p1.estocSuma !== undefined){ rs[i1].estoc = (rs[i1].estoc||0) + Number(p1.estocSuma||0); }
+        for(var k1 in p1){ if(Object.prototype.hasOwnProperty.call(p1,k1) && k1!=='estocSuma') rs[i1][k1]=p1[k1]; }
+        break; } }
+      break;
+    }
+    case 'reptCaixaDelete': {
+      state.reptes.caixes = state.reptes.caixes.filter(function(x){ return x.id!==payload.id; });
+      state.reptes.registres = state.reptes.registres.filter(function(x){ return x.caixa!==payload.id; });
+      break;
+    }
+    case 'reptRegUpsert': {   // idempotent per id (i per caixa+alumne)
+      var rg = payload.reg; var rr = state.reptes.registres; var rj = -1;
+      for(var i2=0;i2<rr.length;i2++){
+        if(rr[i2].id===rg.id ||
+          (rr[i2].caixa===rg.caixa && String(rr[i2].alumne||'').toLowerCase()===String(rg.alumne||'').toLowerCase())){ rj=i2; break; }
+      }
+      if(rj>=0) rr[rj]=rg; else rr.push(rg);
+      break;
+    }
+    case 'reptRegDelete': {
+      state.reptes.registres = state.reptes.registres.filter(function(x){ return x.id!==payload.id; });
+      break;
+    }
+    default: throw new Error('Acció desconeguda: ' + action);
+  }
+  return state;
+}
+/* === PORT DEL BACKEND: fi === */
 
 /* ---------- DADES D'EXEMPLE (rescatades del caos del doc) ---------- */
 function buildDefaultSubthemes(){

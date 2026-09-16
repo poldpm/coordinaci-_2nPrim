@@ -41,6 +41,32 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
   **Recuperar des del full:** executar `copiaDeSeguretatAra` NO; per tornar al full, esborrar la
   propietat `db_n` (Configuració del projecte → Propietats de l'script) i la propera lectura
   agafarà el full. Concurrència protegida amb **`LockService`** (només per escriure).
+- **FIREBASE (Firestore) — migració preparada el 16-09-2026.** Projecte `coordinapp-26-27`
+  (mateix compte de Google). Motiu: Apps Script tenia latències de 1 a 30 s que no depenien del
+  codi (mesurat). Amb Firestore: desar ~0,8-1,3 s i l'altre dispositiu ho veu en ~1 s (mesurat).
+  - **Col·lecció `coord`** (producció) · **`coord_proves`** (proves; en `localhost`/`127.0.0.1` l'app
+    usa SEMPRE aquesta). Documents: `entries, tasks, subthemes(+sembrat), avaluacio, programacio,
+    correus, comments, reptes, altres` (la resta de claus) → cadascun `{j: JSON, v: comptador, t, by}`;
+    `alumnes` `{j:{students,flags}}` (l'escriu Apps Script); `meta {migrat:true}`.
+  - **Mode:** `TRANSPORT` = `'firebase'` si existeix `meta.migrat` (o `localStorage.coord_transport`),
+    si no `'appsscript'`. Abans de migrar la web nova funciona exactament com abans.
+  - **Escriure:** la cua `PENDING` i els lots NO canvien; cada lot és UNA `runTransaction`
+    (`fbEnviaLot`) que llegeix els 9 documents, aplica `fbApply` i desa només els que canvien.
+    `fbApply` és una **còpia generada** d'`_apply`/`_arribaTard`/`_conservaLlegits` del backend:
+    **si toques `_apply` al .gs, executa `node scripts/gen_fb_apply.js`** (no editar el bloc a mà).
+  - **Llegir:** `onSnapshot` de la col·lecció (`fbEscolta`), sense sondeig. Una foto amb `v` menor
+    que el que acabem de desar (`FB.minV`) s'ignora.
+  - **Apps Script després de migrar** (propietat `FIREBASE_MIGRAT=1`): comandes igual; `getState`
+    llegeix de Firebase (`migrat:true`); qualsevol escriptura respon `MIGRAT_FIREBASE` reintentable
+    (l'app antiga la guarda a la cua; l'app nova recarrega i passa a Firebase). Entra a Firestore per
+    REST com a usuari anònim (token de renovació a la propietat `FB_REFRESH`).
+    Funcions a mà: `migraAFirebase()` (UN cop; s'atura si Firebase ja té dades i verifica la còpia
+    element a element), `crearTriggersFirebase()` (còpia al full `DB` cada 30 min, amb `DB_anterior`
+    del dia abans; alumnes cada hora), `copiaFirebaseAlFull()`, `alumnesAFirebase()`.
+    Recordatoris: `_estatActual()`.
+  - **Regles de Firestore:** lectura/escriptura a `coord/{doc}` (i `coord_proves/{doc}` mentre calgui)
+    amb `request.auth != null` (inici de sessió anònim). La config web de Firebase és pública per disseny.
+  - **Service worker:** la llibreria de Firebase (gstatic, versió fixa) va cau-primer.
 - **PWA:** `manifest.webmanifest` + icones a `img/`. Instal·lable al mòbil.
 
 Config al principi de `index.html` (objecte `CONFIG`):

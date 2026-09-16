@@ -6,7 +6,7 @@
      actualització en segon pla.
    - Les crides a Apps Script (POST, cross-origin) NO es toquen mai.
    Per forçar una actualització d'assets, puja la versió de CACHE. */
-const CACHE = 'coord-2n-v3';
+const CACHE = 'coord-2n-v4';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './img/logo.webp', './img/icon-192.png', './img/icon-512.png',
@@ -31,6 +31,15 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;                                  // no toquis POST (API)
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
+  /* La llibreria de Firebase (gstatic, adreça amb la versió → no canvia mai): cau primer.
+     Així l'app obre i mostra la còpia local encara que no hi hagi connexió. */
+  if (url.origin === 'https://www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) {
+    e.respondWith(caches.match(req).then((m) => m || fetch(req).then((res) => {
+      if (res && res.ok) { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(req, cp)); }
+      return res;
+    })));
+    return;
+  }
   if (url.origin !== self.location.origin) return;                   // no toquis cross-origin (Apps Script)
 
   const isDoc = req.mode === 'navigate' || req.destination === 'document';

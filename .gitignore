@@ -12,3 +12,4 @@ Thumbs.db
 
 # informes de QA locals
 .qa/
+.claude/launch.json
