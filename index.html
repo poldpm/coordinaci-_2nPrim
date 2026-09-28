@@ -338,6 +338,32 @@ a{color:var(--teal)}
 .cv-cnt{background:var(--panel-2);color:var(--teal);font-weight:800;font-size:.76rem;padding:.12em .5em;border-radius:8px}
 .cv-lliurat{margin-top:10px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:14px;padding:12px}
 .att-chip.cv-chip.fet{background:#27AE60;border-color:#27AE60;color:#fff}
+/* --- Autoritzacions d'una sortida --- */
+.sec-actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.sec-actions .sec-action{margin-left:0}
+.aut-top{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:4px 0 14px}
+.aut-resum{display:flex;gap:8px;align-items:baseline;border:1.5px solid var(--line);background:var(--paper);border-radius:13px;padding:.5em .85em;font-size:.93rem}
+.aut-resum b{font-weight:800;color:var(--ink)}
+.aut-resum span{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.aut-resum.ple{border-color:#bfe6cf;background:#eafaf1}
+.aut-resum.ple span{color:#1c7a4d}
+.aut-cfg{margin-left:auto}
+.aut-config{border:1.5px dashed var(--line);border-radius:16px;padding:14px;margin-bottom:16px;background:var(--paper)}
+.aut-config-t{font-weight:800;margin-bottom:10px}
+.aut-config-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.aut-config-row input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:.6em .8em;font:inherit;background:var(--bg);color:var(--ink)}
+.aut-config-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.aut-taula{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px;background:var(--paper)}
+.aut-fila{display:flex;align-items:center;gap:10px;padding:.45em .7em;border-top:1px solid var(--line)}
+.aut-fila:first-child{border-top:0}
+.aut-fila.aut-cap{background:var(--bg);font-weight:800;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:.5em .7em}
+.aut-nom{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aut-cel{width:44px;text-align:center;flex:none}
+.aut-check{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;color:transparent;transition:.12s;cursor:pointer}
+.aut-check .icon{width:20px;height:20px;stroke-width:3}
+.aut-check:hover{border-color:var(--cyan)}
+.aut-check.on{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
+@media (max-width:420px){ .aut-check,.aut-cel{width:38px} .aut-check{height:38px} }
 .nov-cmt{background:#fff4e0;color:#8a5600;font-weight:800}
 /* Mida tàctil mínima: abans hi havia icones de 34x29 px, per sota del que es pot tocar bé */
 .rept-icona,.read-btn,.back-btn,.prog-segbtn,.att-tab,.edit-btn,.del{min-height:40px;min-width:40px}
@@ -1580,6 +1606,20 @@ const api = {
     STATE.programacio[subject] = map || {};
     await persist('progSetSubject', {subject, map:map||{}});
   },
+  /* --- Autoritzacions d'una sortida (caselles personalitzables) --- */
+  async autSetCamps(sub, camps){
+    STATE.autoritzacions = STATE.autoritzacions || {};
+    const a = STATE.autoritzacions[sub] = STATE.autoritzacions[sub] || {camps:[], marques:{}};
+    a.camps = camps || [];
+    await persist('autCamps', {sub, camps:a.camps});
+  },
+  async autSet(sub, alumne, camp, on){
+    STATE.autoritzacions = STATE.autoritzacions || {};
+    const a = STATE.autoritzacions[sub] = STATE.autoritzacions[sub] || {camps:[], marques:{}};
+    const m = a.marques[alumne] = a.marques[alumne] || {};
+    if(on) m[camp]=true; else { delete m[camp]; if(!Object.keys(m).length) delete a.marques[alumne]; }
+    await persist('autSet', {sub, alumne, camp, on:!!on});
+  },
   async cvLliurat(key, alumne, on){
     STATE.cvLliurat = STATE.cvLliurat || {};
     const m = STATE.cvLliurat[key] = STATE.cvLliurat[key] || {};
@@ -1889,6 +1929,7 @@ function normalizeState(){
   if(!STATE.emailReminders) STATE.emailReminders={};
   if(!STATE.comments) STATE.comments={};
   if(!STATE.cvLliurat) STATE.cvLliurat={};
+  if(!STATE.autoritzacions) STATE.autoritzacions={};
   if(!STATE.reptes) STATE.reptes={caixes:[],registres:[],v:0};
   STATE.reptes.caixes=STATE.reptes.caixes||[]; STATE.reptes.registres=STATE.reptes.registres||[];
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
@@ -2418,6 +2459,30 @@ function fbApply(state, action, payload){
       }
       break;
     }
+    /* ---- Autoritzacions d'una sortida ----
+       Cada sortida (subtema) té les SEVES caselles: autorització, dret de veu, dret d'imatge,
+       pagament… el que calgui. `camps` és la llista (es desa sencera: només l'edita qui
+       personalitza la sortida); `marques` és granular per alumne i casella, així els tres
+       tutors poden marcar alhora sense trepitjar-se. */
+    case 'autCamps': {
+      state.autoritzacions = state.autoritzacions || {};
+      var ac = state.autoritzacions[payload.sub] = state.autoritzacions[payload.sub] || {camps:[], marques:{}};
+      ac.camps = payload.camps || [];
+      ac.marques = ac.marques || {};
+      break;
+    }
+    case 'autSet': {
+      state.autoritzacions = state.autoritzacions || {};
+      var as = state.autoritzacions[payload.sub] = state.autoritzacions[payload.sub] || {camps:[], marques:{}};
+      as.marques = as.marques || {};
+      var am = as.marques[payload.alumne] = as.marques[payload.alumne] || {};
+      if(payload.on) am[payload.camp] = true;
+      else {
+        delete am[payload.camp];
+        if(!Object.keys(am).length) delete as.marques[payload.alumne];
+      }
+      break;
+    }
     case 'cvLliurat': {   // qui ha entregat la carpeta viatgera d'un cicle
       state.cvLliurat = state.cvLliurat || {};
       var cvm = state.cvLliurat[payload.key] = state.cvLliurat[payload.key] || {};
@@ -2895,7 +2960,7 @@ $('#meBtn').onclick=()=>openProfileMenu();
 
 /* ---------- HOME ---------- */
 function goHome(){
-  EDITING=null; SCHEDULING=null; PICNIC_SUB=null; PICNIC_RESULT=null;
+  EDITING=null; SCHEDULING=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false;
   $('#section').classList.add('hidden'); $('#section').innerHTML='';
   $('#home').classList.remove('hidden');
   renderDash();
@@ -3347,6 +3412,7 @@ function reptApplyPending(){
 let GRP_HETERO=false;
 let ATT_CLASS=null, ATT_RESULT=null, ATT_AVIS='';
 let PICNIC_SUB=null, PICNIC_RESULT=null;
+let AUT_SUB=null, AUT_CONFIG=false, AUT_CLASS=null;   // autoritzacions d'una sortida
 let COMANDA_NEW=false, COMANDA_EDIT=null;
 const TUTOR_CLASS={cristina:'2nA', mireia:'2nB', pol:'2nC'};
 function buildSecHero(S,sec,opts){
@@ -3362,7 +3428,13 @@ function buildSecHero(S,sec,opts){
   const row=el('div','row');
   const ico=el('div','t-ico'); ico.innerHTML=`<svg class="icon" viewBox="0 0 24 24">${ICONS[sec.ico]}</svg>`; row.appendChild(ico);
   const txt=el('div'); txt.innerHTML=`<h2>${esc(opts.title||sec.name)}</h2><p>${esc(opts.desc||sec.desc)}</p>`; row.appendChild(txt);
-  if(opts.action){ const b=el('button','sec-action'); b.type='button'; b.innerHTML=opts.action.html; b.onclick=opts.action.onClick; row.appendChild(b); }
+  /* Una capçalera pot portar més d'un botó (p. ex. Pícnics i Autoritzacions) */
+  const accions=[].concat(opts.action||[], opts.actions||[]);
+  if(accions.length){
+    const grup=el('div','sec-actions');
+    accions.forEach(a=>{ const b=el('button','sec-action'); b.type='button'; b.innerHTML=a.html; b.onclick=a.onClick; grup.appendChild(b); });
+    row.appendChild(grup);
+  }
   hero.appendChild(row); S.appendChild(hero);
 }
 function animateIn(S){
@@ -4291,7 +4363,7 @@ function renderProgOverview(S, subj, curIdx){
 function openSection(id){
   if(id!==CURRENT || CURRENT_SUB) EDITING=null;
   if(id!=='calendari') SCHEDULING=null;
-  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; COMANDA_NEW=false; COMANDA_EDIT=null; }
+  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null; }
   /* PROG_NAV: qui ve de la cerca o d'un avis de la portada ja ha triat setmana o
      cicle. Sense aquesta marca, openSection ho reiniciava a la setmana d'avui i
      el clic aterrava sempre al lloc equivocat. */
@@ -4324,13 +4396,21 @@ function openSubtheme(sectionId, subId){
   const S=$('#section'); S.classList.remove('hidden'); S.innerHTML='';
   if(PICNIC_SUB===subId){
     buildSecHero(S,sec,{title:sub.name+' · Pícnics', desc:'Marca qui demana pícnic.',
-      back:{label:sub.name, onClick:()=>{ PICNIC_SUB=null; PICNIC_RESULT=null; openSubtheme(sectionId, subId); }}});
+      back:{label:sub.name, onClick:()=>{ PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; openSubtheme(sectionId, subId); }}});
     renderPicnic(S, sectionId, subId, sub);
+  } else if(AUT_SUB===subId){
+    buildSecHero(S,sec,{title:sub.name+' · Autoritzacions', desc:'Marca, alumne per alumne, què han portat signat.',
+      back:{label:sub.name, onClick:()=>{ AUT_SUB=null; AUT_CONFIG=false; openSubtheme(sectionId, subId); }}});
+    renderAutoritzacions(S, sectionId, subId, sub);
   } else {
     const heroOpts={title:sub.name, desc:'Subtema '+deDe(sec.name), back:{label:sec.name, onClick:()=>openSection(sectionId)}};
     if(sectionId==='excursions'){
-      heroOpts.action={ html:`<svg class="icon" viewBox="0 0 24 24"><path d="M4 10h16l-1.2 9a1 1 0 0 1-1 .9H6.2a1 1 0 0 1-1-.9L4 10z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Pícnics`,
-        onClick:()=>{ PICNIC_SUB=subId; PICNIC_RESULT=null; openSubtheme(sectionId, subId); } };
+      heroOpts.actions=[
+        { html:`<svg class="icon" viewBox="0 0 24 24"><path d="M4 10h16l-1.2 9a1 1 0 0 1-1 .9H6.2a1 1 0 0 1-1-.9L4 10z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Pícnics`,
+          onClick:()=>{ PICNIC_SUB=subId; PICNIC_RESULT=null; openSubtheme(sectionId, subId); } },
+        { html:`<svg class="icon" viewBox="0 0 24 24"><path d="M8 4h8a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9.5 10.5l1.8 1.8 3.2-3.4"/></svg>Autoritzacions`,
+          onClick:()=>{ AUT_SUB=subId; AUT_CONFIG=false; AUT_CLASS=null; openSubtheme(sectionId, subId); } },
+      ];
     }
     buildSecHero(S,sec,heroOpts);
     renderEntries(S,sec,subId);
@@ -4393,7 +4473,8 @@ function renderPicnic(S, section, subId, sub){
     const head=el('div','pic-cls'); const cc=classColor(c); head.innerHTML=`<span class="grp-dot" style="background:${cc}"></span>${esc(c)}`; S.appendChild(head);
     const grid=el('div','att-grid');
     (STATE.students[c]||[]).forEach(name=>{
-      const chip=el('button','pic-chip'+(pic[name]?' on':'')); chip.type='button'; chip.textContent=name;
+      // stLlegeix: les marques es desen com a CLASSE|NOM (amb pic[name] sortien totes apagades)
+      const chip=el('button','pic-chip'+(stLlegeix(pic,c,name)?' on':'')); chip.type='button'; chip.textContent=name;
       chip.onclick=async()=>{ const now=!chip.classList.contains('on'); chip.classList.toggle('on',now); if(now) pic[stKey(c,name)]=true; else stEsborra(pic,c,name); setCnt(); await api.picnicToggle(subId, stKey(c,name), now); };
       grid.appendChild(chip);
     });
@@ -4433,6 +4514,197 @@ function renderPicnic(S, section, subId, sub){
     bar.appendChild(c2); box.appendChild(bar);
     S.appendChild(box);
   }
+}
+
+/* ---------- AUTORITZACIONS (dins d'una excursió) ----------
+   Cada sortida té les SEVES caselles (autorització, dret de veu, dret d'imatge, pagament…).
+   Es marquen alumne per alumne i classe per classe, com la carpeta viatgera. Les marques
+   són granulars (`autSet` per alumne i casella) → els tres tutors poden marcar alhora. */
+const AUT_PRESETS=[
+  {id:'aut',    nom:'Autorització'},
+  {id:'veu',    nom:'Dret de veu'},
+  {id:'imatge', nom:'Dret d’imatge'},
+  {id:'pagament', nom:'Pagament'},
+];
+function autDades(subId){
+  STATE.autoritzacions=STATE.autoritzacions||{};
+  const a=STATE.autoritzacions[subId]=STATE.autoritzacions[subId]||{camps:[], marques:{}};
+  a.camps=a.camps||[]; a.marques=a.marques||{};
+  return a;
+}
+function autCamps(subId){
+  const c=autDades(subId).camps;
+  return c.length ? c : [AUT_PRESETS[0]];      // per defecte, només «Autorització»
+}
+function autTe(subId, cls, nom, campId){
+  const m=autDades(subId).marques;
+  const x=m[stKey(cls,nom)] || m[nom];          // accepta la clau antiga (només el nom)
+  return !!(x && x[campId]);
+}
+function autCompta(subId, campId){
+  const classes=autClasses(); let fets=0, total=0;
+  classes.forEach(c=>(STATE.students[c]||[]).forEach(n=>{ total++; if(autTe(subId,c,n,campId)) fets++; }));
+  return {fets, total};
+}
+function autClasses(){ return Object.keys(STATE.students||{}).filter(c=>STATE.students[c] && STATE.students[c].length); }
+/* Abreviatura per a la capçalera de la columna. Ignora les paraules buides, si no
+   «Dret de veu» i «Dret d'imatge» sortien totes dues com a «DD». */
+function autInicials(nom){
+  const buides={de:1,del:1,la:1,el:1,els:1,les:1,i:1,a:1,als:1,per:1,amb:1,d:1,l:1};
+  const parts=String(nom||'').trim().split(/[\s’']+/)
+    .map(p=>p.trim()).filter(p=>p && !buides[norm(p)]);
+  if(!parts.length) return '·';
+  if(parts.length===1) return parts[0].slice(0,3).toUpperCase();
+  return parts.slice(0,2).map(p=>p[0]).join('').toUpperCase();
+}
+function autTextQueFalta(subId, sub){
+  const camps=autCamps(subId), classes=autClasses();
+  const L=['Autoritzacions — '+(sub?sub.name:'')+':',''];
+  camps.forEach(camp=>{
+    const c=autCompta(subId, camp.id);
+    L.push(camp.nom+' — falten '+(c.total-c.fets)+' de '+c.total+':');
+    classes.forEach(cls=>{
+      const falten=(STATE.students[cls]||[]).filter(n=>!autTe(subId,cls,n,camp.id));
+      if(falten.length) L.push('  '+cls+': '+falten.join(', '));
+    });
+    if(c.fets===c.total) L.push('  (tots)');
+    L.push('');
+  });
+  return L.join('\n').trim();
+}
+function renderAutoritzacions(S, section, subId, sub){
+  const classes=autClasses();
+  if(!classes.length){ const e=el('div','empty-feed'); e.innerHTML='<div class="big">✍️</div>No hi ha alumnes. Omple la pestanya “Alumnes” del full.'; S.appendChild(e); return; }
+  const camps=autCamps(subId);
+  const repinta=()=>openSubtheme(section, subId);
+
+  /* --- resum per casella + botó de personalitzar --- */
+  const top=el('div','aut-top');
+  camps.forEach(camp=>{
+    const c=autCompta(subId, camp.id);
+    const p=el('div','aut-resum'+(c.fets===c.total?' ple':''));
+    p.innerHTML='<b>'+esc(camp.nom)+'</b><span>'+c.fets+'/'+c.total+'</span>';
+    top.appendChild(p);
+  });
+  const cfg=el('button','btn btn-ghost aut-cfg'); cfg.type='button';
+  cfg.innerHTML='<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Què marquem';
+  cfg.onclick=()=>{ AUT_CONFIG=!AUT_CONFIG; repinta(); };
+  top.appendChild(cfg);
+  S.appendChild(top);
+
+  /* --- personalitzar les caselles d'AQUESTA sortida --- */
+  if(AUT_CONFIG){
+    const box=el('div','aut-config');
+    const t=el('div','aut-config-t'); t.textContent='Caselles d’aquesta sortida'; box.appendChild(t);
+    const llista=el('div','aut-config-list');
+    camps.forEach((camp,i)=>{
+      const row=el('div','aut-config-row');
+      const inp=el('input'); inp.type='text'; inp.value=camp.nom; inp.setAttribute('aria-label','Nom de la casella');
+      inp.onchange=async()=>{
+        const nom=inp.value.trim(); if(!nom){ inp.value=camp.nom; return; }
+        const nous=autCamps(subId).map(x=>x.id===camp.id?{id:x.id,nom:nom}:x);
+        await api.autSetCamps(subId, nous); toast('Desat ✓'); repinta();
+      };
+      row.appendChild(inp);
+      const del=el('button','icon-btn danger'); del.type='button'; del.title='Treu aquesta casella';
+      del.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
+      del.onclick=()=>{
+        askConfirm('Vols treure la casella «'+camp.nom+'» d’aquesta sortida? Deixarà de sortir; si la tornes a posar, les marques encara hi seran.', async()=>{
+          const nous=autCamps(subId).filter(x=>x.id!==camp.id);
+          await api.autSetCamps(subId, nous.length?nous:[AUT_PRESETS[0]]); repinta();
+        }, {title:'Treure la casella', confirmLabel:'Treu-la', danger:true});
+      };
+      if(camps.length>1) row.appendChild(del);
+      llista.appendChild(row);
+    });
+    box.appendChild(llista);
+    const afegir=el('div','aut-config-add');
+    AUT_PRESETS.filter(p=>!camps.some(c=>c.id===p.id)).forEach(p=>{
+      const b=el('button','btn btn-ghost'); b.type='button'; b.textContent='+ '+p.nom;
+      b.onclick=async()=>{ await api.autSetCamps(subId, autCamps(subId).concat([{id:p.id,nom:p.nom}])); repinta(); };
+      afegir.appendChild(b);
+    });
+    const altra=el('button','btn btn-ghost'); altra.type='button'; altra.textContent='+ Una altra…';
+    altra.onclick=()=>{
+      askPrompt({icon:'✍️', title:'Casella nova', label:'Què vols marcar?', placeholder:'p. ex. Samarreta', confirmLabel:'Afegeix'}, val=>{
+        const nom=String(val||'').trim();
+        if(!nom) return false;                       // el modal es queda obert i ho diu
+        if(autCamps(subId).some(c=>norm(c.nom)===norm(nom))) return false;
+        api.autSetCamps(subId, autCamps(subId).concat([{id:'c'+uid(), nom:nom}])).then(repinta);
+      });
+    };
+    afegir.appendChild(altra);
+    box.appendChild(afegir);
+    S.appendChild(box);
+  }
+
+  /* --- pestanyes de classe --- */
+  if(!AUT_CLASS || classes.indexOf(AUT_CLASS)<0) AUT_CLASS=pickTutorClass(classes);
+  const selRow=el('div','att-classsel');
+  classes.forEach(c=>{
+    const t=el('button','att-tab'+(c===AUT_CLASS?' on':'')); t.type='button';
+    if(c===AUT_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    const roster=STATE.students[c]||[];
+    const fets=roster.filter(n=>camps.every(camp=>autTe(subId,c,n,camp.id))).length;
+    t.textContent=c+' ('+fets+'/'+roster.length+')';
+    t.title=c+': '+fets+' de '+roster.length+' ho tenen tot';
+    t.onclick=()=>{ AUT_CLASS=c; repinta(); };
+    selRow.appendChild(t);
+  });
+  S.appendChild(selRow);
+
+  const hint=el('div','att-info');
+  const h1=el('span','att-hint'); h1.textContent=camps.length>1 ? 'Toca cada casella de cada alumne' : 'Toca els que l’han portada';
+  hint.appendChild(h1);
+  S.appendChild(hint);
+
+  /* --- graella: alumne + una casella per concepte --- */
+  const taula=el('div','aut-taula');
+  const cap=el('div','aut-fila aut-cap');
+  cap.appendChild(el('div','aut-nom'));
+  camps.forEach(camp=>{ const c=el('div','aut-cel'); c.textContent=autInicials(camp.nom); c.title=camp.nom; cap.appendChild(c); });
+  taula.appendChild(cap);
+  (STATE.students[AUT_CLASS]||[]).forEach(nom=>{
+    const fila=el('div','aut-fila');
+    const n=el('div','aut-nom'); n.textContent=nom; fila.appendChild(n);
+    camps.forEach(camp=>{
+      const on=autTe(subId, AUT_CLASS, nom, camp.id);
+      const b=el('button','aut-check'+(on?' on':'')); b.type='button';
+      b.setAttribute('aria-label', nom+' · '+camp.nom); b.title=camp.nom;
+      b.setAttribute('aria-pressed', on?'true':'false');
+      b.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+      b.onclick=async()=>{
+        const ara=!b.classList.contains('on');
+        b.classList.toggle('on', ara); b.setAttribute('aria-pressed', ara?'true':'false');
+        await api.autSet(subId, stKey(AUT_CLASS,nom), camp.id, ara);
+        // actualitza els comptadors sense repintar (no perdre el punt on ets)
+        const resums=S.querySelectorAll('.aut-resum span');
+        camps.forEach((cc,i)=>{ const c2=autCompta(subId, cc.id); if(resums[i]) resums[i].textContent=c2.fets+'/'+c2.total; });
+        const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(AUT_CLASS)===0);
+        if(tab){ const roster=STATE.students[AUT_CLASS]||[];
+          const fets=roster.filter(x=>camps.every(camp2=>autTe(subId,AUT_CLASS,x,camp2.id))).length;
+          tab.textContent=AUT_CLASS+' ('+fets+'/'+roster.length+')'; }
+      };
+      fila.appendChild(b);
+    });
+    taula.appendChild(fila);
+  });
+  S.appendChild(taula);
+
+  /* --- copiar qui falta --- */
+  const actions=el('div','att-actions');
+  const cp=el('button','btn btn-primary'); cp.type='button';
+  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui falta';
+  cp.onclick=async()=>{
+    await refrescaEstat();
+    const txt=autTextQueFalta(subId, sub);
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
+    const box=S.querySelector('.att-result') || el('div','att-result');
+    box.innerHTML=''; const pre=el('pre'); pre.textContent=txt; box.appendChild(pre);
+    if(!box.parentNode) S.appendChild(box);
+  };
+  actions.appendChild(cp);
+  S.appendChild(actions);
 }
 
 /* ---------- COMANDES (carpeta del Drive + crear des de plantilla) ---------- */
@@ -5516,7 +5788,7 @@ function subthemeCard(sub,sec){
     askConfirm(msg, async()=>{ await api.deleteSubtheme(sub.id); openSection(sec.id); toast('Subtema esborrat'); });
   };
   card.appendChild(del);
-  card.onclick=()=>{ PICNIC_SUB=null; PICNIC_RESULT=null; openSubtheme(sec.id,sub.id); };
+  card.onclick=()=>{ PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; openSubtheme(sec.id,sub.id); };
   femClicable(card, ()=>card.onclick(), 'Obre '+sub.name);
   return card;
 }
@@ -6534,7 +6806,7 @@ function searchRow(r){
 }
 function openAndFlash(itemId){
   closeSearch();
-  PICNIC_SUB=null; PICNIC_RESULT=null;
+  PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false;
   const entry=STATE.entries.find(e=>e.id===itemId);
   const task=STATE.tasks.find(t=>t.id===itemId);
   if(entry){ if(entry.section==='calendari') CAL_VIEW = entry.eventDate ? 'llista' : 'agendar';

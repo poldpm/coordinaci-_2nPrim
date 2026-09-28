@@ -374,6 +374,16 @@ nom estandarditzat.
 - **Perfil** (topbar, bombolla amb **engranatge**): popup per **canviar de perfil**
   i **activar el correu recordatori (8:00)** per tutor (`api.setEmailReminder`,
   desa a `STATE.emailReminders`).
+- **Autoritzacions d'una sortida** (dins `excursions`, botó al costat de «Pícnics», estat
+  `AUT_SUB`/`AUT_CONFIG`/`AUT_CLASS`): marcatge alumne per alumne, amb **caselles pròpies de cada
+  sortida** (p. ex. Autorització, Dret de veu, Dret d'imatge, Pagament, o les que es vulguin).
+  Model: `STATE.autoritzacions[subthemeId] = {camps:[{id,nom}], marques:{'CLASSE|Nom':{campId:true}}}`.
+  `camps` es desa sencer (`api.autSetCamps` → `autCamps`); les marques són **granulars i idempotents**
+  (`api.autSet` → `autSet`), així els tres tutors poden marcar alhora. Per defecte hi ha una sola
+  casella, «Autorització»; `AUT_PRESETS` són les propostes ràpides. Funcions: `renderAutoritzacions`,
+  `autDades/autCamps/autTe/autCompta/autInicials` (abreviatura de columna, ignora «de/d'/la…»:
+  Dret de veu → DV, Dret d'imatge → DI) i `autTextQueFalta` (botó «Copia qui falta»).
+  Les pestanyes de classe compten els alumnes que tenen **totes** les caselles.
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
 - **Correu de pícnics** (dins Excursions): obre Gmail amb la llista i la data.
 
