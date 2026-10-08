@@ -111,6 +111,9 @@ correus[]        // {id, title, body, date, sent:{tutor:true}, author, createdAt
 emailReminders{} // opt-in del correu recordatori: { tutor: true }
 cvLliurat{}      // qui ha entregat la carpeta viatgera: { dataISO_del_cicle: { 'Nom alumne': true } }
 comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
+llibres{}        // llibres que s'emporten a casa: { titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e:dataISO, r:dataISO}}} } — veure §9
+grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|Nom':{etiqId:true}}, notes:{'CLASSE|Nom':text},
+                 //                   noms:{'CLASSE|Nom':'Nom corregit'}, conjunts:[{id,nom,creat,by,classes[],grups:[{id,nom,membres[]}]}] } — veure §9
 ```
 `normalizeState()` garanteix que totes les claus existeixen.
 
@@ -118,7 +121,24 @@ comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, aut
 `general`(entries), `tasques`(tasks), `calendari`(agenda), `projectes`/
 `excursions`/`activitats`(subthemes), `programacio`(programacio),
 `correus`(correus, `customHero`), `enllacos`(links), `avaluacio`(avaluacio,
-`customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`).
+`customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`),
+`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `size:'wide'`).
+
+**Mides de rajola** (`size`, graella de 12 columnes):
+- `big` = span 4 → `general`, `tasques`, `calendari` (una fila de 12 justa).
+- `reg` = span 3 → les 8 restants (dues files de 4 justes).
+- `wide` = `grid-column:1/-1` → **només `avisos`**, i va **PRIMERA** de totes: una
+  **banda vermella a tota l'amplada** a dalt de la portada, en fila (icona + text +
+  comptador) i més baixa que una targeta. És `1/-1` i no `span 12` perquè al mòbil la
+  graella passa a 2 columnes i un `span 12` se'n sortiria. Deixa les altres dues files
+  exactament com estaven.
+- `pill` = `programacio` i `grups`, botons allargats al final. `renderBento` les posa
+  TOTES dins d'UN sol `.tile-pill-wrap` perquè quedin de costat; abans cada una tenia el
+  seu wrap de `span 12` i quedaven l'una sota l'altra.
+
+`renderBento` afegeix el `.t-badge` **l'últim** (després del cos): a les rajoles normals
+va posicionat absolut i l'ordre del DOM és igual, però a la banda `wide` va en fila i ha
+de quedar a la dreta.
 
 **Regla capçalera:** `openSection` pinta una capçalera per defecte **excepte** si
 la secció té `customHero:true`. Si un `render*` es fa la seva pròpia capçalera
@@ -384,6 +404,134 @@ nom estandarditzat.
   `autDades/autCamps/autTe/autCompta/autInicials` (abreviatura de columna, ignora «de/d'/la…»:
   Dret de veu → DV, Dret d'imatge → DI) i `autTextQueFalta` (botó «Copia qui falta»).
   Les pestanyes de classe compten els alumnes que tenen **totes** les caselles.
+- **Registre llibres a casa** (dins `eines`, `EINA='llibres'`): els llibres de l'escola que els
+  nens i nenes s'emporten a casa per llegir. Cal poder marcar les **DUES** coses: que se l'ha
+  emportat i que l'ha tornat.
+  Model: `STATE.llibres = {titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e,r}}}}`, on
+  `e` = data ISO del dia que se l'emporta i `r` = data ISO del dia que el torna. `titols` es desa
+  sencer (`api.llibTitols` → `llibTitols`); les marques són **granulars i idempotents**
+  (`api.llibSet(alumne, llibre, camp, data)` → `llibSet`, una per alumne/llibre/camp) → els tres
+  tutors poden marcar alhora. La clau d'alumne és composta `CLASSE|NOM` (`stKey`).
+  **11 llibres sembrats** a `LLIB_SEED` (ids estables `l01..l11`): Tumbili, Història d'una orella,
+  Llista d'aniversari, Plou, Mal a la mà mal al peu, En Ton i la Neus, Titelles fades i follets,
+  Anem a la masia, Ai Terri Terri..., Ha nascut en Marçal, La Festa Major. Com la programació, és
+  **sembra mandrosa**: `llibTitols()` torna la llista desada i, si encara no s'ha tocat mai, la
+  sembra; la primera edició la materialitza. Treure un títol **no** esborra les marques (si el
+  tornes a posar, hi són).
+  **El parell es manté coherent** (`llibToggle`): marcar «tornat» sense «emportat» marca també
+  «emportat» el mateix dia; treure «emportat» treu també «tornat». Així no hi pot haver un llibre
+  tornat que ningú s'hagi endut.
+  **Tres vistes** (`LLIB_VIEW`), perquè amb 11 llibres una graella alumnes × llibres no cap al
+  mòbil: *Llibres* (targeta per llibre amb «🏠 N a casa · ✅ N/N tornats» i barra; clic → graella
+  d'alumnes de la classe), *Per alumne* (clic a un alumne → els seus 11 llibres) i *A casa* (els
+  que encara no s'han tornat, **agrupats per classe** i, dins de cada classe, els que fa més dies
+  primer; a partir de `LLIB_DIES_AVIS`=15 dies el comptador surt en vermell, i hi ha «Copia qui té
+  llibres a casa»). Marcar «tornat» des de *A casa* **treu només aquella fila** (no repinta la
+  secció: si no, saltava a dalt de tot a cada marca).
+  **Avís a la portada** (`buildLlibresPanel`, dins `renderDash`): «Llibres per reclamar», els que
+  fa ≥`LLIB_DIES_AVIS` dies que són a casa. Només de **la meva classe** (`TUTOR_CLASS[ME]`):
+  cadascú reclama els seus. Si la lletra no es troba a `STATE.students` (§13: pendent de confirmar
+  2nA/B/C), ensenya **totes** les classes, ho diu al títol i posa el xip de classe a cada fila.
+  Topall de `LLIB_PANEL_MAX`=6 files + «i N llibres més», perquè un descuit de mig trimestre no
+  ompli la portada. Cada fila porta la casella ✓ per marcar-lo **tornat sense sortir de la
+  portada** (com les tasques pendents); el clic obre la vista *A casa* de l'eina.
+  `LLIB_NAV` fa el mateix paper que `PROG_NAV`: sense ell, `openSection` reiniciava `LLIB_VIEW`
+  en entrar a `eines` des de fora i el clic de l'avís aterrava sempre a la llista de llibres.
+  Funcions: `renderLlibres` + `renderLlibres{Llista,Config,Book,Alumnes,Alumne,Casa}`,
+  `llibDades/llibTitols/llibMarca/llibEstat/llibCompta/llibComptaAlumne/llibPendents/llibToggle/
+  llibCheck/llibDies/llibAvui/llibFmtDia/llibTextPendents`. Estat: `LLIB_VIEW`, `LLIB_BOOK`,
+  `LLIB_CLASS`, `LLIB_ALUMNE`, `LLIB_CONFIG`.
+  ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
+  abans. ⚠️ Casos **NOUS a `doPost`** (`llibTitols`, `llibSet`) → cal **nou desplegament del Web
+  App** (§11) i, si es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+- **Gestió de grups** (secció pròpia `grups`, píndola al costat de Programació): tres coses.
+  Model: `STATE.grups = {etiquetes, marques, notes, noms, conjunts}` (§5).
+  1. **Marques a tenir en compte en fer els grups.** Etiquetes sembrades a `GRUP_ETIQ_SEED`:
+     **PI** i **Conducta** (ids estables `pi`/`conducta`), i se'n poden afegir de lliures
+     («Què marquem»). Més una **nota lliure per alumne** per a tot allò que no és una casella.
+     `etiquetes` es desa sencer (`api.grupEtiquetes`); `marques` i `notes` són **granulars i
+     idempotents** per alumne (`api.grupMarca` / `api.grupNota`), clau `CLASSE|NOM`.
+     Treure una etiqueta **no** esborra les marques (si la tornes a posar, hi són).
+  2. **Noms: capa de CORRECCIONS, no una còpia de la llista.** ⚠️ Important: la llista
+     d'alumnes la mana el **full** i Apps Script la torna a pujar **cada hora**
+     (`alumnesAFirebase`), per això `STATE.students` NO s'escriu des de l'app
+     (`FB_NO_DESAR`). `STATE.grups.noms['CLASSE|NOM'] = 'Nom corregit'` diu només **com es
+     mostra**: la clau no canvia mai, així la correcció sobreviu la sincronització i **cap
+     registre queda orfe** (llibres, autoritzacions, reptes i carpeta viatgera van lligats a
+     la clau original). `stMostra(classe, nom)` és l'ÚNIC lloc que decideix com es pinta un
+     nom; `stMostraNom(nom)` resol la classe sol (per al generador i els reptes, que
+     treballen amb noms solts). Ja s'aplica a: Gestió de grups, carpeta viatgera, pícnics,
+     autoritzacions, llibres (les 3 vistes + l'avís de la portada), assistència, reptes,
+     generador de grups, i els textos per copiar (`autTextQueFalta`, `llibTextPendents`,
+     `buildAbsentText`/`buildAbsentBody`). Botó **«Copia la llista de 2nX»**
+     (`grupTextLlista`) → els noms corregits, un per línia, per enganxar-los al full i
+     deixar-ho definitiu.
+  3. **Repartiments** (`conjunts`): grups desats amb nom. Es poden crear a mà (surten 4 grups
+     buits), reanomenar el repartiment i cada grup, **moure alumnes amb un desplegable**,
+     afegir/treure grups (els seus membres tornen al pool), triar **quines classes** hi entren
+     (treure una classe treu també els seus membres, si no quedarien alumnes fantasma),
+     **«Reparteix-los»** (posa els que queden al grup amb menys gent) i copiar-ho tot.
+     Cada fila de membre ensenya les seves marques i la nota.
+  **Generador automàtic:** es queda a `eines` (`EINA='grups'`). Des d'aquí hi ha un botó per
+  anar-hi, i des d'allà **«Desa'ls a Gestió de grups»** (`grupDesaDelGenerador`).
+  `generateGroups` ara fa servir `grupMarcatsPlans()` = les marques del full (`STATE.flags`,
+  que segueixen valent) **+** les d'aquí → els alumnes marcats es reparteixen de debò.
+  ⚠️ El generador treballa amb **noms solts**: amb dos homònims de classes diferents (una
+  Anna Puig a 2nA i una altra a 2nC) el nom sol no diu de qui es tracta. `grupResolClau(nom,
+  etiquetaSeccio, gastats)` ho resol per ordre: el sufix «(2nB)», la classe de la secció, i
+  si no, la primera classe amb aquest nom que encara no s'hagi fet servir en aquest
+  repartiment (bug real: sense això, desar els grups de 2nC assignava l'Anna de 2nA i deixava
+  la de 2nC sense grup).
+  ⚠️ `etiquetes` i cada `conjunt` es desen **sencers**: si dos tutors retoquen el MATEIX
+  repartiment exactament alhora, l'últim que desa es queda (com la programació, §7). Les
+  marques, les notes i els noms són granulars → això no els passa.
+  Funcions: `renderGestioGrups` + `renderGrups{Alumnes,EtiqConfig,Conjunts,Conjunt}`,
+  `grupDades/grupEtiq/grupClasses/grupTe/grupNotaDe/grupCompta/grupTeAlgunaCosa/grupTextLlista/
+  grupConjunts/grupConjuntDe/grupMembresTots/grupPool/grupParteix/grupFmtData/grupMarcatsPlans/
+  grupResolClau/grupDesaDelGenerador`. Estat: `GRUPS_VIEW`, `GRUPS_CLASS`, `GRUPS_CONJ`,
+  `GRUPS_ETIQ_CFG`, i `GRUPS_NAV` (el mateix paper que `PROG_NAV`/`LLIB_NAV`).
+  ⚠️ Casos **NOUS a `doPost`** (`grupEtiquetes`, `grupMarca`, `grupNota`, `grupNom`,
+  `grupConjuntUpsert`, `grupConjuntDelete`) → cal **nou desplegament del Web App** (§11) i, si
+  es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+- **Avisos ràpids** (botó de la barra de dalt, al costat del perfil: bafarada amb alerta,
+  `#avisBtn`): escriure una nota ràpida que les altres dues veuen a la portada, i que poden
+  **comentar** o **marcar com a llegida**.
+  **No hi ha model nou:** són **`entries` amb `section:'avisos'`** (`AVIS_SEC`). Això ho hereta
+  tot del que ja funciona i està provat: `readBy` = «alerta llegida», els comentaris en fil
+  (`STATE.comments[entryId]` + el rail d'`entryRow`), `deleteEntry` que neteja els comentaris,
+  l'edició, la cerca i la cua de reintents. Es pinta amb `renderEntries`, que ja porta tot
+  això: **zero codi de pintat nou per a la secció**.
+  **Rajola de la portada:** `size:'wide'` i **la primera** de `SECTIONS` → banda vermella
+  (`#C9442F`) a tota l'amplada a dalt de tot (§6). `heroPaint` li dona lletra **blanca**
+  (4,83 de contrast). El `metaLabel` és informatiu: «2 avisos nous · <text del més nou>»
+  (tallat a 64 caràcters), o «1 avís amb comentaris nous», o «Últim: …», o «Res de nou ·
+  toca per escriure'n un». El `.t-badge` de la banda va **blanc amb lletra vermella**: el
+  groc de sempre només dona 2,63 de contrast contra aquest vermell i es desdibuixava.
+  **Escriure'n un:** `obreAvisRapid()` → modal d'UNA caixa de text (res de títol ni enllaç: ha
+  de ser ràpid). ⌘/Ctrl+Enter publica. Es desa amb `readBy:[ME]` → per a mi ja està llegit i
+  les altres dues el veuen com a nou. El modal porta a sota un enllaç per veure'ls tots.
+  **Panell de la portada** (`buildAvisosPanel`, el **primer** de `renderDash`): surten els que
+  (a) jo no he llegit, (b) tenen comentaris que no he vist, o (c) són **meus** i encara no els
+  ha llegit tothom — així l'autor veu si cal insistir («falta Mireia i Cristina» / «llegit per
+  tothom»). Els que no he llegit porten la casella ✓ per marcar-los **sense sortir de la
+  portada**; els meus, l'avatar. Xip 💬 amb els fils oberts i en groc si n'hi ha de nous. El
+  clic obre l'avís amb el panell de comentaris desplegat. Topall `AVIS_PANEL_MAX`=5 + «i N
+  avisos més».
+  **Número vs. alerta de color** (`avisNoLlegits` / `avisComentarisNous`): el **comptador**
+  (`.t-badge` de la banda i `.avis-badge` del botó) compta només els avisos **per llegir**;
+  els **comentaris nous** són un **punt de color** (`.t-alerta`) a la icona, perquè són una
+  cosa diferent i no han d'inflar el número. Si hi ha les dues coses, es veu el número (ja
+  crida prou) i el `title` ho diu tot. `updateAvisBadge` es crida des de `refreshHome` i des
+  de `repaintAfterSync`, perquè el botó també s'actualitzi **dins d'una secció**.
+  ⚠️ **Els avisos NO entren a `novItems()`** (ni ells ni els seus comentaris): tenen el seu
+  panell, que és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa
+  sortiria **dues vegades** a la portada.
+  ⚠️ `.avis-pill` porta el `margin-left:auto` que abans tenia `.topbar .me`: amb dos
+  `margin-left:auto` el buit es reparteix entre tots dos i els dos botons quedarien separats.
+  Funcions: `avisosTots/avisNoLlegit/avisQuiFalta/avisActius/avisPendentsMeus/updateAvisBadge/
+  obreAvisRapid/buildAvisosPanel`. Variables de color: `--avis`, `--avis-ink`.
+  **No cal cap acció nova al backend:** fa servir `addEntry`, `entryRead`, `commentSeen` i la
+  resta, que ja hi són. **No cal redesplegar el Web App per això.**
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
 - **Correu de pícnics** (dins Excursions): obre Gmail amb la llista i la data.
 
