@@ -36,6 +36,8 @@
   --cristina:#D5638E;
   --pol:#5A6FE0;
 
+  --avis:#C9442F;          /* avisos ràpids (bafarada amb alerta) */
+  --avis-ink:#A3301F;      /* el mateix to, prou fosc per al text */
   --pendent:#E9B93A;
   --proces:#4F9BDE;
   --acabada:#4CB782;
@@ -134,7 +136,20 @@ a{color:var(--teal)}
 .search-pill .icon{width:18px;height:18px;stroke-width:2.7}
 .search-pill:hover{border-color:var(--cyan)}
 @media(max-width:520px){.search-pill .lbl{display:none}.search-pill{padding:8px 11px}}
-.topbar .me{margin-left:auto;display:flex;align-items:center;gap:9px;background:var(--panel);border:1.5px solid var(--line);
+/* Avisos ràpids. Porta el margin-left:auto (abans el tenia .me): així aquest botó i el
+   perfil queden junts a la dreta. Amb dos margin-left:auto el buit es reparteix entre
+   tots dos i quedarien separats. */
+.avis-pill{margin-left:auto;position:relative;display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1.5px solid var(--line);border-radius:999px;padding:8px 15px;box-shadow:var(--shadow-sm);
+  font-weight:800;color:var(--avis-ink);cursor:pointer;transition:.15s}
+.avis-pill .icon{width:18px;height:18px;stroke-width:2.6}
+.avis-pill:hover{border-color:var(--avis);background:color-mix(in srgb,var(--avis) 8%,var(--panel))}
+.avis-pill.te{border-color:var(--avis);background:color-mix(in srgb,var(--avis) 11%,var(--panel))}
+.avis-badge{position:absolute;top:-5px;right:-4px;min-width:1.45em;height:1.45em;padding:0 .35em;border-radius:999px;
+  background:var(--avis);color:#fff;font-weight:800;font-size:.7rem;display:grid;place-items:center;
+  box-shadow:0 1px 4px -1px rgba(0,0,0,.35)}
+@media(max-width:520px){.avis-pill .lbl{display:none}.avis-pill{padding:8px 11px}}
+.topbar .me{display:flex;align-items:center;gap:9px;background:var(--panel);border:1.5px solid var(--line);
   border-radius:999px;padding:5px 12px 5px 6px;box-shadow:var(--shadow-sm);font-weight:800;color:var(--teal-ink);cursor:pointer;transition:.15s}
 .topbar .me:hover{border-color:var(--indigo)}
 .topbar .me .avatar{width:32px;height:32px;font-size:.85rem}
@@ -443,6 +458,22 @@ a{color:var(--teal)}
 .gg-pool{border:1.5px dashed var(--line);border-radius:14px;background:var(--paper);overflow:hidden;margin-bottom:16px}
 .gg-pool-cap{display:flex;align-items:center;gap:8px;padding:.55em .7em;font-weight:800;font-size:.8rem;color:var(--muted);
   text-transform:uppercase;letter-spacing:.04em}
+/* --- Avisos ràpids --- */
+.avis-panel{border-left:5px solid var(--avis)}
+.avis-panel .hpanel-head .icon{stroke:var(--avis)}
+.avis-panel .hpanel-count{background:var(--avis);color:#fff}
+.avis-nou{font-weight:800;color:var(--avis-ink)}
+.avis-av{flex:none}
+.avis-cmt{flex:none;font-weight:800;font-size:.76rem;color:var(--muted);background:var(--bg);
+  border:1.5px solid var(--line);border-radius:999px;padding:.14em .5em;white-space:nowrap}
+.avis-cmt.nous{color:#8a5600;background:#fff4e0;border-color:#eccf9a}
+.avis-modal{text-align:center}
+.avis-modal p{color:var(--muted);font-weight:700;font-size:.88rem;margin:0 0 14px}
+.avis-ta{width:100%;min-height:104px;resize:vertical;text-align:left;margin-bottom:14px;font:inherit}
+.avis-veure{display:block;width:100%;margin-top:12px;border:0;background:transparent;font:inherit;
+  font-weight:800;font-size:.84rem;color:var(--teal);cursor:pointer;padding:.4em}
+.avis-veure:hover:not(:disabled){text-decoration:underline}
+.avis-veure:disabled{color:var(--muted);cursor:default}
 .nov-cmt{background:#fff4e0;color:#8a5600;font-weight:800}
 /* Mida tàctil mínima: abans hi havia icones de 34x29 px, per sota del que es pot tocar bé */
 .rept-icona,.read-btn,.back-btn,.prog-segbtn,.att-tab,.edit-btn,.del{min-height:40px;min-width:40px}
@@ -1281,6 +1312,10 @@ button.subtheme-card,button.rept-card{
       <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
       <span class="lbl">Cerca</span>
     </button>
+    <button class="avis-pill" id="avisBtn" title="Avisos ràpids">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M12 7.6v3.3"/><path d="M12 13.2h.01"/></svg>
+      <span class="lbl">Avisos</span>
+    </button>
     <button class="me" id="meBtn" title="El teu perfil i opcions">
       <span class="avatar" id="meAv"></span>
       <span id="meName"></span>
@@ -1486,6 +1521,8 @@ const ICONS = {
   agendar:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 1.5"/>',
   eines:'<path d="M14.5 6.5a3.5 3.5 0 0 0-4.6 4.6L3 18l3 3 6.9-6.9a3.5 3.5 0 0 0 4.6-4.6l-2.3 2.3-2.2-.5-.5-2.2z"/>',
   grups:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16 14h1a4 4 0 0 1 4 4v2"/>',
+  /* bafarada amb un signe d'alerta a dins (avisos) */
+  avis:'<path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M12 7.6v3.3"/><path d="M12 13.2h.01"/>',
   comandes:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>',
   programacio:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13 5l-2 14"/>',
 };
@@ -1503,6 +1540,10 @@ const SECTIONS = [
   {id:'avaluacio',  name:'Avaluació',         type:'avaluacio', color:'#5A6FE0', size:'reg', customHero:true, desc:'Frases d\u2019avaluació organitzades per trimestre i assignatura.', ico:'avaluacio'},
   {id:'programacio',name:'Programació',       type:'programacio', color:'#944B9C', size:'pill', desc:'Programació setmanal per assignatura.', ico:'programacio'},
   {id:'grups',      name:'Gestió de grups',   type:'grups', color:'#1F8A7A', size:'pill', customHero:true, desc:'Marques a tenir en compte, noms i els grups de classe.', ico:'grups'},
+  /* `hidden`: NO surt com a rajola de la portada. S'hi entra pel botó de la barra de
+     dalt i per l'avís de la portada; si també hi hagués rajola, hi hauria tres portes
+     a la mateixa cosa i una rajola més que ningú ha demanat. */
+  {id:'avisos',     name:'Avisos',            type:'entries', color:'#C9442F', size:'reg', hidden:true, desc:'Avisos i notes ràpides per a les tres tutores.', ico:'avis'},
 ];
 const secById = id => SECTIONS.find(s=>s.id===id);
 
@@ -2115,7 +2156,8 @@ async function request(action, payload){
   } finally { clearTimeout(timer); }
 }
 /* refresc en viu quan estàs a l'inici (perquè vegis els canvis dels altres) */
-function refreshHome(){ if(!$('#home').classList.contains('hidden')){ renderDash(); renderNovetats(); renderBento(); } }
+function refreshHome(){ try{ updateAvisBadge(); }catch(e){}
+  if(!$('#home').classList.contains('hidden')){ renderDash(); renderNovetats(); renderBento(); } }
 let _lastSig = '';
 let _revVista = '';        // revisió del servidor que ja tenim
 let _ultimaCompleta = 0;   // quan vam baixar l'estat sencer per última vegada
@@ -2141,6 +2183,7 @@ function sectionBusy(){
 }
 /* Repinta el que s'estigui mirant quan arriben canvis dels altres */
 function repaintAfterSync(){
+  try{ updateAvisBadge(); }catch(e){}     // el comptador del botó també es veu dins d'una secció
   if(!$('#home').classList.contains('hidden')){ refreshHome(); return; }
   if(!CURRENT || sectionBusy()) return;   // l'estat ja està actualitzat; es veurà en navegar
   const y=window.scrollY;
@@ -3178,6 +3221,7 @@ window.addEventListener('popstate', function(){
   // si ja som a l'inici, no re-armem: el següent 'enrere' tanca/minimitza l'app
 });
 $('#meBtn').onclick=()=>openProfileMenu();
+$('#avisBtn').onclick=()=>obreAvisRapid();
 
 /* ---------- HOME ---------- */
 function goHome(){
@@ -3191,10 +3235,174 @@ function goHome(){
 }
 $('#homeBtn').onclick=goHome;
 
+/* ============ AVISOS RÀPIDS ============
+   Botó de la barra de dalt (bafarada amb alerta) per escriure una nota ràpida que les
+   altres dues tutores veuen a la portada, amb «Llegida» i comentaris.
+   Model: NO n'hi ha de nou. Són `entries` amb `section:'avisos'`, i així hereten tot el
+   que ja funciona i està provat: `readBy` (= «alerta llegida»), els comentaris en fil
+   (`STATE.comments[entryId]`), `deleteEntry` que neteja els comentaris, l'edició, la
+   cerca i la cua de reintents. La secció `avisos` és `hidden` (no surt a la portada com
+   a rajola) i es pinta amb `renderEntries`, que ja porta el rail de comentaris. */
+const AVIS_SEC='avisos';
+const AVIS_PANEL_MAX=5;
+function avisosTots(){
+  return (STATE.entries||[]).filter(e=>e.section===AVIS_SEC)
+    .sort((a,b)=> new Date(b.updatedAt||b.date||0)-new Date(a.updatedAt||a.date||0));
+}
+function avisNoLlegit(e){ return e.author!==ME && !(e.readBy||[]).includes(ME); }
+/* Qui encara no l'ha llegit (l'autor hi compta com a llegit) */
+function avisQuiFalta(e){ return USERS.filter(u=>!(e.readBy||[]).includes(u.id)); }
+/* Els que han de cridar l'atenció: el que no he llegit, el que té comentaris nous, i
+   els meus que encara no ha llegit tothom (per saber si cal insistir). */
+function avisActius(){
+  return avisosTots().filter(e=>
+    avisNoLlegit(e) || entryHasUnseenComments(e.id) || (e.author===ME && avisQuiFalta(e).length));
+}
+/* Els que demanen una acció MEVA (per al comptador del botó) */
+function avisPendentsMeus(){
+  return avisosTots().filter(e=> avisNoLlegit(e) || entryHasUnseenComments(e.id));
+}
+function updateAvisBadge(){
+  const b=$('#avisBtn'); if(!b) return;
+  const n=avisPendentsMeus().length;
+  b.classList.toggle('te', n>0);
+  b.title = n ? n+' '+plural(n,'avís','avisos')+' per llegir · toca per escriure’n un' : 'Avisos ràpids';
+  let bd=b.querySelector('.avis-badge');
+  if(n){ if(!bd){ bd=el('span','avis-badge'); b.appendChild(bd); } bd.textContent=n; }
+  else if(bd) bd.remove();
+}
+/* ---- Escriure'n un (modal ràpid: una caixa de text i prou) ---- */
+function obreAvisRapid(){
+  const modal=el('div','modal open');
+  const scrim=el('div','scrim'); modal.appendChild(scrim);
+  const box=el('div','modal-box avis-modal');
+  const h=el('h3'); h.textContent='Avís ràpid';
+  box.innerHTML='<div class="modal-ico">⚠️</div>';
+  box.appendChild(h);
+  const p=el('p'); p.textContent='Les altres dues tutores ho veuran a la seva pantalla d’inici, i t’ho podran comentar o marcar com a llegit.';
+  box.appendChild(p);
+  const ta=el('textarea','input avis-ta');
+  ta.placeholder='p. ex. Demà la sortida surt a les 9, no a les 9.30';
+  ta.setAttribute('aria-label','Text de l’avís');
+  box.appendChild(ta);
+  const err=el('p','modal-err'); err.setAttribute('role','alert'); err.hidden=true; box.appendChild(err);
+
+  const acts=el('div','modal-actions');
+  const no=el('button','btn btn-ghost'); no.type='button'; no.textContent='Cancel·la';
+  const si=el('button','btn btn-primary'); si.type='button';
+  si.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Publica l’avís';
+  acts.appendChild(no); acts.appendChild(si); box.appendChild(acts);
+
+  const veure=el('button','avis-veure'); veure.type='button';
+  const nTots=avisosTots().length;
+  veure.textContent = !nTots ? 'Encara no hi ha cap avís'
+    : (nTots===1 ? 'Veure l’avís que hi ha' : 'Veure els '+nTots+' avisos');
+  veure.disabled=!nTots;
+  box.appendChild(veure);
+
+  modal.appendChild(box); document.body.appendChild(modal);
+  let desmunta=()=>{};
+  const close=()=>{ desmunta(); modal.remove(); };
+  const publica=async()=>{
+    const text=ta.value.trim();
+    if(!text){ err.textContent='Escriu l’avís abans de publicar-lo.'; err.hidden=false; ta.setAttribute('aria-invalid','true'); ta.focus(); return; }
+    si.disabled=true;
+    const ts=nowISO();
+    /* readBy:[ME] → per a mi ja està llegit; les altres dues el veuran com a nou */
+    const e={id:uid(), section:AVIS_SEC, subtheme:null, author:ME, title:'', body:text, rich:false,
+      url:'', date:ts, createdAt:ts, updatedAt:ts, readBy:[ME]};
+    if(jaCreatAra(STATE.entries, text.slice(0,40), ME)){ close(); toast('Aquest avís ja l’acabes de publicar'); return; }
+    await api.addEntry(e);
+    close(); refreshHome(); updateAvisBadge(); toast('Avís publicat');
+  };
+  no.onclick=close; scrim.onclick=close; si.onclick=publica;
+  veure.onclick=()=>{ close(); openSection(AVIS_SEC); };
+  /* Ctrl/⌘+Enter publica; l'Enter sol fa salt de línia (és un text de diverses línies) */
+  ta.addEventListener('keydown',ev=>{ if(ev.key==='Enter'&&(ev.metaKey||ev.ctrlKey)){ ev.preventDefault(); publica(); } });
+  desmunta=wireModal(box, close, h);
+  setTimeout(()=>ta.focus(),60);
+}
+/* ---- Panell de la portada ---- */
+function buildAvisosPanel(){
+  const list=avisActius();
+  if(!list.length) return null;
+  const card=el('div','hpanel avis-panel');
+  const head=el('div','hpanel-head');
+  head.innerHTML='<svg class="icon" viewBox="0 0 24 24">'+ICONS.avis+'</svg><h3>Avisos</h3><span class="hpanel-count">'+list.length+'</span>';
+  card.appendChild(head);
+
+  const mostra=list.slice(0, AVIS_PANEL_MAX);
+  mostra.forEach(e=>{
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',ev=>{ if(ev.target!==row) return;
+      if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); if(row.onclick) row.onclick(ev); } });
+    /* «Alerta llegida» sense sortir de la portada */
+    if(avisNoLlegit(e)){
+      const box=el('button','hbox'); box.type='button'; box.title='Marca’l com a llegit';
+      box.setAttribute('aria-label','Marca l’avís com a llegit');
+      box.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+      box.onclick=async(ev)=>{
+        ev.stopPropagation(); box.disabled=true;
+        await api.entryRead(e.id);
+        if(entryHasUnseenComments(e.id)) await api.commentSeen(e.id);
+        renderDash(); renderNovetats(); updateAvisBadge(); toast('Llegit ✓');
+      };
+      row.appendChild(box);
+    } else {
+      const av=avatarEl(e.author,22); av.classList.add('avis-av'); row.appendChild(av);
+    }
+    const t=el('div','htitle');
+    t.textContent=stripHtml(e.body||'').replace(/\s+/g,' ').trim();
+    if(avisNoLlegit(e)) t.classList.add('avis-nou');
+    row.appendChild(t);
+
+    /* qui falta, si és meu; si no, de qui és */
+    if(e.author===ME){
+      const falta=avisQuiFalta(e);
+      const st=el('span','hstatus');
+      const pc=pillPaint(falta.length? 'var(--avis)' : 'var(--acabada)');
+      st.style.background=pc.bg; st.style.color=pc.ink;
+      st.textContent = falta.length ? 'falta '+falta.map(u=>u.name).join(' i ') : 'llegit per tothom';
+      row.appendChild(st);
+    } else {
+      const st=el('span','hstatus');
+      const u=userById(e.author); const pc=pillPaint(u.accent);
+      st.style.background=pc.bg; st.style.color=pc.ink; st.textContent=u.name;
+      row.appendChild(st);
+    }
+    /* comentaris */
+    const fils=((STATE.comments||{})[e.id]||[]).filter(x=>!x.resolved).length;
+    const nous=entryHasUnseenComments(e.id);
+    if(fils || nous){
+      const c=el('span','avis-cmt'+(nous?' nous':''));
+      c.textContent='💬'+(fils?' '+fils:'');
+      c.title=nous?'Comentaris nous':fils+' '+plural(fils,'comentari');
+      row.appendChild(c);
+    }
+    row.onclick=()=>{ OPEN_COMMENTS.add(e.id); if(entryHasUnseenComments(e.id)) api.commentSeen(e.id); openAndFlash(e.id); };
+    card.appendChild(row);
+  });
+  if(list.length>mostra.length){
+    const resta=list.length-mostra.length;
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',ev=>{ if(ev.target!==row) return;
+      if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); if(row.onclick) row.onclick(ev); } });
+    const t=el('div','htitle'); t.style.color='var(--muted)';
+    t.textContent='i '+resta+' '+plural(resta,'avís més','avisos més');
+    row.appendChild(t);
+    row.onclick=()=>openSection(AVIS_SEC);
+    card.appendChild(row);
+  }
+  return card;
+}
 function novItems(){
   const out=[];
   const isEdited = x => !!(x.updatedAt && x.createdAt && x.updatedAt!==x.createdAt);
-  STATE.entries.forEach(e=>{ if(!(e.readBy||[]).includes(ME))
+  /* Els avisos NO entren a Novetats: tenen el seu propi panell (buildAvisosPanel), que
+     és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa sortiria
+     dues vegades a la portada. */
+  STATE.entries.forEach(e=>{ if(e.section===AVIS_SEC) return;
+    if(!(e.readBy||[]).includes(ME))
     out.push({kind:'entry',ref:e,id:e.id,section:e.section,title:e.title,snippet:e.body,author:e.author,
       updatedAt:e.updatedAt||e.date,edited:isEdited(e)}); });
   STATE.tasks.forEach(t=>{ if(!(t.readBy||[]).includes(ME))
@@ -3202,6 +3410,7 @@ function novItems(){
       updatedAt:t.updatedAt||t.date,edited:isEdited(t)}); });
   Object.keys(STATE.comments||{}).forEach(entryId=>{
     const entry=STATE.entries.find(e=>e.id===entryId); if(!entry) return;
+    if(entry.section===AVIS_SEC) return;          // els avisos van al seu panell
     // si l'entrada ja surt com a novetat, els comentaris hi van inclosos (una sola targeta)
     if(!(entry.readBy||[]).includes(ME)) return;
     const units=[];
@@ -3277,6 +3486,7 @@ function buildWeekPanel(){
 }
 function renderDash(){
   const cols=$('#dashCols'); if(!cols) return; cols.innerHTML='';
+  const av=buildAvisosPanel(); if(av) cols.appendChild(av);   // primer: és el més urgent
   const a=buildMyTasksPanel(); if(a) cols.appendChild(a);
   const cr=buildCorreusPanel(); if(cr) cols.appendChild(cr);
   const cv=buildCarpetaPanel(); if(cv) cols.appendChild(cv);
@@ -3461,6 +3671,7 @@ function renderBento(){
   const b=$('#bento'); b.innerHTML='';
   let pillWrap=null;                  // el comparteixen totes les píndoles (veure el CSS)
   SECTIONS.forEach(sec=>{
+    if(sec.hidden) return;            // avisos: s'hi entra pel botó de la barra de dalt
     if(sec.size==='pill'){
       if(!pillWrap){ pillWrap=el('div','tile-pill-wrap'); b.appendChild(pillWrap); }
       const pill=el('button','tile-pill');

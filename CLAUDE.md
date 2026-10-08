@@ -122,7 +122,11 @@ grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|N
 `excursions`/`activitats`(subthemes), `programacio`(programacio),
 `correus`(correus, `customHero`), `enllacos`(links), `avaluacio`(avaluacio,
 `customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`),
-`grups`(grups, `customHero`, `size:'pill'`).
+`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `hidden`).
+
+**`hidden:true`** (només `avisos`): la secció existeix i `openSection` hi entra, però
+`renderBento` la **salta** i NO surt com a rajola de la portada. S'hi entra pel botó de
+la barra de dalt i per l'avís de la portada (§9).
 
 **Píndoles:** `programacio` i `grups` tenen `size:'pill'` i es pinten com a botons
 allargats al final de la portada. `renderBento` les posa TOTES dins d'UN sol
@@ -482,6 +486,36 @@ nom estandarditzat.
   ⚠️ Casos **NOUS a `doPost`** (`grupEtiquetes`, `grupMarca`, `grupNota`, `grupNom`,
   `grupConjuntUpsert`, `grupConjuntDelete`) → cal **nou desplegament del Web App** (§11) i, si
   es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+- **Avisos ràpids** (botó de la barra de dalt, al costat del perfil: bafarada amb alerta,
+  `#avisBtn`): escriure una nota ràpida que les altres dues veuen a la portada, i que poden
+  **comentar** o **marcar com a llegida**.
+  **No hi ha model nou:** són **`entries` amb `section:'avisos'`** (`AVIS_SEC`). Això ho hereta
+  tot del que ja funciona i està provat: `readBy` = «alerta llegida», els comentaris en fil
+  (`STATE.comments[entryId]` + el rail d'`entryRow`), `deleteEntry` que neteja els comentaris,
+  l'edició, la cerca i la cua de reintents. La secció és `hidden` (§6) i es pinta amb
+  `renderEntries`, que ja porta tot això: **zero codi de pintat nou per a la secció**.
+  **Escriure'n un:** `obreAvisRapid()` → modal d'UNA caixa de text (res de títol ni enllaç: ha
+  de ser ràpid). ⌘/Ctrl+Enter publica. Es desa amb `readBy:[ME]` → per a mi ja està llegit i
+  les altres dues el veuen com a nou. El modal porta a sota un enllaç per veure'ls tots.
+  **Panell de la portada** (`buildAvisosPanel`, el **primer** de `renderDash`): surten els que
+  (a) jo no he llegit, (b) tenen comentaris que no he vist, o (c) són **meus** i encara no els
+  ha llegit tothom — així l'autor veu si cal insistir («falta Mireia i Cristina» / «llegit per
+  tothom»). Els que no he llegit porten la casella ✓ per marcar-los **sense sortir de la
+  portada**; els meus, l'avatar. Xip 💬 amb els fils oberts i en groc si n'hi ha de nous. El
+  clic obre l'avís amb el panell de comentaris desplegat. Topall `AVIS_PANEL_MAX`=5 + «i N
+  avisos més».
+  **Comptador al botó** (`updateAvisBadge`): els que demanen una acció MEVA
+  (`avisPendentsMeus`: no llegits + amb comentaris nous). Es crida des de `refreshHome` i des
+  de `repaintAfterSync`, perquè també s'actualitzi **dins d'una secció**.
+  ⚠️ **Els avisos NO entren a `novItems()`** (ni ells ni els seus comentaris): tenen el seu
+  panell, que és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa
+  sortiria **dues vegades** a la portada.
+  ⚠️ `.avis-pill` porta el `margin-left:auto` que abans tenia `.topbar .me`: amb dos
+  `margin-left:auto` el buit es reparteix entre tots dos i els dos botons quedarien separats.
+  Funcions: `avisosTots/avisNoLlegit/avisQuiFalta/avisActius/avisPendentsMeus/updateAvisBadge/
+  obreAvisRapid/buildAvisosPanel`. Variables de color: `--avis`, `--avis-ink`.
+  **No cal cap acció nova al backend:** fa servir `addEntry`, `entryRead`, `commentSeen` i la
+  resta, que ja hi són. **No cal redesplegar el Web App per això.**
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
 - **Correu de pícnics** (dins Excursions): obre Gmail amb la llista i la data.
 
