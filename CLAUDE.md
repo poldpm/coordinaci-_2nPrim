@@ -54,6 +54,16 @@ Els mestres no-tutors s'anomenen SEMPRE **"especialistes"** (mai "no-tutors").
     (`fbEnviaLot`) que llegeix els 9 documents, aplica `fbApply` i desa només els que canvien.
     `fbApply` és una **còpia generada** d'`_apply`/`_arribaTard`/`_conservaLlegits` del backend:
     **si toques `_apply` al .gs, executa `node scripts/gen_fb_apply.js`** (no editar el bloc a mà).
+    ⚠️ **El perill va en les DUES direccions.** El generador **sobreescriu** `fbApply` amb el que
+    digui el `.gs`: si el `.gs` va endarrerit, li **esborra casos a `index.html`** i aquella funció
+    deixa de desar-se *en silenci* (el backend respon «Acció desconeguda», que el client marca com
+    a error permanent). Va passar de debò: el 08-10-2026 el `.gs` li faltaven **10 casos**
+    (`autCamps`, `autSet` de les autoritzacions, i els 8 de llibres i grups), perquè l'app roda
+    sobre Firebase i funciona encara que el `.gs` vagi enrere. **Abans d'executar el generador,
+    comprova que els dos costats tenen els mateixos casos** (§12). Si has editat `fbApply` a mà
+    (perquè el `.gs` no és al repositori), enganxa el mateix tros al `.gs` com més aviat millor.
+    **Estat: verificat en sincronia el 08-10-2026, 51 casos als dos costats, i Web App
+    redesplegat.**
   - **Llegir:** `onSnapshot` de la col·lecció (`fbEscolta`), sense sondeig. Una foto amb `v` menor
     que el que acabem de desar (`FB.minV`) s'ignora.
   - **Apps Script després de migrar** (propietat `FIREBASE_MIGRAT=1`): comandes igual; `getState`
@@ -399,7 +409,9 @@ nom estandarditzat.
   sortida** (p. ex. Autorització, Dret de veu, Dret d'imatge, Pagament, o les que es vulguin).
   Model: `STATE.autoritzacions[subthemeId] = {camps:[{id,nom}], marques:{'CLASSE|Nom':{campId:true}}}`.
   `camps` es desa sencer (`api.autSetCamps` → `autCamps`); les marques són **granulars i idempotents**
-  (`api.autSet` → `autSet`), així els tres tutors poden marcar alhora. Per defecte hi ha una sola
+  (`api.autSet` → `autSet`), així els tres tutors poden marcar alhora. Casos `autCamps`/`autSet` al
+  `doPost`: ✅ al `.gs` i Web App redesplegat (08-10-2026) — van estar al web però NO al `.gs` des
+  del 28-09 fins al 08-10 (§3: per què això és perillós). Per defecte hi ha una sola
   casella, «Autorització»; `AUT_PRESETS` són les propostes ràpides. Funcions: `renderAutoritzacions`,
   `autDades/autCamps/autTe/autCompta/autInicials` (abreviatura de columna, ignora «de/d'/la…»:
   Dret de veu → DV, Dret d'imatge → DI) i `autTextQueFalta` (botó «Copia qui falta»).
@@ -442,8 +454,7 @@ nom estandarditzat.
   llibCheck/llibDies/llibAvui/llibFmtDia/llibTextPendents`. Estat: `LLIB_VIEW`, `LLIB_BOOK`,
   `LLIB_CLASS`, `LLIB_ALUMNE`, `LLIB_CONFIG`.
   ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
-  abans. ⚠️ Casos **NOUS a `doPost`** (`llibTitols`, `llibSet`) → cal **nou desplegament del Web
-  App** (§11) i, si es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+  abans. Casos `llibTitols` i `llibSet` al `doPost`: ✅ al `.gs` i Web App redesplegat (08-10-2026).
 - **Gestió de grups** (secció pròpia `grups`, píndola al costat de Programació): tres coses.
   Model: `STATE.grups = {etiquetes, marques, notes, noms, conjunts}` (§5).
   1. **Marques a tenir en compte en fer els grups.** Etiquetes sembrades a `GRUP_ETIQ_SEED`:
@@ -490,9 +501,8 @@ nom estandarditzat.
   grupConjunts/grupConjuntDe/grupMembresTots/grupPool/grupParteix/grupFmtData/grupMarcatsPlans/
   grupResolClau/grupDesaDelGenerador`. Estat: `GRUPS_VIEW`, `GRUPS_CLASS`, `GRUPS_CONJ`,
   `GRUPS_ETIQ_CFG`, i `GRUPS_NAV` (el mateix paper que `PROG_NAV`/`LLIB_NAV`).
-  ⚠️ Casos **NOUS a `doPost`** (`grupEtiquetes`, `grupMarca`, `grupNota`, `grupNom`,
-  `grupConjuntUpsert`, `grupConjuntDelete`) → cal **nou desplegament del Web App** (§11) i, si
-  es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+  Casos `grupEtiquetes`, `grupMarca`, `grupNota`, `grupNom`, `grupConjuntUpsert` i
+  `grupConjuntDelete` al `doPost`: ✅ al `.gs` i Web App redesplegat (08-10-2026).
 - **Avisos ràpids** (botó de la barra de dalt, al costat del perfil: bafarada amb alerta,
   `#avisBtn`): escriure una nota ràpida que les altres dues veuen a la portada, i que poden
   **comentar** o **marcar com a llegida**.
@@ -538,8 +548,12 @@ nom estandarditzat.
 ## 10. Recordatoris diaris (Apps Script — PRIVAT, fora de la web)
 Al final de `Codi_AppsScript.gs`. **Res d'això surt a la web ni a GitHub.**
 - **`recordatoriTelegram()`** → 7:00, missatge de **Telegram només per a Pol**
-  amb els seus pendents (només si en té). Token i chat_id **al codi** (decisió de
-  Pol). ⚠️ El token és sensible: aquest fitxer NO ha d'anar mai a un repo públic.
+  amb els seus pendents (només si en té). **El token NO és al codi:** viu a les
+  Propietats de l'script (`TG_TOKEN` i `TG_CHAT_ID`), i `_tgToken()`/`_tgChat()` el
+  llegeixen d'allà. `configuraTelegram()` serveix per desar-lo-hi un sol cop.
+  ⚠️ Tot i això, aquest fitxer **NO ha d'anar mai a un repo públic** (i el de
+  Coordinació 2n ho és): hi ha el `chat_id`, les adreces de la Cristina i la Mireia
+  (`REMINDER_EMAILS`) i els IDs de les carpetes del Drive. El `.gitignore` ho evita.
 - **`recordatoriEmails()`** → 8:00, **correu** a Cristina/Mireia (adreces a
   `REMINDER_EMAILS`) **només si han activat l'opció a l'app** (`emailReminders`)
   **i** tenen pendents.
@@ -581,6 +595,24 @@ reinstal·lar la PWA per veure els canvis.
   # Backend:
   cp Codi_AppsScript.gs /tmp/chk.js && node --check /tmp/chk.js
   ```
+- **Comprovar que el backend i el web diuen el mateix** (abans d'executar
+  `gen_fb_apply.js`, i sempre que hagis tocat accions). Compara els `case` dels dos
+  costats; ha de sortir «(cap)» a les dues llistes:
+  ```bash
+  python3 -I - <<'PY'
+  import re
+  gs=open('Codi_AppsScript.gs',encoding='utf-8').read()
+  html=open('index.html',encoding='utf-8').read()
+  tall=lambda t,a,b:(lambda i:t[i:t.index(b,i)])(t.index(a))
+  cas=lambda t:set(re.findall(r"case '([A-Za-z]+)':",t))
+  a=cas(tall(gs,'function _apply(','function _loadStudents('))
+  b=cas(tall(html,'function fbApply(','/* === PORT DEL BACKEND: fi === */'))
+  print('falten al .gs :', sorted(b-a) or '(cap)')
+  print('sobren al .gs :', sorted(a-b) or '(cap)')
+  PY
+  ```
+  La prova definitiva: executar `node scripts/gen_fb_apply.js` i comprovar que
+  `git diff --quiet index.html` no detecta cap canvi.
 - Cada canvi: edició petita i incremental, validar, i (si escau) provar la lògica
   de dates amb un mini-script de node abans de donar-ho per bo.
 
