@@ -387,18 +387,10 @@ a{color:var(--teal)}
 .aut-check.on{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
 @media (max-width:420px){ .aut-check,.aut-cel{width:38px} .aut-check{height:38px} }
 /* --- Registre de llibres a casa (eina) --- */
-.llib-chip{display:inline-block;font-weight:800;font-size:.74rem;padding:.18em .5em;border-radius:999px;background:#fff4de;color:#8a5a06;margin-right:5px}
 .llib-check{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;color:transparent;transition:.12s;cursor:pointer}
 .llib-check .icon{width:20px;height:20px;stroke-width:3}
 .llib-check:hover{border-color:var(--cyan)}
 .llib-check.on.r{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
-.llib-pend-cls{background:var(--bg);font-weight:800;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:.5em .8em;border-top:1px solid var(--line)}
-.llib-pend-cls:first-child{border-top:0}
-.llib-pend-row{display:flex;align-items:center;gap:10px;padding:.5em .8em;border-top:1px solid var(--line)}
-.llib-pend-row .n{font-weight:800;flex:none}
-.llib-pend-row .l{flex:1;min-width:0;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.llib-pend-row .d{font-weight:800;font-size:.8rem;color:#8a5a06;background:#fff4de;border-radius:999px;padding:.2em .6em;flex:none}
-.llib-pend-row .d.alerta{color:#a3301f;background:#ffe6e1}
 @media (max-width:420px){ .llib-check{width:38px;height:38px} }
 /* --- Cicles de llibres --- */
 .llib-ciclenav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
@@ -430,8 +422,6 @@ a{color:var(--teal)}
   border-radius:999px;padding:.15em .55em;flex:none}
 .llib-tria-op.ja{opacity:.62}
 .llib-tria-op.on{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 10%,#fff)}
-.llib-avis{font-weight:800;font-size:.84rem;color:#8a5a06;background:#fff4de;border:1.5px solid #eccf9a;
-  border-radius:12px;padding:.6em .8em;margin-bottom:12px;text-align:left}
 /* --- Gestió de grups --- */
 .gg-etiq{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:.72rem;padding:.18em .55em;border-radius:999px;
   background:color-mix(in srgb,var(--cyan) 15%,#fff);color:var(--teal-ink);white-space:nowrap}
