@@ -1,22 +1,38 @@
-# Tros per enganxar a `Codi_AppsScript.gs`
+# El tros que falta a `Codi_AppsScript.gs`
 
-`Codi_AppsScript.gs` **no és en aquest repositori** (el `.gitignore` l'exclou, §10: hi ha
-el token de Telegram). Per això no he pogut executar `node scripts/gen_fb_apply.js`, que és
-el que normalment copia `_apply` del `.gs` al bloc `fbApply` d'`index.html`.
+## Per què no et dono el fitxer sencer
 
-He editat el bloc d'`index.html` **a mà** i he comprovat amb un script que el que aplica
-la pantalla i el que aplicaria el servidor donen un estat **idèntic**. Però perquè els dos
-costats no quedin desincronitzats (i perquè la propera vegada que generis `fbApply` no
-s'esborrin aquests dos casos), **has d'enganxar aquest tros al `.gs`**.
+`Codi_AppsScript.gs` **no és en aquest repositori**: el `.gitignore` l'exclou perquè hi tens
+el token de Telegram (§10 del `CLAUDE.md`). **No l'he vist mai**, així que no et puc donar el
+fitxer complet sense inventar-me la resta. El que hi ha aquí és **exactament el que falta**:
+els 8 casos nous de les tres millores (llibres, gestió de grups) i les línies de
+`normalizeState`.
 
-## Què has de fer
+Per això tampoc he pogut executar `node scripts/gen_fb_apply.js`, que és el que normalment
+copia `_apply` del `.gs` al bloc `fbApply` d'`index.html`. He editat aquell bloc **a mà** i he
+comprovat amb un script que el que aplica la pantalla i el que aplicaria el servidor donen un
+estat **idèntic** (i que reenviar el lot dues vegades no canvia res). Però perquè els dos
+costats no quedin desincronitzats —i perquè la propera vegada que generis `fbApply` no
+s'esborrin aquests casos— has d'enganxar això al `.gs`.
 
-1. Obre `Codi_AppsScript.gs` al teu ordinador.
-2. Dins de `function _apply(state, action, payload)`, busca el `case 'cvLliurat':`.
-3. Enganxa aquests dos casos **just abans** d'aquell `case`.
-4. Puja el `.gs` a l'editor d'Apps Script.
-5. **Nou desplegament del Web App** (Implementar → Gestionar implementacions → versió nova):
-   són **accions noves de `doPost`** (§11).
+## Fa falta per fer servir les millores?
+
+**No.** L'app està migrada a Firebase (§3) i les escriptures les aplica `fbApply` des
+d'`index.html`, que ja porta els 8 casos. **Tot funciona ara mateix amb la web ja pujada.**
+El `.gs` cal per a dues coses:
+
+1. Que `gen_fb_apply.js` no esborri aquests casos la propera vegada que el facis servir.
+2. Que l'app segueixi funcionant si algun dia es torna a `TRANSPORT='appsscript'`.
+
+Els **avisos ràpids** (l'última millora) no hi surten: fan servir `addEntry`, `entryRead` i
+`commentSeen`, que ja hi són. No necessiten res de nou.
+
+---
+
+## 1. Els 8 casos — dins de `_apply`
+
+Obre `Codi_AppsScript.gs`, busca `function _apply(state, action, payload)` i, **dins del seu
+`switch`**, enganxa aquest bloc sencer just **abans** del `case 'cvLliurat':`.
 
 ```js
     /* ---- Registre de llibres a casa ----
@@ -43,13 +59,6 @@ s'esborrin aquests dos casos), **has d'enganxar aquest tros al `.gs`**.
       }
       break;
     }
-```
-
-## I aquests sis, per a la Gestió de grups
-
-Enganxa'ls també dins de `_apply`, just abans dels dos de `llibTitols`/`llibSet`:
-
-```js
     /* ---- Gestió de grups ----
        `etiquetes` (PI, Conducta, les que calguin) i cada `conjunt` de grups es desen
        sencers; `marques`, `notes` i `noms` són granulars per alumne, així els tres
@@ -100,14 +109,10 @@ Enganxa'ls també dins de `_apply`, just abans dels dos de `llibTitols`/`llibSet
     }
 ```
 
-⚠️ **No toquis `alumnesAFirebase()`.** La correcció de noms de l'app NO reescriu la llista
-d'alumnes: és una capa a sobre (`STATE.grups.noms`), justament perquè el full segueixi
-manant i la pujada de cada hora no esborri res. Si algun dia vols fer les correccions
-definitives, el botó «Copia la llista de 2nX» de l'app et dona els noms per enganxar al full.
+## 2. Les claus noves — al `normalizeState` del servidor
 
-## Si també hi tens un `normalizeState` equivalent al servidor
-
-Afegeix-hi la clau nova, com les altres:
+Si al `.gs` hi tens una funció que garanteix que les claus de l'estat existeixen (l'equivalent
+de `normalizeState`), afegeix-hi també això:
 
 ```js
   if(!state.llibres) state.llibres = {titols:[], marques:{}};
@@ -121,22 +126,31 @@ Afegeix-hi la clau nova, com les altres:
   state.grups.conjunts = state.grups.conjunts || [];
 ```
 
-## Comprova que ha quedat bé
+## 3. Desplega'l
+
+Són **accions noves de `doPost`**, així que cal **nou desplegament del Web App** (§11):
+Implementar → Gestionar implementacions → versió nova.
+
+## 4. Comprova que ha quedat bé
 
 ```bash
-cp Codi_AppsScript.gs /tmp/chk.js && node --check /tmp/chk.js
-node scripts/gen_fb_apply.js      # ha de deixar index.html IGUAL que ara
-git diff --stat index.html        # si surt buit, els dos costats coincideixen
+cp Codi_AppsScript.gs /tmp/chk.js && node --check /tmp/chk.js   # sintaxi
+node scripts/gen_fb_apply.js                                    # ha de deixar index.html IGUAL
+git diff --stat index.html                                      # si surt buit, els dos costats coincideixen
 ```
 
-Si `gen_fb_apply.js` et canvia `index.html`, és que el tros del `.gs` no és idèntic al
-que hi ha ara al bloc; mira el diff abans de donar-ho per bo.
+Si `gen_fb_apply.js` et canvia `index.html`, és que el tros del `.gs` no és idèntic al que hi
+ha al bloc `fbApply`: mira el diff abans de donar-ho per bo.
 
-## Fa falta això per fer-ho servir?
+---
 
-**No.** L'app està migrada a Firebase (§3), i amb Firebase les escriptures les aplica
-`fbApply` des d'`index.html` — que ja porta els dos casos. L'eina funciona en pujar
-la web. El `.gs` cal per a dues coses:
+## ⚠️ Una cosa que NO has de fer
 
-- que `gen_fb_apply.js` no esborri aquests casos la propera vegada;
-- que l'app segueixi funcionant si algun dia es torna a `TRANSPORT='appsscript'`.
+**No toquis `alumnesAFirebase()`.** La correcció de noms de la Gestió de grups **no** reescriu
+la llista d'alumnes: és una capa a sobre (`STATE.grups.noms`), justament perquè el full
+segueixi manant i la pujada de cada hora no esborri res. Si algú ho «millorés» fent que l'app
+pugés els noms al full, la pujada automàtica i les claus dels registres (llibres,
+autoritzacions, reptes, carpeta viatgera) entrarien en conflicte.
+
+Si vols fer les correccions definitives, el botó **«Copia la llista de 2nX»** de l'app et dona
+els noms ja corregits per enganxar-los a la columna del full.
