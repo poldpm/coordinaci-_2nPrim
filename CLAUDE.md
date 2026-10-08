@@ -111,6 +111,7 @@ correus[]        // {id, title, body, date, sent:{tutor:true}, author, createdAt
 emailReminders{} // opt-in del correu recordatori: { tutor: true }
 cvLliurat{}      // qui ha entregat la carpeta viatgera: { dataISO_del_cicle: { 'Nom alumne': true } }
 comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
+llibres{}        // llibres que s'emporten a casa: { titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e:dataISO, r:dataISO}}} } — veure §9
 ```
 `normalizeState()` garanteix que totes les claus existeixen.
 
@@ -384,6 +385,37 @@ nom estandarditzat.
   `autDades/autCamps/autTe/autCompta/autInicials` (abreviatura de columna, ignora «de/d'/la…»:
   Dret de veu → DV, Dret d'imatge → DI) i `autTextQueFalta` (botó «Copia qui falta»).
   Les pestanyes de classe compten els alumnes que tenen **totes** les caselles.
+- **Registre llibres a casa** (dins `eines`, `EINA='llibres'`): els llibres de l'escola que els
+  nens i nenes s'emporten a casa per llegir. Cal poder marcar les **DUES** coses: que se l'ha
+  emportat i que l'ha tornat.
+  Model: `STATE.llibres = {titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e,r}}}}`, on
+  `e` = data ISO del dia que se l'emporta i `r` = data ISO del dia que el torna. `titols` es desa
+  sencer (`api.llibTitols` → `llibTitols`); les marques són **granulars i idempotents**
+  (`api.llibSet(alumne, llibre, camp, data)` → `llibSet`, una per alumne/llibre/camp) → els tres
+  tutors poden marcar alhora. La clau d'alumne és composta `CLASSE|NOM` (`stKey`).
+  **11 llibres sembrats** a `LLIB_SEED` (ids estables `l01..l11`): Tumbili, Història d'una orella,
+  Llista d'aniversari, Plou, Mal a la mà mal al peu, En Ton i la Neus, Titelles fades i follets,
+  Anem a la masia, Ai Terri Terri..., Ha nascut en Marçal, La Festa Major. Com la programació, és
+  **sembra mandrosa**: `llibTitols()` torna la llista desada i, si encara no s'ha tocat mai, la
+  sembra; la primera edició la materialitza. Treure un títol **no** esborra les marques (si el
+  tornes a posar, hi són).
+  **El parell es manté coherent** (`llibToggle`): marcar «tornat» sense «emportat» marca també
+  «emportat» el mateix dia; treure «emportat» treu també «tornat». Així no hi pot haver un llibre
+  tornat que ningú s'hagi endut.
+  **Tres vistes** (`LLIB_VIEW`), perquè amb 11 llibres una graella alumnes × llibres no cap al
+  mòbil: *Llibres* (targeta per llibre amb «🏠 N a casa · ✅ N/N tornats» i barra; clic → graella
+  d'alumnes de la classe), *Per alumne* (clic a un alumne → els seus 11 llibres) i *A casa* (els
+  que encara no s'han tornat, **agrupats per classe** i, dins de cada classe, els que fa més dies
+  primer; a partir de `LLIB_DIES_AVIS`=15 dies el comptador surt en vermell, i hi ha «Copia qui té
+  llibres a casa»). Marcar «tornat» des de *A casa* **treu només aquella fila** (no repinta la
+  secció: si no, saltava a dalt de tot a cada marca).
+  Funcions: `renderLlibres` + `renderLlibres{Llista,Config,Book,Alumnes,Alumne,Casa}`,
+  `llibDades/llibTitols/llibMarca/llibEstat/llibCompta/llibComptaAlumne/llibPendents/llibToggle/
+  llibCheck/llibDies/llibAvui/llibFmtDia/llibTextPendents`. Estat: `LLIB_VIEW`, `LLIB_BOOK`,
+  `LLIB_CLASS`, `LLIB_ALUMNE`, `LLIB_CONFIG`.
+  ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
+  abans. ⚠️ Casos **NOUS a `doPost`** (`llibTitols`, `llibSet`) → cal **nou desplegament del Web
+  App** (§11) i, si es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
 - **Correu de pícnics** (dins Excursions): obre Gmail amb la llista i la data.
 

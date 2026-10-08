@@ -353,6 +353,13 @@ a{color:var(--teal)}
 .aut-config-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .aut-config-row input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:.6em .8em;font:inherit;background:var(--bg);color:var(--ink)}
 .aut-config-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+/* Botó d'icona (treure una casella, treure un llibre). No tenia cap estil: sortia
+   com un botó gris del navegador, desencaixat de tot. */
+.icon-btn{flex:none;width:40px;height:40px;display:grid;place-items:center;border:1.5px solid var(--line);
+  background:var(--bg);color:var(--muted);border-radius:12px;cursor:pointer;transition:.12s}
+.icon-btn .icon{width:18px;height:18px}
+.icon-btn:hover{border-color:var(--cyan);color:var(--teal-ink)}
+.icon-btn.danger:hover{border-color:#e2a09a;background:#fff1ee;color:#a3301f}
 .aut-taula{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px;background:var(--paper)}
 .aut-fila{display:flex;align-items:center;gap:10px;padding:.45em .7em;border-top:1px solid var(--line)}
 .aut-fila:first-child{border-top:0}
@@ -364,6 +371,35 @@ a{color:var(--teal)}
 .aut-check:hover{border-color:var(--cyan)}
 .aut-check.on{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
 @media (max-width:420px){ .aut-check,.aut-cel{width:38px} .aut-check{height:38px} }
+/* --- Registre de llibres a casa (eina) --- */
+.llib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:12px;margin-bottom:18px}
+.llib-card{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:14px;background:var(--panel);cursor:pointer;transition:.15s;font:inherit;color:inherit}
+.llib-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--cyan)}
+.llib-card .llib-t{font-family:var(--font-d);font-weight:600;font-size:1.02rem;color:var(--teal-ink);line-height:1.18}
+.llib-card .llib-m{font-weight:800;font-size:.79rem;color:var(--muted);margin-top:7px}
+.llib-bar{height:5px;border-radius:5px;margin-top:9px;background:var(--line);overflow:hidden}
+.llib-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--acabada),#3ba06f)}
+.llib-chip{display:inline-block;font-weight:800;font-size:.74rem;padding:.18em .5em;border-radius:999px;background:#fff4de;color:#8a5a06;margin-right:5px}
+.llib-h{width:44px;text-align:center;flex:none;font-size:.95rem}
+.llib-rowbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:inherit;padding:.55em .7em;border-top:1px solid var(--line);cursor:pointer}
+.llib-rowbtn:first-child{border-top:0}
+.llib-rowbtn:hover{background:var(--bg)}
+.llib-rowbtn .nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.llib-rowbtn .ct{font-weight:800;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.llib-check{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;color:transparent;transition:.12s;cursor:pointer}
+.llib-check .icon{width:20px;height:20px;stroke-width:3}
+.llib-check:hover{border-color:var(--cyan)}
+.llib-check.on.e{background:linear-gradient(180deg,#eca33f,#d2871b);border-color:transparent;color:#fff}
+.llib-check.on.r{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
+.llib-pend{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);margin-bottom:16px}
+.llib-pend-cls{background:var(--bg);font-weight:800;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:.5em .8em;border-top:1px solid var(--line)}
+.llib-pend-cls:first-child{border-top:0}
+.llib-pend-row{display:flex;align-items:center;gap:10px;padding:.5em .8em;border-top:1px solid var(--line)}
+.llib-pend-row .n{font-weight:800;flex:none}
+.llib-pend-row .l{flex:1;min-width:0;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.llib-pend-row .d{font-weight:800;font-size:.8rem;color:#8a5a06;background:#fff4de;border-radius:999px;padding:.2em .6em;flex:none}
+.llib-pend-row .d.alerta{color:#a3301f;background:#ffe6e1}
+@media (max-width:420px){ .llib-check,.llib-h{width:38px} .llib-check{height:38px} }
 .nov-cmt{background:#fff4e0;color:#8a5600;font-weight:800}
 /* Mida tàctil mínima: abans hi havia icones de 34x29 px, per sota del que es pot tocar bé */
 .rept-icona,.read-btn,.back-btn,.prog-segbtn,.att-tab,.edit-btn,.del{min-height:40px;min-width:40px}
@@ -1620,6 +1656,28 @@ const api = {
     if(on) m[camp]=true; else { delete m[camp]; if(!Object.keys(m).length) delete a.marques[alumne]; }
     await persist('autSet', {sub, alumne, camp, on:!!on});
   },
+  /* --- Registre de llibres a casa ---
+     `titols` es desa sencer (només l'edita qui personalitza la llista); les marques són
+     granulars per alumne i llibre, així els tres tutors poden marcar alhora sense
+     trepitjar-se. `data` és la data (ISO) del dia que se l'emporta o que el torna;
+     null = treure la marca. Idempotent: desar la mateixa data dues vegades no canvia res. */
+  async llibTitols(titols){
+    const d = llibDades();
+    d.titols = titols || [];
+    await persist('llibTitols', {titols:d.titols});
+  },
+  async llibSet(alumne, llibre, camp, data){
+    const d = llibDades();
+    const m = d.marques[alumne] = d.marques[alumne] || {};
+    const b = m[llibre] = m[llibre] || {};
+    if(data) b[camp] = data;
+    else {
+      delete b[camp];
+      if(!Object.keys(b).length) delete m[llibre];
+      if(!Object.keys(m).length) delete d.marques[alumne];
+    }
+    await persist('llibSet', {alumne, llibre, camp, data: data||null});
+  },
   async cvLliurat(key, alumne, on){
     STATE.cvLliurat = STATE.cvLliurat || {};
     const m = STATE.cvLliurat[key] = STATE.cvLliurat[key] || {};
@@ -1930,6 +1988,8 @@ function normalizeState(){
   if(!STATE.comments) STATE.comments={};
   if(!STATE.cvLliurat) STATE.cvLliurat={};
   if(!STATE.autoritzacions) STATE.autoritzacions={};
+  if(!STATE.llibres) STATE.llibres={titols:[],marques:{}};
+  STATE.llibres.titols=STATE.llibres.titols||[]; STATE.llibres.marques=STATE.llibres.marques||{};
   if(!STATE.reptes) STATE.reptes={caixes:[],registres:[],v:0};
   STATE.reptes.caixes=STATE.reptes.caixes||[]; STATE.reptes.registres=STATE.reptes.registres||[];
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
@@ -2480,6 +2540,30 @@ function fbApply(state, action, payload){
       else {
         delete am[payload.camp];
         if(!Object.keys(am).length) delete as.marques[payload.alumne];
+      }
+      break;
+    }
+    /* ---- Registre de llibres a casa ----
+       `titols` és la llista de llibres (es desa sencera: només l'edita qui la personalitza).
+       `marques` és granular per alumne i llibre → els tres tutors poden marcar alhora.
+       Cada llibre d'un alumne guarda {e: data que se l'emporta, r: data que el torna}. */
+    case 'llibTitols': {
+      state.llibres = state.llibres || {titols:[], marques:{}};
+      state.llibres.titols = payload.titols || [];
+      state.llibres.marques = state.llibres.marques || {};
+      break;
+    }
+    case 'llibSet': {
+      state.llibres = state.llibres || {titols:[], marques:{}};
+      state.llibres.titols = state.llibres.titols || [];
+      state.llibres.marques = state.llibres.marques || {};
+      var lm = state.llibres.marques[payload.alumne] = state.llibres.marques[payload.alumne] || {};
+      var lb = lm[payload.llibre] = lm[payload.llibre] || {};
+      if(payload.data) lb[payload.camp] = payload.data;
+      else {
+        delete lb[payload.camp];
+        if(!Object.keys(lb).length) delete lm[payload.llibre];
+        if(!Object.keys(lm).length) delete state.llibres.marques[payload.alumne];
       }
       break;
     }
@@ -3290,6 +3374,8 @@ let KANBAN_GROUP=false;
 let AV_TRI=null, AV_SUBJECT=null, PENDING_AV=null;
 let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
+/* ---------- Registre de llibres a casa (dins STATE.llibres → sincronitzat entre els tres) ---------- */
+let LLIB_VIEW='llibres', LLIB_BOOK=null, LLIB_CLASS=null, LLIB_ALUMNE=null, LLIB_CONFIG=false;
 /* ---------- El racó dels reptes (dins STATE.reptes → sincronitzat entre els tres) ---------- */
 let REPTES_FILTRE='', REPTES_MAT='tot';
 let REPTES_VIEW='caixes', REPTES_CAIXA=null, REPTES_ALUMNE=null, REPTES_ADD=false, PENDING_REPTE=null;
@@ -4363,7 +4449,8 @@ function renderProgOverview(S, subj, curIdx){
 function openSection(id){
   if(id!==CURRENT || CURRENT_SUB) EDITING=null;
   if(id!=='calendari') SCHEDULING=null;
-  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null; }
+  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null;
+    LLIB_VIEW='llibres'; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; }
   /* PROG_NAV: qui ve de la cerca o d'un avis de la portada ja ha triat setmana o
      cicle. Sense aquesta marca, openSection ho reiniciava a la setmana d'avui i
      el clic aterrava sempre al lloc equivocat. */
@@ -5070,6 +5157,10 @@ function renderEines(S,sec){
     buildSecHero(S,sec,{title:'Assistència d\u2019excursió', desc:'Marca els absents del teu grup i genera la llista per a administració.',
       back:{label:sec.name, onClick:()=>{ EINA=null; openSection('eines'); }}});
     renderAttendance(S);
+  } else if(EINA==='llibres'){
+    buildSecHero(S,sec,{title:'📚 Registre llibres a casa', desc:'Qui s’ha emportat cada llibre a casa i qui ja l’ha tornat.',
+      back:{label:sec.name, onClick:()=>{ EINA=null; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; LLIB_VIEW='llibres'; openSection('eines'); }}});
+    renderLlibres(S);
   } else {
     buildSecHero(S,sec,{title:sec.name, desc:'Tria una eina.'});
     renderEinesList(S);
@@ -5080,6 +5171,7 @@ function renderEinesList(S){
   const tools=[
     {id:'reptes', name:'🎯 El racó dels reptes', desc:'Caixes de treball autònom: escaneja l’NFC, marca qui l’ha fet, controla còpies i evolució.'},
     {id:'grups', name:'👥 Generador de grups', desc:'Fes grups per mida, amb o sense barrejar classes.'},
+    {id:'llibres', name:'📚 Registre llibres a casa', desc:'Qui s’ha emportat cada llibre i qui ja l’ha tornat, llibre per llibre o alumne per alumne.'},
     {id:'assistencia', name:'🚌 Assistència d\u2019excursió', desc:'Passa llista del teu grup i treu els absents per administració.'},
   ];
   tools.forEach(t=>{
@@ -5091,6 +5183,415 @@ function renderEinesList(S){
   });
   S.appendChild(grid);
 }
+/* ============ REGISTRE DE LLIBRES A CASA ============
+   Els llibres de l'escola que els nens i nenes s'emporten a casa per llegir.
+   Cal poder marcar les DUES coses: que se l'ha emportat i que l'ha tornat.
+   Model: STATE.llibres = {titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e,r}}}}
+     e = data (ISO) del dia que se l'emporta · r = data del dia que el torna
+   Les marques són granulars i idempotents (una per alumne, llibre i camp), com les
+   autoritzacions i la carpeta viatgera → els tres tutors poden marcar alhora.
+   Amb 11 llibres una graella alumnes × llibres no cap al mòbil, així que hi ha tres
+   vistes: per llibre, per alumne, i «a casa» (els que encara no han tornat). */
+const LLIB_SEED=[
+  {id:'l01', nom:'Tumbili'},
+  {id:'l02', nom:'Història d’una orella'},
+  {id:'l03', nom:'Llista d’aniversari'},
+  {id:'l04', nom:'Plou'},
+  {id:'l05', nom:'Mal a la mà, mal al peu'},
+  {id:'l06', nom:'En Ton i la Neus'},
+  {id:'l07', nom:'Titelles, fades i follets'},
+  {id:'l08', nom:'Anem a la masia'},
+  {id:'l09', nom:'Ai, Terri, Terri...'},
+  {id:'l10', nom:'Ha nascut en Marçal'},
+  {id:'l11', nom:'La Festa Major'},
+];
+const LLIB_DIES_AVIS=15;        // a partir d'aquí el comptador de dies surt en vermell
+function llibDades(){
+  STATE.llibres = STATE.llibres || {titols:[], marques:{}};
+  STATE.llibres.titols = STATE.llibres.titols || [];
+  STATE.llibres.marques = STATE.llibres.marques || {};
+  return STATE.llibres;
+}
+/* La llista desada manar; si encara no s'ha tocat mai, la sembra (com la programació) */
+function llibTitols(){ const t=llibDades().titols; return t.length ? t : LLIB_SEED; }
+function llibClasses(){ return autClasses(); }   // les classes que tenen alumnes al full
+/* Data d'avui en hora LOCAL. Amb toISOString() a la nit sortia el dia d'abans. */
+function llibAvui(){ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function llibDies(iso){
+  const a=Date.parse(String(iso)+'T00:00:00'), b=Date.parse(llibAvui()+'T00:00:00');
+  if(!a || !b) return 0;
+  return Math.max(0, Math.round((b-a)/864e5));
+}
+function llibFmtDia(iso){ const p=String(iso||'').split('-'); return p.length===3 ? p[2]+'/'+p[1] : ''; }
+function llibMarca(cls, nom, llibre){ const x=llibDades().marques[stKey(cls,nom)]; return (x && x[llibre]) || {}; }
+/* 'res' = no l'ha tingut · 'casa' = se l'ha emportat i no l'ha tornat · 'tornat' = fet */
+function llibEstat(cls, nom, llibre){ const k=llibMarca(cls,nom,llibre); return k.r ? 'tornat' : (k.e ? 'casa' : 'res'); }
+function llibCompta(llibre){
+  let casa=0, tornat=0, total=0;
+  llibClasses().forEach(c=>(STATE.students[c]||[]).forEach(n=>{
+    total++; const s=llibEstat(c,n,llibre);
+    if(s==='tornat') tornat++; else if(s==='casa') casa++;
+  }));
+  return {casa, tornat, total};
+}
+function llibComptaAlumne(cls, nom){
+  const t=llibTitols(); let casa=0, tornat=0;
+  t.forEach(l=>{ const s=llibEstat(cls,nom,l.id); if(s==='tornat') tornat++; else if(s==='casa') casa++; });
+  return {casa, tornat, total:t.length};
+}
+/* Tots els (alumne, llibre) que són a casa ara mateix, els que fa més dies primer */
+function llibPendents(){
+  const out=[], tit=llibTitols();
+  llibClasses().forEach(c=>(STATE.students[c]||[]).forEach(n=>{
+    tit.forEach(l=>{ const k=llibMarca(c,n,l.id);
+      if(k.e && !k.r) out.push({cls:c, nom:n, llibre:l, des:k.e, dies:llibDies(k.e)}); });
+  }));
+  out.sort((a,b)=> b.dies-a.dies || a.cls.localeCompare(b.cls) || a.nom.localeCompare(b.nom));
+  return out;
+}
+function llibTextPendents(){
+  const p=llibPendents();
+  if(!p.length) return 'Llibres a casa: cap. Tots tornats ✓';
+  const L=['Llibres a casa ('+p.length+'):',''];
+  llibClasses().forEach(c=>{
+    const seus=p.filter(x=>x.cls===c);
+    if(!seus.length) return;
+    L.push(c+':');
+    seus.forEach(x=>L.push('- '+x.nom+' — '+x.llibre.nom+' (des del '+llibFmtDia(x.des)+', '+x.dies+' dies)'));
+    L.push('');
+  });
+  return L.join('\n').trim();
+}
+/* Marca o desmarca, mantenint el parell coherent:
+   - treure «emportat» treu també «tornat» (no es pot tornar el que no s'ha endut)
+   - marcar «tornat» sense «emportat» marca també «emportat» (el mateix dia) */
+async function llibToggle(cls, nom, llibre, camp, vol){
+  const clau=stKey(cls,nom), avui=llibAvui(), k=llibMarca(cls,nom,llibre);
+  if(camp==='e'){
+    if(vol) await api.llibSet(clau, llibre, 'e', avui);
+    else { if(k.r) await api.llibSet(clau, llibre, 'r', null); await api.llibSet(clau, llibre, 'e', null); }
+  } else {
+    if(vol){ if(!k.e) await api.llibSet(clau, llibre, 'e', avui); await api.llibSet(clau, llibre, 'r', avui); }
+    else await api.llibSet(clau, llibre, 'r', null);
+  }
+}
+/* Una casella (emportat o tornat) d'un alumne i un llibre. `onCanvi` refresca els comptadors. */
+function llibCheck(cls, nom, llibre, camp, onCanvi){
+  const ICO={ e:'<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>', r:'<path d="M5 12.5l4.5 4.5L19 7.5"/>' };
+  const QUE={ e:'se l’ha emportat a casa', r:'l’ha tornat' };
+  const b=el('button','llib-check '+camp); b.type='button';
+  b.innerHTML='<svg class="icon" viewBox="0 0 24 24">'+ICO[camp]+'</svg>';
+  const pinta=()=>{
+    const k=llibMarca(cls,nom,llibre), on=!!k[camp];
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on?'true':'false');
+    b.setAttribute('aria-label', nom+' · '+QUE[camp]);
+    b.title = on ? (camp==='e'?'Emportat el ':'Tornat el ')+llibFmtDia(k[camp]) : QUE[camp].charAt(0).toUpperCase()+QUE[camp].slice(1);
+  };
+  pinta();
+  b.onclick=async()=>{
+    const vol=!b.classList.contains('on');
+    b.disabled=true;
+    try{ await llibToggle(cls, nom, llibre, camp, vol); }
+    finally{ b.disabled=false; }
+    if(onCanvi) onCanvi();        // repinta les dues caselles i els comptadors
+  };
+  b.__pinta=pinta;
+  return b;
+}
+/* Capçalera de les dues columnes de caselles */
+function llibCapCols(primera){
+  const cap=el('div','aut-fila aut-cap');
+  const n=el('div','aut-nom'); n.textContent=primera||''; cap.appendChild(n);
+  const h1=el('div','llib-h'); h1.textContent='🏠'; h1.title='Se l’ha emportat a casa'; cap.appendChild(h1);
+  const h2=el('div','llib-h'); h2.textContent='✅'; h2.title='L’ha tornat'; cap.appendChild(h2);
+  return cap;
+}
+function renderLlibres(S){
+  const classes=llibClasses();
+  if(!classes.length){
+    const e=el('div','empty-feed');
+    e.innerHTML='<div class="big">📚</div>No hi ha alumnes. Omple la pestanya “Alumnes” del full.';
+    S.appendChild(e); return;
+  }
+  /* --- pestanyes de vista --- */
+  const seg=el('div','prog-seg');
+  const pend=llibPendents().length;
+  [['llibres','📚 Llibres'],['alumnes','🧒 Per alumne'],['casa','🏠 A casa'+(pend?' ('+pend+')':'')]].forEach(([v,lbl])=>{
+    const b=el('button','prog-segbtn'+(LLIB_VIEW===v?' on':'')); b.type='button'; b.textContent=lbl;
+    b.onclick=()=>{ LLIB_VIEW=v; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; openSection('eines'); };
+    seg.appendChild(b);
+  });
+  S.appendChild(seg);
+
+  if(LLIB_VIEW==='casa'){ renderLlibresCasa(S); return; }
+  if(LLIB_VIEW==='alumnes'){
+    if(LLIB_ALUMNE) renderLlibresAlumne(S);
+    else renderLlibresAlumnes(S);
+    return;
+  }
+  if(LLIB_BOOK){ renderLlibresBook(S); return; }
+  renderLlibresLlista(S);
+}
+/* ---- Vista «Llibres»: una targeta per llibre ---- */
+function renderLlibresLlista(S){
+  const tit=llibTitols();
+  const repinta=()=>openSection('eines');
+
+  const top=el('div','aut-top');
+  const totCasa=llibPendents().length;
+  const resum=el('div','aut-resum');
+  resum.innerHTML='<b>'+tit.length+' llibres</b><span>'+(totCasa?totCasa+' a casa':'cap a casa')+'</span>';
+  top.appendChild(resum);
+  const cfg=el('button','btn btn-ghost aut-cfg'); cfg.type='button';
+  cfg.innerHTML='<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Quins llibres';
+  cfg.onclick=()=>{ LLIB_CONFIG=!LLIB_CONFIG; repinta(); };
+  top.appendChild(cfg);
+  S.appendChild(top);
+
+  if(LLIB_CONFIG){ renderLlibresConfig(S, repinta); }
+
+  const hint=el('div','att-info');
+  const h=el('span','att-hint'); h.textContent='Tria un llibre per marcar qui se l’ha emportat i qui l’ha tornat';
+  hint.appendChild(h); S.appendChild(hint);
+
+  const grid=el('div','llib-grid');
+  tit.forEach(l=>{
+    const c=llibCompta(l.id);
+    const card=el('button','llib-card'); card.type='button';
+    const t=el('div','llib-t'); t.textContent=l.nom; card.appendChild(t);
+    const m=el('div','llib-m');
+    m.innerHTML=(c.casa?'<span class="llib-chip">🏠 '+c.casa+' a casa</span>':'')+'✅ '+c.tornat+'/'+c.total+' tornats';
+    card.appendChild(m);
+    const bar=el('div','llib-bar'); const i=el('i');
+    i.style.width=(c.total? Math.round(c.tornat/c.total*100):0)+'%'; bar.appendChild(i); card.appendChild(bar);
+    card.onclick=()=>{ LLIB_BOOK=l.id; LLIB_CONFIG=false; openSection('eines'); };
+    grid.appendChild(card);
+  });
+  S.appendChild(grid);
+}
+/* ---- Personalitzar la llista de llibres ---- */
+function renderLlibresConfig(S, repinta){
+  const tit=llibTitols();
+  const box=el('div','aut-config');
+  const t=el('div','aut-config-t'); t.textContent='Llibres que donem'; box.appendChild(t);
+  const llista=el('div','aut-config-list');
+  tit.forEach(l=>{
+    const row=el('div','aut-config-row');
+    const inp=el('input'); inp.type='text'; inp.value=l.nom; inp.setAttribute('aria-label','Títol del llibre');
+    inp.onchange=async()=>{
+      const nom=inp.value.trim(); if(!nom){ inp.value=l.nom; return; }
+      await api.llibTitols(llibTitols().map(x=>x.id===l.id?{id:x.id, nom:nom}:x));
+      toast('Desat ✓'); repinta();
+    };
+    row.appendChild(inp);
+    const del=el('button','icon-btn danger'); del.type='button'; del.title='Treu aquest llibre';
+    del.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
+    del.onclick=()=>{
+      askConfirm('Vols treure «'+l.nom+'» de la llista? Deixarà de sortir; si el tornes a posar, les marques encara hi seran.', async()=>{
+        const nous=llibTitols().filter(x=>x.id!==l.id);
+        await api.llibTitols(nous); repinta();
+      }, {title:'Treure el llibre', confirmLabel:'Treu-lo', danger:true});
+    };
+    if(tit.length>1) row.appendChild(del);
+    llista.appendChild(row);
+  });
+  box.appendChild(llista);
+  const afegir=el('div','aut-config-add');
+  const nou=el('button','btn btn-ghost'); nou.type='button'; nou.textContent='+ Un altre llibre…';
+  nou.onclick=()=>{
+    /* errorMsg va DINS d'opts: askPrompt(opts, onConfirm) només té dos paràmetres */
+    askPrompt({icon:'📚', title:'Llibre nou', label:'Com es diu?', placeholder:'p. ex. El cargol i la formiga',
+      confirmLabel:'Afegeix', errorMsg:'Posa-hi un títol que no hi sigui ja a la llista.'}, val=>{
+      const nom=String(val||'').trim();
+      if(!nom) return false;
+      if(llibTitols().some(x=>norm(x.nom)===norm(nom))) return false;   // ja hi és
+      api.llibTitols(llibTitols().concat([{id:'l'+uid(), nom:nom}])).then(repinta);
+    });
+  };
+  afegir.appendChild(nou);
+  box.appendChild(afegir);
+  S.appendChild(box);
+}
+/* ---- Un llibre: tots els alumnes d'una classe ---- */
+function renderLlibresBook(S){
+  const l=llibTitols().find(x=>x.id===LLIB_BOOK);
+  if(!l){ LLIB_BOOK=null; renderLlibresLlista(S); return; }
+  const classes=llibClasses();
+
+  const tornar=el('button','btn btn-ghost'); tornar.type='button';
+  tornar.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Tots els llibres';
+  tornar.onclick=()=>{ LLIB_BOOK=null; openSection('eines'); };
+  const barra=el('div','att-actions'); barra.appendChild(tornar); S.appendChild(barra);
+
+  const top=el('div','aut-top');
+  const resum=el('div','aut-resum');
+  const pintaResum=()=>{ const c=llibCompta(l.id);
+    resum.classList.toggle('ple', c.tornat===c.total && c.total>0);
+    resum.innerHTML='<b>'+esc(l.nom)+'</b><span>'+(c.casa?'🏠 '+c.casa+' · ':'')+'✅ '+c.tornat+'/'+c.total+'</span>'; };
+  pintaResum(); top.appendChild(resum); S.appendChild(top);
+
+  if(!LLIB_CLASS || classes.indexOf(LLIB_CLASS)<0) LLIB_CLASS=pickTutorClass(classes);
+  const selRow=el('div','att-classsel');
+  const pintaTabs=()=>{
+    selRow.innerHTML='';
+    classes.forEach(c=>{
+      const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
+      if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+      const roster=STATE.students[c]||[];
+      const fets=roster.filter(n=>llibEstat(c,n,l.id)==='tornat').length;
+      t.textContent=c+' ('+fets+'/'+roster.length+')';
+      t.title=c+': '+fets+' de '+roster.length+' l’han tornat';
+      t.onclick=()=>{ LLIB_CLASS=c; openSection('eines'); };
+      selRow.appendChild(t);
+    });
+  };
+  pintaTabs(); S.appendChild(selRow);
+
+  const hint=el('div','att-info');
+  const h=el('span','att-hint'); h.textContent='🏠 se l’ha emportat · ✅ l’ha tornat';
+  hint.appendChild(h); S.appendChild(hint);
+
+  const taula=el('div','aut-taula');
+  taula.appendChild(llibCapCols());
+  (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
+    const fila=el('div','aut-fila');
+    const n=el('div','aut-nom'); n.textContent=nom; fila.appendChild(n);
+    const refresca=()=>{ fila.querySelectorAll('.llib-check').forEach(b=>{ if(b.__pinta) b.__pinta(); }); pintaResum(); pintaTabs(); };
+    fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'e', refresca));
+    fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'r', refresca));
+    taula.appendChild(fila);
+  });
+  S.appendChild(taula);
+}
+/* ---- Vista «Per alumne»: la llista de la classe ---- */
+function renderLlibresAlumnes(S){
+  const classes=llibClasses();
+  if(!LLIB_CLASS || classes.indexOf(LLIB_CLASS)<0) LLIB_CLASS=pickTutorClass(classes);
+  const selRow=el('div','att-classsel');
+  classes.forEach(c=>{
+    const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
+    if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    t.textContent=c+' ('+(STATE.students[c]||[]).length+')';
+    t.onclick=()=>{ LLIB_CLASS=c; openSection('eines'); };
+    selRow.appendChild(t);
+  });
+  S.appendChild(selRow);
+
+  const hint=el('div','att-info');
+  const h=el('span','att-hint'); h.textContent='Tria un alumne per veure i marcar els seus llibres';
+  hint.appendChild(h); S.appendChild(hint);
+
+  const taula=el('div','aut-taula');
+  (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
+    const c=llibComptaAlumne(LLIB_CLASS, nom);
+    const row=el('button','llib-rowbtn'); row.type='button';
+    const nm=el('div','nm'); nm.textContent=nom; row.appendChild(nm);
+    if(c.casa){ const xip=el('span','llib-chip'); xip.textContent='🏠 '+c.casa; row.appendChild(xip); }
+    const ct=el('div','ct'); ct.textContent='✅ '+c.tornat+'/'+c.total; row.appendChild(ct);
+    const fletxa=el('div','ct'); fletxa.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'; row.appendChild(fletxa);
+    row.onclick=()=>{ LLIB_ALUMNE=nom; openSection('eines'); };
+    taula.appendChild(row);
+  });
+  S.appendChild(taula);
+}
+/* ---- Un alumne: tots els llibres ---- */
+function renderLlibresAlumne(S){
+  const nom=LLIB_ALUMNE, cls=LLIB_CLASS;
+  if(!nom || (STATE.students[cls]||[]).indexOf(nom)<0){ LLIB_ALUMNE=null; renderLlibresAlumnes(S); return; }
+
+  const tornar=el('button','btn btn-ghost'); tornar.type='button';
+  tornar.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>'+esc(cls);
+  tornar.onclick=()=>{ LLIB_ALUMNE=null; openSection('eines'); };
+  const barra=el('div','att-actions'); barra.appendChild(tornar); S.appendChild(barra);
+
+  const top=el('div','aut-top');
+  const resum=el('div','aut-resum');
+  const pintaResum=()=>{ const c=llibComptaAlumne(cls,nom);
+    resum.classList.toggle('ple', c.tornat===c.total && c.total>0);
+    resum.innerHTML='<b>'+esc(nom)+'</b><span>'+(c.casa?'🏠 '+c.casa+' · ':'')+'✅ '+c.tornat+'/'+c.total+'</span>'; };
+  pintaResum(); top.appendChild(resum); S.appendChild(top);
+
+  const hint=el('div','att-info');
+  const h=el('span','att-hint'); h.textContent='🏠 se l’ha emportat · ✅ l’ha tornat';
+  hint.appendChild(h); S.appendChild(hint);
+
+  const taula=el('div','aut-taula');
+  taula.appendChild(llibCapCols('Llibre'));
+  llibTitols().forEach(l=>{
+    const fila=el('div','aut-fila');
+    const n=el('div','aut-nom'); n.textContent=l.nom;
+    const k=llibMarca(cls,nom,l.id);
+    if(k.e && !k.r) n.title='A casa des del '+llibFmtDia(k.e)+' ('+llibDies(k.e)+' dies)';
+    fila.appendChild(n);
+    const refresca=()=>{ fila.querySelectorAll('.llib-check').forEach(b=>{ if(b.__pinta) b.__pinta(); }); pintaResum(); };
+    fila.appendChild(llibCheck(cls, nom, l.id, 'e', refresca));
+    fila.appendChild(llibCheck(cls, nom, l.id, 'r', refresca));
+    taula.appendChild(fila);
+  });
+  S.appendChild(taula);
+}
+/* ---- Vista «A casa»: qui té un llibre sense tornar ---- */
+function renderLlibresCasa(S){
+  const p=llibPendents();
+  if(!p.length){
+    const e=el('div','empty-feed');
+    e.innerHTML='<div class="big">✅</div>Cap llibre a casa. Tots tornats!';
+    S.appendChild(e); return;
+  }
+  const top=el('div','aut-top');
+  const resum=el('div','aut-resum');
+  resum.innerHTML='<b>Llibres a casa</b><span>'+p.length+'</span>';
+  top.appendChild(resum); S.appendChild(top);
+
+  /* Marcar «tornat» aquí treu la fila i prou. Abans repintava la secció sencera i
+     saltava a dalt de tot: si n'havies de marcar quatre seguits, perdies el lloc cada cop. */
+  const box=el('div','llib-pend');
+  const grups=[];
+  llibClasses().forEach(c=>{
+    const seus=p.filter(x=>x.cls===c);
+    if(!seus.length) return;
+    const cap=el('div','llib-pend-cls'); cap.textContent=c+' · '+seus.length; box.appendChild(cap);
+    const g={cls:c, cap:cap, files:[]}; grups.push(g);
+    seus.forEach(x=>{
+      const row=el('div','llib-pend-row');
+      const n=el('div','n'); n.textContent=x.nom; row.appendChild(n);
+      const l=el('div','l'); l.textContent=x.llibre.nom; row.appendChild(l);
+      const d=el('div','d'+(x.dies>=LLIB_DIES_AVIS?' alerta':''));
+      d.textContent=x.dies+' d'; d.title='Des del '+llibFmtDia(x.des);
+      row.appendChild(d);
+      const b=llibCheck(x.cls, x.nom, x.llibre.id, 'r', ()=>{
+        row.remove();
+        g.files=g.files.filter(f=>f!==row);
+        if(!g.files.length) g.cap.remove(); else g.cap.textContent=g.cls+' · '+g.files.length;
+        const queden=llibPendents().length;
+        const sp=resum.querySelector('span'); if(sp) sp.textContent=queden;
+        const seg=S.querySelector('.prog-seg');
+        if(seg && seg.children[2]) seg.children[2].textContent='🏠 A casa'+(queden?' ('+queden+')':'');
+        if(!queden) openSection('eines');   // ja no queda cap: ensenya l'estat buit
+      });
+      b.title='L’ha tornat'; row.appendChild(b);
+      g.files.push(row);
+      box.appendChild(row);
+    });
+  });
+  S.appendChild(box);
+
+  const actions=el('div','att-actions');
+  const cp=el('button','btn btn-primary'); cp.type='button';
+  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui té llibres a casa';
+  cp.onclick=async()=>{
+    await refrescaEstat();
+    const txt=llibTextPendents();
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
+    const caixa=S.querySelector('.att-result') || el('div','att-result');
+    caixa.innerHTML=''; const pre=el('pre'); pre.textContent=txt; caixa.appendChild(pre);
+    if(!caixa.parentNode) S.appendChild(caixa);
+  };
+  actions.appendChild(cp);
+  S.appendChild(actions);
+}
+
 /* ============ EL RACÓ DELS REPTES ============ */
 function renderReptes(S){
   if(REPTES_CAIXA){ const c=reptCaixa(REPTES_CAIXA); if(c){ renderReptesScan(S,c); return; } REPTES_CAIXA=null; }
