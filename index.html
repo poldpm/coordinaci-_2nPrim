@@ -784,6 +784,24 @@ button.prog-note-ico:hover{transform:scale(1.08)}
 .tile.big{grid-column:span 4}
 .tile.med{grid-column:span 4}
 .tile.reg{grid-column:span 3}
+/* `wide` = banda a tota l'amplada (avisos). `1/-1` i no `span 12` perquè al mòbil la
+   graella passa a 2 columnes i un span 12 se'n sortiria. Va en FILA (icona + text al
+   costat) i més baixa: és una banda d'avís, no una targeta alta. */
+.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:15px;padding:15px 18px}
+.tile.wide .t-ico{width:44px;height:44px;border-radius:13px;flex:none}
+.tile.wide .t-ico .icon{width:25px;height:25px}
+.tile.wide .t-body{flex:1;min-width:0}
+.tile.wide h3{font-size:1.2rem}
+.tile.wide .t-meta{margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+/* Blanc sobre el vermell: 4,83 de contrast. El groc de sempre només en dona 2,63
+   contra aquest vermell i la píndola es desdibuixava. */
+.tile.wide .t-badge{position:static;top:auto;right:auto;flex:none;font-size:.82rem;min-width:1.9em;height:1.9em;
+  background:#fff;color:var(--avis-ink)}
+/* Alerta de color a la icona quan hi ha comentaris nous */
+.t-alerta{position:absolute;top:-3px;right:-3px;width:13px;height:13px;border-radius:50%;
+  background:var(--sun);border:2.5px solid var(--avis);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tile.wide .t-ico .t-alerta{width:15px;height:15px}
+.avis-pill .t-alerta{top:4px;right:9px;border-color:var(--panel);background:var(--avis)}
 /* Totes les píndoles comparteixen UNA fila: abans cada una tenia el seu wrap de
    span 12 i quedaven l'una sota l'altra en comptes de de costat. */
 .tile-pill-wrap{grid-column:span 12;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:2px}
@@ -1527,6 +1545,8 @@ const ICONS = {
   programacio:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13 5l-2 14"/>',
 };
 const SECTIONS = [
+  /* Primera i a tota l'amplada: és el que ha de cridar l'atenció en obrir l'app. */
+  {id:'avisos',     name:'Avisos',            type:'entries', color:'#C9442F', size:'wide', desc:'Avisos i notes ràpides per a les tres tutores.', ico:'avis'},
   {id:'general',    name:'Aspectes generals', type:'entries', color:'#14657F', size:'big', rich:true, desc:'El calaix de sastre: acords, informacions i tot allò que no encaixa enlloc més.', ico:'general'},
   {id:'tasques',    name:'Tasques',           type:'tasks',   color:'#4F9BDE', size:'big', desc:'Qui fa què i com va. Pendent, en procés o acabada.', ico:'tasques'},
   {id:'calendari',  name:'Calendari',         type:'agenda',  color:'#E9B93A', size:'big', desc:'Dates clau, i coses per agendar que encara no en tenen.', ico:'calendari'},
@@ -1540,10 +1560,6 @@ const SECTIONS = [
   {id:'avaluacio',  name:'Avaluació',         type:'avaluacio', color:'#5A6FE0', size:'reg', customHero:true, desc:'Frases d\u2019avaluació organitzades per trimestre i assignatura.', ico:'avaluacio'},
   {id:'programacio',name:'Programació',       type:'programacio', color:'#944B9C', size:'pill', desc:'Programació setmanal per assignatura.', ico:'programacio'},
   {id:'grups',      name:'Gestió de grups',   type:'grups', color:'#1F8A7A', size:'pill', customHero:true, desc:'Marques a tenir en compte, noms i els grups de classe.', ico:'grups'},
-  /* `hidden`: NO surt com a rajola de la portada. S'hi entra pel botó de la barra de
-     dalt i per l'avís de la portada; si també hi hagués rajola, hi hauria tres portes
-     a la mateixa cosa i una rajola més que ningú ha demanat. */
-  {id:'avisos',     name:'Avisos',            type:'entries', color:'#C9442F', size:'reg', hidden:true, desc:'Avisos i notes ràpides per a les tres tutores.', ico:'avis'},
 ];
 const secById = id => SECTIONS.find(s=>s.id===id);
 
@@ -3258,18 +3274,28 @@ function avisActius(){
   return avisosTots().filter(e=>
     avisNoLlegit(e) || entryHasUnseenComments(e.id) || (e.author===ME && avisQuiFalta(e).length));
 }
-/* Els que demanen una acció MEVA (per al comptador del botó) */
+function avisNoLlegits(){ return avisosTots().filter(avisNoLlegit); }
+function avisComentarisNous(){ return avisosTots().filter(e=>entryHasUnseenComments(e.id)); }
+/* Els que demanen una acció MEVA (llegir-lo o llegir-ne els comentaris) */
 function avisPendentsMeus(){
   return avisosTots().filter(e=> avisNoLlegit(e) || entryHasUnseenComments(e.id));
 }
+/* El comptador compta els avisos per LLEGIR; els comentaris nous són un punt de color
+   a la icona (són una cosa diferent i no han d'inflar el número). */
 function updateAvisBadge(){
   const b=$('#avisBtn'); if(!b) return;
-  const n=avisPendentsMeus().length;
-  b.classList.toggle('te', n>0);
-  b.title = n ? n+' '+plural(n,'avís','avisos')+' per llegir · toca per escriure’n un' : 'Avisos ràpids';
+  const n=avisNoLlegits().length, cmt=avisComentarisNous().length;
+  b.classList.toggle('te', n>0 || cmt>0);
+  const parts=[];
+  if(n) parts.push(n+' '+plural(n,'avís','avisos')+' per llegir');
+  if(cmt) parts.push(cmt+' amb comentaris nous');
+  b.title = parts.length ? parts.join(' · ')+' · toca per escriure’n un' : 'Avisos ràpids';
   let bd=b.querySelector('.avis-badge');
   if(n){ if(!bd){ bd=el('span','avis-badge'); b.appendChild(bd); } bd.textContent=n; }
   else if(bd) bd.remove();
+  let al=b.querySelector('.t-alerta');
+  if(cmt && !n){ if(!al){ al=el('span','t-alerta'); al.title='Hi ha comentaris nous'; b.appendChild(al); } }
+  else if(al) al.remove();
 }
 /* ---- Escriure'n un (modal ràpid: una caixa de text i prou) ---- */
 function obreAvisRapid(){
@@ -3671,7 +3697,6 @@ function renderBento(){
   const b=$('#bento'); b.innerHTML='';
   let pillWrap=null;                  // el comparteixen totes les píndoles (veure el CSS)
   SECTIONS.forEach(sec=>{
-    if(sec.hidden) return;            // avisos: s'hi entra pel botó de la barra de dalt
     if(sec.size==='pill'){
       if(!pillWrap){ pillWrap=el('div','tile-pill-wrap'); b.appendChild(pillWrap); }
       const pill=el('button','tile-pill');
@@ -3685,13 +3710,21 @@ function renderBento(){
     }
     const tile=el('button','tile '+sec.size);
     const pin=heroPaint(sec.color); tile.style.background=pin.bg; tile.style.setProperty('--hero-ink', pin.ink); tile.style.setProperty('--hero-chip', pin.chip);
-    const badge=sectionBadge(sec);
-    if(badge>0){ const bg=el('span','t-badge'); bg.textContent=badge; tile.appendChild(bg); }
-    const ico=el('div','t-ico'); ico.innerHTML=`<svg class="icon" viewBox="0 0 24 24">${ICONS[sec.ico]}</svg>`; tile.appendChild(ico);
+    const ico=el('div','t-ico'); ico.innerHTML=`<svg class="icon" viewBox="0 0 24 24">${ICONS[sec.ico]}</svg>`;
+    /* Alerta de color a la icona quan hi ha comentaris nous en algun avís */
+    if(sec.id===AVIS_SEC && avisComentarisNous().length){
+      const d=el('span','t-alerta'); d.title='Hi ha comentaris nous'; ico.appendChild(d);
+    }
+    tile.appendChild(ico);
     const body=el('div','t-body');
     const h=el('h3'); h.textContent=sec.name; body.appendChild(h);
     const meta=el('div','t-meta'); meta.textContent=metaLabel(sec); body.appendChild(meta);
     tile.appendChild(body);
+    /* L'últim: a les rajoles normals va posicionat absolut (l'ordre del DOM és igual),
+       però a la banda `wide` va en fila i ha de quedar a la dreta. */
+    const badge=sectionBadge(sec);
+    if(badge>0){ const bg=el('span','t-badge'); bg.textContent=badge;
+      bg.title=badge+' '+plural(badge,'sense llegir'); tile.appendChild(bg); }
     tile.onclick=()=>openSection(sec.id);
     b.appendChild(tile);
   });
@@ -3710,6 +3743,14 @@ function metaLabel(sec){
   if(sec.type==='links'){ const n=STATE.entries.filter(e=>e.section===sec.id).length; return n? `${n} enllaç${n===1?'':'os'}` : 'Cap enllaç'; }
   if(sec.type==='agenda'){ const dated=STATE.entries.filter(e=>e.section===sec.id&&e.eventDate).length; const pend=STATE.entries.filter(e=>e.section===sec.id&&!e.eventDate).length; return pend? `${dated} ${plural(dated,'data','dates')} · ${pend} per agendar` : `${dated} ${plural(dated,'data','dates')}`; }
   if(sec.type==='avaluacio'){ return 'Frases per trimestre'; }
+  if(sec.id===AVIS_SEC){
+    const nous=avisNoLlegits().length, cmt=avisComentarisNous().length, ultim=avisosTots()[0];
+    const tall=t=>{ const s=stripHtml(t||'').replace(/\s+/g,' ').trim(); return s.length>64 ? s.slice(0,63)+'…' : s; };
+    if(nous) return nous+' '+plural(nous,'avís nou','avisos nous')+(ultim? ' · '+tall(ultim.body) : '');
+    if(cmt) return cmt+' '+(cmt===1?'avís amb comentaris nous':'avisos amb comentaris nous');
+    if(ultim) return 'Últim: '+tall(ultim.body);
+    return 'Res de nou · toca per escriure’n un';
+  }
   if(sec.type==='programacio'){ return 'Setmanal · 3 assignatures'; }
   if(sec.type==='grups'){
     const m=Object.keys((STATE.grups&&STATE.grups.marques)||{}).length;

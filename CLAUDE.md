@@ -122,16 +122,23 @@ grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|N
 `excursions`/`activitats`(subthemes), `programacio`(programacio),
 `correus`(correus, `customHero`), `enllacos`(links), `avaluacio`(avaluacio,
 `customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`),
-`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `hidden`).
+`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `size:'wide'`).
 
-**`hidden:true`** (només `avisos`): la secció existeix i `openSection` hi entra, però
-`renderBento` la **salta** i NO surt com a rajola de la portada. S'hi entra pel botó de
-la barra de dalt i per l'avís de la portada (§9).
+**Mides de rajola** (`size`, graella de 12 columnes):
+- `big` = span 4 → `general`, `tasques`, `calendari` (una fila de 12 justa).
+- `reg` = span 3 → les 8 restants (dues files de 4 justes).
+- `wide` = `grid-column:1/-1` → **només `avisos`**, i va **PRIMERA** de totes: una
+  **banda vermella a tota l'amplada** a dalt de la portada, en fila (icona + text +
+  comptador) i més baixa que una targeta. És `1/-1` i no `span 12` perquè al mòbil la
+  graella passa a 2 columnes i un `span 12` se'n sortiria. Deixa les altres dues files
+  exactament com estaven.
+- `pill` = `programacio` i `grups`, botons allargats al final. `renderBento` les posa
+  TOTES dins d'UN sol `.tile-pill-wrap` perquè quedin de costat; abans cada una tenia el
+  seu wrap de `span 12` i quedaven l'una sota l'altra.
 
-**Píndoles:** `programacio` i `grups` tenen `size:'pill'` i es pinten com a botons
-allargats al final de la portada. `renderBento` les posa TOTES dins d'UN sol
-`.tile-pill-wrap` perquè quedin de costat; abans cada una tenia el seu wrap de
-`span 12` i quedaven l'una sota l'altra.
+`renderBento` afegeix el `.t-badge` **l'últim** (després del cos): a les rajoles normals
+va posicionat absolut i l'ordre del DOM és igual, però a la banda `wide` va en fila i ha
+de quedar a la dreta.
 
 **Regla capçalera:** `openSection` pinta una capçalera per defecte **excepte** si
 la secció té `customHero:true`. Si un `render*` es fa la seva pròpia capçalera
@@ -492,8 +499,14 @@ nom estandarditzat.
   **No hi ha model nou:** són **`entries` amb `section:'avisos'`** (`AVIS_SEC`). Això ho hereta
   tot del que ja funciona i està provat: `readBy` = «alerta llegida», els comentaris en fil
   (`STATE.comments[entryId]` + el rail d'`entryRow`), `deleteEntry` que neteja els comentaris,
-  l'edició, la cerca i la cua de reintents. La secció és `hidden` (§6) i es pinta amb
-  `renderEntries`, que ja porta tot això: **zero codi de pintat nou per a la secció**.
+  l'edició, la cerca i la cua de reintents. Es pinta amb `renderEntries`, que ja porta tot
+  això: **zero codi de pintat nou per a la secció**.
+  **Rajola de la portada:** `size:'wide'` i **la primera** de `SECTIONS` → banda vermella
+  (`#C9442F`) a tota l'amplada a dalt de tot (§6). `heroPaint` li dona lletra **blanca**
+  (4,83 de contrast). El `metaLabel` és informatiu: «2 avisos nous · <text del més nou>»
+  (tallat a 64 caràcters), o «1 avís amb comentaris nous», o «Últim: …», o «Res de nou ·
+  toca per escriure'n un». El `.t-badge` de la banda va **blanc amb lletra vermella**: el
+  groc de sempre només dona 2,63 de contrast contra aquest vermell i es desdibuixava.
   **Escriure'n un:** `obreAvisRapid()` → modal d'UNA caixa de text (res de títol ni enllaç: ha
   de ser ràpid). ⌘/Ctrl+Enter publica. Es desa amb `readBy:[ME]` → per a mi ja està llegit i
   les altres dues el veuen com a nou. El modal porta a sota un enllaç per veure'ls tots.
@@ -504,9 +517,12 @@ nom estandarditzat.
   portada**; els meus, l'avatar. Xip 💬 amb els fils oberts i en groc si n'hi ha de nous. El
   clic obre l'avís amb el panell de comentaris desplegat. Topall `AVIS_PANEL_MAX`=5 + «i N
   avisos més».
-  **Comptador al botó** (`updateAvisBadge`): els que demanen una acció MEVA
-  (`avisPendentsMeus`: no llegits + amb comentaris nous). Es crida des de `refreshHome` i des
-  de `repaintAfterSync`, perquè també s'actualitzi **dins d'una secció**.
+  **Número vs. alerta de color** (`avisNoLlegits` / `avisComentarisNous`): el **comptador**
+  (`.t-badge` de la banda i `.avis-badge` del botó) compta només els avisos **per llegir**;
+  els **comentaris nous** són un **punt de color** (`.t-alerta`) a la icona, perquè són una
+  cosa diferent i no han d'inflar el número. Si hi ha les dues coses, es veu el número (ja
+  crida prou) i el `title` ho diu tot. `updateAvisBadge` es crida des de `refreshHome` i des
+  de `repaintAfterSync`, perquè el botó també s'actualitzi **dins d'una secció**.
   ⚠️ **Els avisos NO entren a `novItems()`** (ni ells ni els seus comentaris): tenen el seu
   panell, que és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa
   sortiria **dues vegades** a la portada.
