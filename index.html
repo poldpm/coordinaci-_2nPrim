@@ -3144,6 +3144,7 @@ function renderDash(){
   const cr=buildCorreusPanel(); if(cr) cols.appendChild(cr);
   const cv=buildCarpetaPanel(); if(cv) cols.appendChild(cv);
   const rp=buildReptesPanel(); if(rp) cols.appendChild(rp);
+  const ll=buildLlibresPanel(); if(ll) cols.appendChild(ll);
   const w=buildWeekPanel(); if(w) cols.appendChild(w);
   $('#dashBlock').style.display = cols.children.length ? '' : 'none';
 }
@@ -3170,6 +3171,63 @@ function buildReptesPanel(){
         toast('S’obre la fitxa · +'+n+' '+plural(n,'còpia','còpies')+' (ara '+reptQueden(reptCaixa(c.id))+')'); });
     card.appendChild(row);
   });
+  return card;
+}
+/* Avís de portada: llibres que fa massa dies que són a casa (§9).
+   Només de la MEVA classe: cadascú reclama els seus i no val la pena molestar els
+   altres dos amb els seus. Si no es pot saber quina és (les lletres del full no
+   coincideixen amb TUTOR_CLASS), s'ensenyen totes i es diu al títol. */
+const LLIB_PANEL_MAX=6;      // perquè un descuit de mig trimestre no ompli la portada
+function buildLlibresPanel(){
+  if(!STATE.llibres || !STATE.students) return null;
+  const vol=TUTOR_CLASS[ME];
+  const meva=vol && Object.keys(STATE.students).find(c=>c.toLowerCase()===vol.toLowerCase());
+  const tots=llibPendents().filter(x=>x.dies>=LLIB_DIES_AVIS && (!meva || x.cls===meva));
+  if(!tots.length) return null;
+  const obre=(cls)=>{ PENDING_EINA='llibres'; LLIB_VIEW='casa'; if(cls) LLIB_CLASS=cls;
+    LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; LLIB_NAV=true; openSection('eines'); };
+
+  const card=el('div','hpanel');
+  const head=el('div','hpanel-head');
+  head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h12v15"/><path d="M6 17h12v3H6a2 2 0 0 1 0-3z"/><path d="M8 7h7"/></svg>'
+    +'<h3>Llibres per reclamar'+(meva?'':' (totes les classes)')+'</h3><span class="hpanel-count">'+tots.length+'</span>';
+  card.appendChild(head);
+
+  const mostra=tots.slice(0, LLIB_PANEL_MAX);
+  mostra.forEach(x=>{
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
+    /* Marcar-lo tornat sense sortir de la portada (com les tasques pendents) */
+    const box=el('button','hbox'); box.title='L’ha tornat';
+    box.setAttribute('aria-label', x.nom+' ha tornat «'+x.llibre.nom+'»');
+    box.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+    box.onclick=async(ev)=>{
+      ev.stopPropagation(); box.disabled=true;
+      try{ await llibToggle(x.cls, x.nom, x.llibre.id, 'r', true); }
+      finally{ box.disabled=false; }
+      renderDash(); toast('Tornat!');
+    };
+    row.appendChild(box);
+    const t=el('div','htitle'); t.textContent=x.nom+' · '+x.llibre.nom; row.appendChild(t);
+    if(!meva){ const g=el('span','hstatus'); const pg=pillPaint(classColor(x.cls));
+      g.style.background=pg.bg; g.style.color=pg.ink; g.textContent=x.cls; row.appendChild(g); }
+    const d=el('span','hcorreu-date'); d.textContent=x.dies+' dies';
+    d.title='A casa des del '+llibFmtDia(x.des); row.appendChild(d);
+    row.onclick=()=>obre(x.cls);
+    card.appendChild(row);
+  });
+  if(tots.length>mostra.length){
+    const resta=tots.length-mostra.length;
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
+    const t=el('div','htitle'); t.style.color='var(--muted)';
+    t.textContent='i '+resta+' '+plural(resta,'llibre més','llibres més');
+    row.appendChild(t);
+    row.onclick=()=>obre(meva||null);
+    card.appendChild(row);
+  }
   return card;
 }
 function renderNovetats(){
@@ -3376,6 +3434,9 @@ let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
 /* ---------- Registre de llibres a casa (dins STATE.llibres → sincronitzat entre els tres) ---------- */
 let LLIB_VIEW='llibres', LLIB_BOOK=null, LLIB_CLASS=null, LLIB_ALUMNE=null, LLIB_CONFIG=false;
+/* Com PROG_NAV: qui ve d'un avís de la portada ja ha triat la vista, i openSection
+   no l'hi ha de reiniciar (si no, el clic aterrava sempre a la llista de llibres). */
+let LLIB_NAV=false;
 /* ---------- El racó dels reptes (dins STATE.reptes → sincronitzat entre els tres) ---------- */
 let REPTES_FILTRE='', REPTES_MAT='tot';
 let REPTES_VIEW='caixes', REPTES_CAIXA=null, REPTES_ALUMNE=null, REPTES_ADD=false, PENDING_REPTE=null;
@@ -4449,8 +4510,9 @@ function renderProgOverview(S, subj, curIdx){
 function openSection(id){
   if(id!==CURRENT || CURRENT_SUB) EDITING=null;
   if(id!=='calendari') SCHEDULING=null;
-  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null;
-    LLIB_VIEW='llibres'; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; }
+  if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null; }
+  if(id==='eines' && id!==CURRENT && !LLIB_NAV){ LLIB_VIEW='llibres'; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; }
+  LLIB_NAV=false;
   /* PROG_NAV: qui ve de la cerca o d'un avis de la portada ja ha triat setmana o
      cicle. Sense aquesta marca, openSection ho reiniciava a la setmana d'avui i
      el clic aterrava sempre al lloc equivocat. */

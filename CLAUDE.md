@@ -409,6 +409,15 @@ nom estandarditzat.
   primer; a partir de `LLIB_DIES_AVIS`=15 dies el comptador surt en vermell, i hi ha «Copia qui té
   llibres a casa»). Marcar «tornat» des de *A casa* **treu només aquella fila** (no repinta la
   secció: si no, saltava a dalt de tot a cada marca).
+  **Avís a la portada** (`buildLlibresPanel`, dins `renderDash`): «Llibres per reclamar», els que
+  fa ≥`LLIB_DIES_AVIS` dies que són a casa. Només de **la meva classe** (`TUTOR_CLASS[ME]`):
+  cadascú reclama els seus. Si la lletra no es troba a `STATE.students` (§13: pendent de confirmar
+  2nA/B/C), ensenya **totes** les classes, ho diu al títol i posa el xip de classe a cada fila.
+  Topall de `LLIB_PANEL_MAX`=6 files + «i N llibres més», perquè un descuit de mig trimestre no
+  ompli la portada. Cada fila porta la casella ✓ per marcar-lo **tornat sense sortir de la
+  portada** (com les tasques pendents); el clic obre la vista *A casa* de l'eina.
+  `LLIB_NAV` fa el mateix paper que `PROG_NAV`: sense ell, `openSection` reiniciava `LLIB_VIEW`
+  en entrar a `eines` des de fora i el clic de l'avís aterrava sempre a la llista de llibres.
   Funcions: `renderLlibres` + `renderLlibres{Llista,Config,Book,Alumnes,Alumne,Casa}`,
   `llibDades/llibTitols/llibMarca/llibEstat/llibCompta/llibComptaAlumne/llibPendents/llibToggle/
   llibCheck/llibDies/llibAvui/llibFmtDia/llibTextPendents`. Estat: `LLIB_VIEW`, `LLIB_BOOK`,
