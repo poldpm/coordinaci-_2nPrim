@@ -136,22 +136,10 @@ const igual = (a, b, q) => { const x=JSON.stringify(a), y=JSON.stringify(b);
   cal(await page.locator('#app').isVisible(), 'l’app es veu (no s’ha quedat a la pantalla d’entrada)');
   cal((await page.locator('#meName').textContent()).trim() === 'Pol', 'ha entrat com a Pol');
   cal(await page.locator('#bento .tile').count() >= 11, 'la portada té les rajoles ('+(await page.locator('#bento .tile').count())+')');
-
-  console.log('\n2. La banda vermella dels avisos');
-  const banda = page.locator('#bento .tile.wide');
-  igual(await banda.count(), 1, 'hi ha UNA banda wide');
-  const caixaB = await banda.boundingBox();
-  const caixaBento = await page.locator('#bento').boundingBox();
-  cal(Math.abs(caixaB.width - caixaBento.width) < 2, 'ocupa tota l’amplada ('+Math.round(caixaB.width)+' de '+Math.round(caixaBento.width)+' px)');
-  cal(/wide/.test(await page.locator('#bento > *').first().getAttribute('class')), 'és la PRIMERA cosa de la portada');
-  const bg = await banda.evaluate(el => getComputedStyle(el).backgroundImage);
-  cal(/201,\s*68,\s*47/.test(bg), 'és vermella');
-  igual(await banda.evaluate(el => getComputedStyle(el).color), 'rgb(255, 255, 255)', 'amb lletra blanca (4,83 de contrast)');
-  igual((await banda.locator('.t-badge').textContent()).trim(), '2', 'el comptador diu 2');
-  cal(/2 avisos nous/.test(await banda.locator('.t-meta').textContent()), 'el text: ' + (await banda.locator('.t-meta').textContent()));
-  const altaReg = (await page.locator('#bento .tile.big').first().boundingBox()).height;
-  cal(caixaB.height < altaReg, 'és més baixa que una targeta ('+Math.round(caixaB.height)+' vs '+Math.round(altaReg)+' px)');
-  await page.locator('#bento').screenshot({ path: path.join(QA, 'portada-amb-avisos.png') });
+  console.log('\n2. El bento NO té cap rajola d’avisos');
+  igual(await page.locator('#bento .tile.wide').count(), 0, 'cap banda vermella');
+  igual(await page.locator('#bento .tile').filter({ hasText:'Avisos' }).count(), 0,
+    'ni cap rajola d’Avisos, tot i haver-hi 2 avisos per llegir');
 
   console.log('\n2b. La icona (bombolla plena amb el ! retallat)');
   const ico = page.locator('#avisBtn .icon path');
@@ -159,7 +147,6 @@ const igual = (a, b, q) => { const x=JSON.stringify(a), y=JSON.stringify(b);
   igual(await ico.getAttribute('fill-rule'), 'evenodd', 'amb evenodd (el ! es retalla, no es pinta a sobre)');
   igual(await ico.evaluate(el => getComputedStyle(el).fill !== 'none'), true, 'i és PLENA');
   igual(((await ico.getAttribute('d')).match(/[Mm]/g) || []).length, 3, 'tres subcamins: bombolla + barra + punt');
-  igual(await page.locator('#bento .tile.wide .t-ico .icon path').count(), 1, 'la mateixa icona a la banda');
 
   console.log('\n3. Les dues píndoles, de costat');
   const pind = page.locator('#bento .tile-pill');
@@ -176,57 +163,87 @@ const igual = (a, b, q) => { const x=JSON.stringify(a), y=JSON.stringify(b);
   const cb = await btn.boundingBox(), cm = await page.locator('#meBtn').boundingBox();
   cal(cb.x < cm.x && (cm.x - (cb.x + cb.width)) < 24, 'just al costat del perfil ('+Math.round(cm.x-(cb.x+cb.width))+' px)');
 
-  console.log('\n5. El panell d’avisos de la portada');
+  console.log('\n5. La targeta d’avisos: banda a banda i SOTA les columnes');
   const pan = page.locator('.avis-panel');
   igual(await pan.count(), 1, 'hi és');
-  igual(await pan.locator('.hrow').count(), 2, '2 files');
-  cal(/Demà la sortida/.test(await pan.locator('.hrow').first().textContent()), 'amb el text de l’avís');
-  igual(await pan.locator('.hbox').count(), 2, 'i les dues caselles de «llegida»');
+  const cp = await pan.boundingBox();
+  const ccols = await page.locator('#dashCols').boundingBox();
+  cal(Math.abs(cp.width - ccols.width) < 2, 'ocupa tota l’amplada ('+Math.round(cp.width)+' de '+Math.round(ccols.width)+' px)');
+  cal(cp.y > ccols.y + ccols.height - 4, 'i va SOTA les columnes de tasques i calendari');
+  cal(cp.y < (await page.locator('#bento').boundingBox()).y, 'però per sobre de «Les nostres àrees»');
+  const bgp = await pan.evaluate(el => getComputedStyle(el).borderLeftColor);
+  igual(bgp, 'rgb(201, 68, 47)', 'amb la ratlla vermella de l’esquerra');
+  igual(await pan.locator('.avis-item').count(), 2, '2 avisos');
+  cal(/Demà la sortida/.test(await pan.locator('.avis-item').first().textContent()), 'amb el text de l’avís');
+  igual(await pan.locator('.hpanel-count').textContent(), '2', 'i el comptador a 2');
 
-  console.log('\n6. Marcar un avís com a llegit, des de la portada');
-  await pan.locator('.hrow').first().locator('.hbox').click();
-  await page.waitForTimeout(700);
-  igual(await page.locator('.avis-panel .hrow').count(), 1, 'queda 1 fila al panell');
-  igual((await page.locator('#bento .tile.wide .t-badge').textContent()).trim(), '1', 'la banda baixa a 1 (bug real: abans es quedava a 2)');
-  igual((await page.locator('#avisBtn .avis-badge').textContent()).trim(), '1', 'i el botó també');
+  console.log('\n5b. Els botons, a dins de la targeta');
+  const it0 = pan.locator('.avis-item').first();
+  igual(await it0.locator('.avis-acts .btn').count(), 2, 'dos botons per avís');
+  cal(/Marca.l com a llegit/.test(await it0.locator('.avis-llegit').textContent()), 'un de «marca’l com a llegit»');
+  cal(/Contesta/.test(await it0.locator('.avis-contesta').textContent()), 'i un de «contesta»');
+  igual(await it0.locator('.avis-llegit').evaluate(el => getComputedStyle(el).color), 'rgb(255, 255, 255)',
+    'el de llegit, vermell ple amb lletra blanca (4,83 de contrast)');
+  await page.locator('#home').screenshot({ path: path.join(QA, 'portada-amb-avisos.png') });
+
+  console.log('\n6. Contestar sense sortir de la portada');
+  await it0.locator('.avis-contesta').click();
+  await page.waitForTimeout(400);
+  igual(await pan.locator('.avis-comp').count(), 1, 's’obre el compositor a dins de la targeta');
+  cal(await pan.locator('.avis-comp textarea').evaluate(el => el === document.activeElement),
+    'amb el focus ja posat');
+  await pan.locator('.avis-comp textarea').fill('Doncs jo marxo a les 8.45');
+  /* una sincronització mentre s'escriu no s'ho ha d'emportar */
+  await page.evaluate(() => refreshHome());
+  await page.waitForTimeout(300);
+  igual(await pan.locator('.avis-comp textarea').inputValue(), 'Doncs jo marxo a les 8.45',
+    'un repintat amb el focus a dins NO esborra el que s’escriu');
+  await pan.locator('.avis-comp .btn-primary').click();
+  await page.waitForTimeout(800);
+  cal(await page.evaluate(c => {
+    const s = JSON.parse(localStorage.getItem(c));
+    return ((s.comments || {}).av1 || []).some(t => t.text === 'Doncs jo marxo a les 8.45' && t.author === 'pol');
+  }, CLAU), 'el comentari ha quedat desat');
+  igual(await page.locator('.avis-panel .avis-comp').count(), 0, 'i el compositor es tanca');
   cal(await page.evaluate(c => {
     const s = JSON.parse(localStorage.getItem(c));
     return (s.entries.find(e => e.id === 'av1').readBy || []).includes('pol');
-  }, CLAU), 'i ha quedat desat a la còpia local');
+  }, CLAU), 'contestar-lo també l’ha marcat com a llegit');
+  igual((await page.locator('#avisBtn .avis-badge').textContent()).trim(), '1', 'el botó de dalt baixa a 1');
 
-  console.log('\n7. Escriure un avís nou');
-  await btn.click();
-  await page.waitForSelector('.avis-modal', { timeout: 5000 });
-  cal(await page.locator('.avis-modal .avis-ta').isVisible(), 's’obre el modal amb la caixa de text');
-  await page.locator('.avis-modal .avis-ta').fill('Prova automàtica: reunió de cicle dijous');
-  await page.locator('.avis-modal .btn-primary').click();
-  await page.waitForTimeout(800);
-  igual(await page.locator('.avis-modal').count(), 0, 'es tanca en publicar');
-  cal(await page.evaluate(c => {
-    const s = JSON.parse(localStorage.getItem(c));
-    const a = s.entries.filter(e => e.section === 'avisos');
-    return a.length === 3 && a.some(e => e.body === 'Prova automàtica: reunió de cicle dijous' && e.author === 'pol');
-  }, CLAU), 'l’avís s’ha desat, firmat per Pol');
-  igual(await page.locator('#bento .tile.wide').count(), 1, 'la banda segueix sortint');
-  igual((await page.locator('#bento .tile.wide .t-badge').textContent()).trim(), '1', 'el comptador queda a 1 (el de la Mireia)');
+  console.log('\n7. Marcar l’altre com a llegit');
+  const it1 = page.locator('.avis-panel .avis-item').filter({ hasText:'fotocòpies' });
+  await it1.locator('.avis-llegit').click();
+  await page.waitForTimeout(700);
+  igual(await page.locator('#avisBtn .avis-badge').count(), 0, 'ja no queda cap avís per llegir');
 
-  console.log('\n7b. La banda NO és permanent');
+  console.log('\n7b. La targeta NO és permanent');
   await page.evaluate(c => {
     const s = JSON.parse(localStorage.getItem(c));
     s.entries.filter(e => e.section === 'avisos').forEach(e => { e.readBy = ['pol','cristina','mireia']; });
     localStorage.setItem(c, JSON.stringify(s));
-    // la cua encara porta l'addEntry sense enviar (aquí no hi ha xarxa) i reaplicaPendents
-    // el tornaria a posar amb el readBy original: la buidem com si ja s'hagués enviat
+    // la cua encara porta els canvis sense enviar (aquí no hi ha xarxa) i reaplicaPendents
+    // els tornaria a posar amb el readBy original: la buidem com si ja s'hagués enviat
     localStorage.setItem('coord_pending', '[]');
   }, CLAU);
   await page.reload({ waitUntil:'domcontentloaded' });
   await page.waitForSelector('#bento .tile', { timeout: 20000 });
   await page.waitForTimeout(1000);
-  igual(await page.locator('#bento .tile.wide').count(), 0, 'amb tot llegit, la banda DESAPAREIX');
-  igual(await page.locator('.avis-panel').count(), 0, 'i el panell també');
+  igual(await page.locator('.avis-panel').count(), 0, 'amb tot llegit, la targeta DESAPAREIX');
+  igual(await page.locator('#avisBlock').evaluate(el => getComputedStyle(el).display), 'none', 'i el bloc s’amaga');
   cal(await page.locator('#avisBtn').isVisible(), 'però el botó de dalt hi segueix (per veure l’històric)');
   igual(await page.locator('#avisBtn .avis-badge').count(), 0, 'sense comptador');
   cal(await page.locator('#bento .tile').count() >= 10, 'la resta de la portada, intacta');
+
+  console.log('\n7c. El botó de dalt obre la pàgina d’avisos');
+  await page.locator('#avisBtn').click();
+  await page.waitForTimeout(700);
+  cal(/Avisos/.test(await page.locator('.sec-hero').textContent()), 'obre la secció d’avisos');
+  cal(await page.locator('#section .entry-card, #section .entry-row').count() >= 2,
+    'amb tots els avisos que s’han escrit');
+  await page.locator('#homeBtn').click();
+  await page.waitForTimeout(600);
+
 
   console.log('\n8. Llibres per tornar (avís de la portada)');
   const pll = page.locator('.hpanel').filter({ hasText:'Llibres per tornar' });

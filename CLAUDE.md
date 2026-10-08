@@ -137,23 +137,19 @@ grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|N
 `excursions`/`activitats`(subthemes), `programacio`(programacio),
 `correus`(correus, `customHero`), `enllacos`(links), `avaluacio`(avaluacio,
 `customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`),
-`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `size:'wide'`).
+`grups`(grups, `customHero`, `size:'pill'`), `avisos`(entries, `inBento:false`).
 
 **Mides de rajola** (`size`, graella de 12 columnes):
 - `big` = span 4 → `general`, `tasques`, `calendari` (una fila de 12 justa).
 - `reg` = span 3 → les 8 restants (dues files de 4 justes).
-- `wide` = `grid-column:1/-1` → **només `avisos`**, i va **PRIMERA** de totes: una
-  **banda vermella a tota l'amplada** a dalt de la portada, en fila (icona + text +
-  comptador) i més baixa que una targeta. És `1/-1` i no `span 12` perquè al mòbil la
-  graella passa a 2 columnes i un `span 12` se'n sortiria. Deixa les altres dues files
-  exactament com estaven.
 - `pill` = `programacio` i `grups`, botons allargats al final. `renderBento` les posa
   TOTES dins d'UN sol `.tile-pill-wrap` perquè quedin de costat; abans cada una tenia el
   seu wrap de `span 12` i quedaven l'una sota l'altra.
-
-`renderBento` afegeix el `.t-badge` **l'últim** (després del cos): a les rajoles normals
-va posicionat absolut i l'ordre del DOM és igual, però a la banda `wide` va en fila i ha
-de quedar a la dreta.
+- **`inBento:false`** → **només `avisos`**: la secció existeix i s'hi entra, però NO es
+  pinta cap rajola. Té la seva targeta de banda a banda a la portada i el botó de la
+  barra de dalt; una rajola hauria dit la mateixa cosa una tercera vegada. Hi va haver
+  una `size:'wide'` (banda vermella a tota l'amplada a dalt del bento) i es va treure
+  (08-10-2026): la informació ja era als altres dos llocs.
 
 **Regla capçalera:** `openSection` pinta una capçalera per defecte **excepte** si
 la secció té `customHero:true`. Si un `render*` es fa la seva pròpia capçalera
@@ -531,35 +527,54 @@ nom estandarditzat.
   (`STATE.comments[entryId]` + el rail d'`entryRow`), `deleteEntry` que neteja els comentaris,
   l'edició, la cerca i la cua de reintents. Es pinta amb `renderEntries`, que ja porta tot
   això: **zero codi de pintat nou per a la secció**.
-  **Rajola de la portada:** `size:'wide'` i **la primera** de `SECTIONS` → banda vermella
-  (`#C9442F`) a tota l'amplada a dalt de tot (§6). `heroPaint` li dona lletra **blanca**
-  (4,83 de contrast). El `metaLabel` és informatiu: «2 avisos nous · <text del més nou>»
-  (tallat a 64 caràcters), o «1 avís amb comentaris nous», o «Últim: …», o «Res de nou ·
-  toca per escriure'n un». El `.t-badge` de la banda va **blanc amb lletra vermella**: el
-  groc de sempre només dona 2,63 de contrast contra aquest vermell i es desdibuixava.
+  **On es veuen (dos llocs, no tres):**
+  1. **La targeta de la portada** (`buildAvisosPanel`, dins `#avisBlock`/`#avisWrap`): de
+     **banda a banda** i **SOTA** les columnes de tasques, carpeta i llibres (`#dashCols`),
+     just abans de Novetats. To **vermell** (`--avis` `#C9442F`, ratlla de 5 px a l'esquerra
+     i fons degradat) perquè destaqui. Hi surten els que (a) jo no he llegit, (b) tenen
+     comentaris que no he vist, o (c) són **meus** i encara no els ha llegit tothom — així
+     l'autor veu si cal insistir («falta Mireia i Cristina» / «llegit per tothom»).
+     **Cada avís (`avisItem`) porta a dins:** qui l'ha escrit i quan, el xip d'estat, el
+     **text sencer a tota l'amplada** (clicable: obre l'avís amb els comentaris; tallat a 8
+     línies amb `-webkit-line-clamp`), els **fils de comentaris** (els dos últims, amb enllaç
+     a la resta) i **els seus dos botons**: «✓ Marca'l com a llegit» (vermell ple, lletra
+     blanca, 4,83 de contrast) i «💬 Contesta (N)». Topall `AVIS_PANEL_MAX`=5 + «i N avisos
+     més». Al capdamunt, «+ Escriu-ne un» (`obreAvisRapid`).
+     **Contestar sense sortir de la portada** (`avisComposer`): el compositor s'obre dins de
+     la mateixa targeta i desa amb `api.commentAdd` — és el **mateix fil** que el panell de
+     comentaris de dins de la secció. Contestar un avís també el marca com a llegit.
+     ⚠️ `renderAvisosHome(focusComp)` **no repinta si el focus és dins del compositor** (una
+     sincronització s'enduria el que s'està escrivint); i `AVIS_DRAFT` guarda l'esborrany a
+     cada tecla, així un repintat sense focus el torna a posar. `AVIS_REPLY` diu quin avís el
+     té obert.
+  2. **El botó de la barra de dalt** (`#avisBtn`): **obre la pàgina d'avisos**
+     (`openSection('avisos')`), amb tots els que s'han escrit i els seus comentaris. El
+     comptador `.avis-badge` i el punt `.t-alerta` ja diuen si hi ha res per llegir o
+     comentaris nous.
+  ⚠️ **No hi ha rajola al bento** (`inBento:false`, §6). N'hi va haver una de `size:'wide'`
+  (banda vermella a dalt de tot) i es va treure el 08-10-2026: dient-ho a la targeta i al
+  botó, una tercera vegada només feia soroll. Amb ella van marxar el `metaLabel` dels avisos
+  i el CSS de `.tile.wide`.
   **Escriure'n un:** `obreAvisRapid()` → modal d'UNA caixa de text (res de títol ni enllaç: ha
   de ser ràpid). ⌘/Ctrl+Enter publica. Es desa amb `readBy:[ME]` → per a mi ja està llegit i
   les altres dues el veuen com a nou. El modal porta a sota un enllaç per veure'ls tots.
-  **Panell de la portada** (`buildAvisosPanel`, el **primer** de `renderDash`): surten els que
-  (a) jo no he llegit, (b) tenen comentaris que no he vist, o (c) són **meus** i encara no els
-  ha llegit tothom — així l'autor veu si cal insistir («falta Mireia i Cristina» / «llegit per
-  tothom»). Els que no he llegit porten la casella ✓ per marcar-los **sense sortir de la
-  portada**; els meus, l'avatar. Xip 💬 amb els fils oberts i en groc si n'hi ha de nous. El
-  clic obre l'avís amb el panell de comentaris desplegat. Topall `AVIS_PANEL_MAX`=5 + «i N
-  avisos més».
   **Número vs. alerta de color** (`avisNoLlegits` / `avisComentarisNous`): el **comptador**
-  (`.t-badge` de la banda i `.avis-badge` del botó) compta només els avisos **per llegir**;
-  els **comentaris nous** són un **punt de color** (`.t-alerta`) a la icona, perquè són una
-  cosa diferent i no han d'inflar el número. Si hi ha les dues coses, es veu el número (ja
-  crida prou) i el `title` ho diu tot. `updateAvisBadge` es crida des de `refreshHome` i des
-  de `repaintAfterSync`, perquè el botó també s'actualitzi **dins d'una secció**.
-  ⚠️ **Els avisos NO entren a `novItems()`** (ni ells ni els seus comentaris): tenen el seu
-  panell, que és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa
+  (`.avis-badge` del botó) compta només els avisos **per llegir**; els **comentaris nous** són
+  un **punt de color** (`.t-alerta`) a la icona, perquè són una cosa diferent i no han
+  d'inflar el número. Si hi ha les dues coses, es veu el número (ja crida prou) i el `title`
+  ho diu tot. `updateAvisBadge` es crida des de `refreshHome` i des de `repaintAfterSync`,
+  perquè el botó també s'actualitzi **dins d'una secció**.
+  ⚠️ **Els avisos NO entren a `novItems()`** (ni ells ni els seus comentaris): tenen la seva
+  targeta, que és més visible i porta qui els ha llegit. Si hi entressin, la mateixa cosa
   sortiria **dues vegades** a la portada.
   ⚠️ `.avis-pill` porta el `margin-left:auto` que abans tenia `.topbar .me`: amb dos
   `margin-left:auto` el buit es reparteix entre tots dos i els dos botons quedarien separats.
+  ⚠️ La regla de la targeta és `.hpanel.avis-panel` i no `.avis-panel` a seques: `.hpanel` ve
+  més avall al full i, amb la mateixa especificitat, li guanyava la vora i el fons (la ratlla
+  vermella no es veia).
   Funcions: `avisosTots/avisNoLlegit/avisQuiFalta/avisActius/avisPendentsMeus/updateAvisBadge/
-  obreAvisRapid/buildAvisosPanel`. Variables de color: `--avis`, `--avis-ink`.
+  obreAvisRapid/renderAvisosHome/buildAvisosPanel/avisItem/avisComposer/obreAvisAmbComentaris`.
+  Estat: `AVIS_REPLY`, `AVIS_DRAFT`. Variables de color: `--avis`, `--avis-ink`.
   **No cal cap acció nova al backend:** fa servir `addEntry`, `entryRead`, `commentSeen` i la
   resta, que ja hi són. **No cal redesplegar el Web App per això.**
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
