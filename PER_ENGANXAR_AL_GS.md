@@ -45,6 +45,66 @@ s'esborrin aquests dos casos), **has d'enganxar aquest tros al `.gs`**.
     }
 ```
 
+## I aquests sis, per a la Gestió de grups
+
+Enganxa'ls també dins de `_apply`, just abans dels dos de `llibTitols`/`llibSet`:
+
+```js
+    /* ---- Gestió de grups ----
+       `etiquetes` (PI, Conducta, les que calguin) i cada `conjunt` de grups es desen
+       sencers; `marques`, `notes` i `noms` són granulars per alumne, així els tres
+       tutors poden marcar alhora. `noms` és una capa de CORRECCIONS a sobre de la
+       llista del full: no canvia cap clau, només com es mostra el nom. */
+    case 'grupEtiquetes': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.etiquetes = payload.etiquetes || [];
+      break;
+    }
+    case 'grupMarca': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.marques = state.grups.marques || {};
+      var gm = state.grups.marques[payload.alumne] = state.grups.marques[payload.alumne] || {};
+      if(payload.on) gm[payload.etiqueta] = true;
+      else {
+        delete gm[payload.etiqueta];
+        if(!Object.keys(gm).length) delete state.grups.marques[payload.alumne];
+      }
+      break;
+    }
+    case 'grupNota': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.notes = state.grups.notes || {};
+      if(payload.text) state.grups.notes[payload.alumne] = payload.text;
+      else delete state.grups.notes[payload.alumne];
+      break;
+    }
+    case 'grupNom': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.noms = state.grups.noms || {};
+      if(payload.nom) state.grups.noms[payload.alumne] = payload.nom;
+      else delete state.grups.noms[payload.alumne];
+      break;
+    }
+    case 'grupConjuntUpsert': {   // idempotent per id
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.conjunts = state.grups.conjunts || [];
+      var gc = payload.conjunt, gl = state.grups.conjunts, gi = -1;
+      for(var g0=0;g0<gl.length;g0++){ if(gl[g0].id===gc.id){ gi=g0; break; } }
+      if(gi>=0) gl[gi]=gc; else gl.push(gc);
+      break;
+    }
+    case 'grupConjuntDelete': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.conjunts = (state.grups.conjunts||[]).filter(function(x){ return x.id!==payload.id; });
+      break;
+    }
+```
+
+⚠️ **No toquis `alumnesAFirebase()`.** La correcció de noms de l'app NO reescriu la llista
+d'alumnes: és una capa a sobre (`STATE.grups.noms`), justament perquè el full segueixi
+manant i la pujada de cada hora no esborri res. Si algun dia vols fer les correccions
+definitives, el botó «Copia la llista de 2nX» de l'app et dona els noms per enganxar al full.
+
 ## Si també hi tens un `normalizeState` equivalent al servidor
 
 Afegeix-hi la clau nova, com les altres:
@@ -53,6 +113,12 @@ Afegeix-hi la clau nova, com les altres:
   if(!state.llibres) state.llibres = {titols:[], marques:{}};
   state.llibres.titols = state.llibres.titols || [];
   state.llibres.marques = state.llibres.marques || {};
+  if(!state.grups) state.grups = {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+  state.grups.etiquetes = state.grups.etiquetes || [];
+  state.grups.marques = state.grups.marques || {};
+  state.grups.notes = state.grups.notes || {};
+  state.grups.noms = state.grups.noms || {};
+  state.grups.conjunts = state.grups.conjunts || [];
 ```
 
 ## Comprova que ha quedat bé

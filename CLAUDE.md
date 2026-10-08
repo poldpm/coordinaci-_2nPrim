@@ -112,6 +112,8 @@ emailReminders{} // opt-in del correu recordatori: { tutor: true }
 cvLliurat{}      // qui ha entregat la carpeta viatgera: { dataISO_del_cicle: { 'Nom alumne': true } }
 comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
 llibres{}        // llibres que s'emporten a casa: { titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e:dataISO, r:dataISO}}} } — veure §9
+grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|Nom':{etiqId:true}}, notes:{'CLASSE|Nom':text},
+                 //                   noms:{'CLASSE|Nom':'Nom corregit'}, conjunts:[{id,nom,creat,by,classes[],grups:[{id,nom,membres[]}]}] } — veure §9
 ```
 `normalizeState()` garanteix que totes les claus existeixen.
 
@@ -119,7 +121,13 @@ llibres{}        // llibres que s'emporten a casa: { titols:[{id,nom}], marques:
 `general`(entries), `tasques`(tasks), `calendari`(agenda), `projectes`/
 `excursions`/`activitats`(subthemes), `programacio`(programacio),
 `correus`(correus, `customHero`), `enllacos`(links), `avaluacio`(avaluacio,
-`customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`).
+`customHero`), `comandes`(entries, `customHero`), `eines`(eines, `customHero`),
+`grups`(grups, `customHero`, `size:'pill'`).
+
+**Píndoles:** `programacio` i `grups` tenen `size:'pill'` i es pinten com a botons
+allargats al final de la portada. `renderBento` les posa TOTES dins d'UN sol
+`.tile-pill-wrap` perquè quedin de costat; abans cada una tenia el seu wrap de
+`span 12` i quedaven l'una sota l'altra.
 
 **Regla capçalera:** `openSection` pinta una capçalera per defecte **excepte** si
 la secció té `customHero:true`. Si un `render*` es fa la seva pròpia capçalera
@@ -425,6 +433,55 @@ nom estandarditzat.
   ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
   abans. ⚠️ Casos **NOUS a `doPost`** (`llibTitols`, `llibSet`) → cal **nou desplegament del Web
   App** (§11) i, si es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
+- **Gestió de grups** (secció pròpia `grups`, píndola al costat de Programació): tres coses.
+  Model: `STATE.grups = {etiquetes, marques, notes, noms, conjunts}` (§5).
+  1. **Marques a tenir en compte en fer els grups.** Etiquetes sembrades a `GRUP_ETIQ_SEED`:
+     **PI** i **Conducta** (ids estables `pi`/`conducta`), i se'n poden afegir de lliures
+     («Què marquem»). Més una **nota lliure per alumne** per a tot allò que no és una casella.
+     `etiquetes` es desa sencer (`api.grupEtiquetes`); `marques` i `notes` són **granulars i
+     idempotents** per alumne (`api.grupMarca` / `api.grupNota`), clau `CLASSE|NOM`.
+     Treure una etiqueta **no** esborra les marques (si la tornes a posar, hi són).
+  2. **Noms: capa de CORRECCIONS, no una còpia de la llista.** ⚠️ Important: la llista
+     d'alumnes la mana el **full** i Apps Script la torna a pujar **cada hora**
+     (`alumnesAFirebase`), per això `STATE.students` NO s'escriu des de l'app
+     (`FB_NO_DESAR`). `STATE.grups.noms['CLASSE|NOM'] = 'Nom corregit'` diu només **com es
+     mostra**: la clau no canvia mai, així la correcció sobreviu la sincronització i **cap
+     registre queda orfe** (llibres, autoritzacions, reptes i carpeta viatgera van lligats a
+     la clau original). `stMostra(classe, nom)` és l'ÚNIC lloc que decideix com es pinta un
+     nom; `stMostraNom(nom)` resol la classe sol (per al generador i els reptes, que
+     treballen amb noms solts). Ja s'aplica a: Gestió de grups, carpeta viatgera, pícnics,
+     autoritzacions, llibres (les 3 vistes + l'avís de la portada), assistència, reptes,
+     generador de grups, i els textos per copiar (`autTextQueFalta`, `llibTextPendents`,
+     `buildAbsentText`/`buildAbsentBody`). Botó **«Copia la llista de 2nX»**
+     (`grupTextLlista`) → els noms corregits, un per línia, per enganxar-los al full i
+     deixar-ho definitiu.
+  3. **Repartiments** (`conjunts`): grups desats amb nom. Es poden crear a mà (surten 4 grups
+     buits), reanomenar el repartiment i cada grup, **moure alumnes amb un desplegable**,
+     afegir/treure grups (els seus membres tornen al pool), triar **quines classes** hi entren
+     (treure una classe treu també els seus membres, si no quedarien alumnes fantasma),
+     **«Reparteix-los»** (posa els que queden al grup amb menys gent) i copiar-ho tot.
+     Cada fila de membre ensenya les seves marques i la nota.
+  **Generador automàtic:** es queda a `eines` (`EINA='grups'`). Des d'aquí hi ha un botó per
+  anar-hi, i des d'allà **«Desa'ls a Gestió de grups»** (`grupDesaDelGenerador`).
+  `generateGroups` ara fa servir `grupMarcatsPlans()` = les marques del full (`STATE.flags`,
+  que segueixen valent) **+** les d'aquí → els alumnes marcats es reparteixen de debò.
+  ⚠️ El generador treballa amb **noms solts**: amb dos homònims de classes diferents (una
+  Anna Puig a 2nA i una altra a 2nC) el nom sol no diu de qui es tracta. `grupResolClau(nom,
+  etiquetaSeccio, gastats)` ho resol per ordre: el sufix «(2nB)», la classe de la secció, i
+  si no, la primera classe amb aquest nom que encara no s'hagi fet servir en aquest
+  repartiment (bug real: sense això, desar els grups de 2nC assignava l'Anna de 2nA i deixava
+  la de 2nC sense grup).
+  ⚠️ `etiquetes` i cada `conjunt` es desen **sencers**: si dos tutors retoquen el MATEIX
+  repartiment exactament alhora, l'últim que desa es queda (com la programació, §7). Les
+  marques, les notes i els noms són granulars → això no els passa.
+  Funcions: `renderGestioGrups` + `renderGrups{Alumnes,EtiqConfig,Conjunts,Conjunt}`,
+  `grupDades/grupEtiq/grupClasses/grupTe/grupNotaDe/grupCompta/grupTeAlgunaCosa/grupTextLlista/
+  grupConjunts/grupConjuntDe/grupMembresTots/grupPool/grupParteix/grupFmtData/grupMarcatsPlans/
+  grupResolClau/grupDesaDelGenerador`. Estat: `GRUPS_VIEW`, `GRUPS_CLASS`, `GRUPS_CONJ`,
+  `GRUPS_ETIQ_CFG`, i `GRUPS_NAV` (el mateix paper que `PROG_NAV`/`LLIB_NAV`).
+  ⚠️ Casos **NOUS a `doPost`** (`grupEtiquetes`, `grupMarca`, `grupNota`, `grupNom`,
+  `grupConjuntUpsert`, `grupConjuntDelete`) → cal **nou desplegament del Web App** (§11) i, si
+  es torna a generar `fbApply`, han de ser al `_apply` del `.gs`.
 - **Comandes**: llegeix una carpeta de Drive; estat enviat a Direcció/Administració.
 - **Correu de pícnics** (dins Excursions): obre Gmail amb la llista i la data.
 

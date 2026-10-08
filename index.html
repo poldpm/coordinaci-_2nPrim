@@ -400,6 +400,49 @@ a{color:var(--teal)}
 .llib-pend-row .d{font-weight:800;font-size:.8rem;color:#8a5a06;background:#fff4de;border-radius:999px;padding:.2em .6em;flex:none}
 .llib-pend-row .d.alerta{color:#a3301f;background:#ffe6e1}
 @media (max-width:420px){ .llib-check,.llib-h{width:38px} .llib-check{height:38px} }
+/* --- Gestió de grups --- */
+.gg-etiq{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:.72rem;padding:.18em .55em;border-radius:999px;
+  background:color-mix(in srgb,var(--cyan) 15%,#fff);color:var(--teal-ink);white-space:nowrap}
+.gg-etiq.pi{background:#e8e6ff;color:#4635a8}
+.gg-etiq.conducta{background:#ffe9e2;color:#a3451f}
+.gg-nota-ico{flex:none;width:34px;height:34px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--bg);
+  border-radius:10px;cursor:pointer;color:var(--muted)}
+.gg-nota-ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.gg-nota-ico.on{background:#fff4de;border-color:#eccf9a;color:#8a5a06}
+.gg-nota-ico:hover{border-color:var(--cyan)}
+.gg-fila-sub{display:flex;gap:6px;flex-wrap:wrap;padding:0 .7em .5em calc(.7em + 34px + 10px)}
+.gg-nom-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
+.gg-nom{min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gg-nom-canviat{border-bottom:1.5px dashed var(--cyan);cursor:help}
+.gg-llapis{flex:none;width:30px;height:30px;display:grid;place-items:center;border:0;background:transparent;color:#8aa0ab;
+  border-radius:8px;cursor:pointer;opacity:0;transition:.12s}
+.gg-llapis svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.aut-fila:hover .gg-llapis,.gg-llapis:focus-visible{opacity:1}
+.gg-llapis:hover{background:var(--bg);color:var(--teal-ink)}
+@media (hover:none){ .gg-llapis{opacity:.75} }
+.gg-conj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.gg-conj-card{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:15px;
+  background:var(--panel);cursor:pointer;transition:.15s;font:inherit;color:inherit}
+.gg-conj-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--cyan)}
+.gg-conj-card .cn{font-family:var(--font-d);font-weight:600;font-size:1.04rem;color:var(--teal-ink);line-height:1.18}
+.gg-conj-card .cm{font-weight:800;font-size:.78rem;color:var(--muted);margin-top:6px}
+.gg-grups{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:12px;margin-bottom:16px}
+.gg-grup{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden}
+.gg-grup-cap{display:flex;align-items:center;gap:6px;padding:.5em .6em;background:var(--bg);border-bottom:1px solid var(--line)}
+.gg-grup-cap input{flex:1;min-width:0;border:1.5px solid transparent;border-radius:9px;padding:.3em .45em;font:inherit;
+  font-weight:800;font-size:.92rem;color:var(--teal-ink);background:transparent}
+.gg-grup-cap input:hover{border-color:var(--line);background:#fff}
+.gg-grup-cap input:focus{border-color:var(--cyan);background:#fff;outline:none}
+.gg-grup-cap .gc{font-weight:800;font-size:.72rem;color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.gg-membre{display:flex;align-items:center;gap:7px;padding:.4em .6em;border-top:1px solid var(--line)}
+.gg-membre:first-child{border-top:0}
+.gg-membre .mn{flex:1;min-width:0;font-weight:700;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gg-membre select{flex:none;max-width:104px;border:1.5px solid var(--line);border-radius:9px;padding:.25em .3em;
+  font:inherit;font-weight:800;font-size:.74rem;background:var(--bg);color:var(--muted);cursor:pointer}
+.gg-buit{padding:.7em .6em;color:var(--muted);font-weight:700;font-size:.84rem;font-style:italic}
+.gg-pool{border:1.5px dashed var(--line);border-radius:14px;background:var(--paper);overflow:hidden;margin-bottom:16px}
+.gg-pool-cap{display:flex;align-items:center;gap:8px;padding:.55em .7em;font-weight:800;font-size:.8rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.04em}
 .nov-cmt{background:#fff4e0;color:#8a5600;font-weight:800}
 /* Mida tàctil mínima: abans hi havia icones de 34x29 px, per sota del que es pot tocar bé */
 .rept-icona,.read-btn,.back-btn,.prog-segbtn,.att-tab,.edit-btn,.del{min-height:40px;min-width:40px}
@@ -710,7 +753,9 @@ button.prog-note-ico:hover{transform:scale(1.08)}
 .tile.big{grid-column:span 4}
 .tile.med{grid-column:span 4}
 .tile.reg{grid-column:span 3}
-.tile-pill-wrap{grid-column:span 12;display:flex;justify-content:center;margin-top:2px}
+/* Totes les píndoles comparteixen UNA fila: abans cada una tenia el seu wrap de
+   span 12 i quedaven l'una sota l'altra en comptes de de costat. */
+.tile-pill-wrap{grid-column:span 12;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:2px}
 .tile-pill{position:relative;display:inline-flex;align-items:center;gap:10px;border:none;border-radius:14px;padding:11px 24px;
   color:#fff;font-family:var(--font-d);font-weight:600;font-size:1rem;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .15s,box-shadow .2s}
 .tile-pill:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
@@ -1440,6 +1485,7 @@ const ICONS = {
   siei:'<path d="M12 20s-6.5-4.3-9-8.2A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 9 5.8C18.5 15.7 12 20 12 20z"/>',
   agendar:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 1.5"/>',
   eines:'<path d="M14.5 6.5a3.5 3.5 0 0 0-4.6 4.6L3 18l3 3 6.9-6.9a3.5 3.5 0 0 0 4.6-4.6l-2.3 2.3-2.2-.5-.5-2.2z"/>',
+  grups:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16 14h1a4 4 0 0 1 4 4v2"/>',
   comandes:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>',
   programacio:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13 5l-2 14"/>',
 };
@@ -1456,6 +1502,7 @@ const SECTIONS = [
   {id:'enllacos',   name:'Enllaços d\u2019interès', type:'links', color:'#2E9AA8', size:'reg', desc:'Botons d\u2019accés directe a webs i documents que feu servir sovint.', ico:'enllacos'},
   {id:'avaluacio',  name:'Avaluació',         type:'avaluacio', color:'#5A6FE0', size:'reg', customHero:true, desc:'Frases d\u2019avaluació organitzades per trimestre i assignatura.', ico:'avaluacio'},
   {id:'programacio',name:'Programació',       type:'programacio', color:'#944B9C', size:'pill', desc:'Programació setmanal per assignatura.', ico:'programacio'},
+  {id:'grups',      name:'Gestió de grups',   type:'grups', color:'#1F8A7A', size:'pill', customHero:true, desc:'Marques a tenir en compte, noms i els grups de classe.', ico:'grups'},
 ];
 const secById = id => SECTIONS.find(s=>s.id===id);
 
@@ -1655,6 +1702,44 @@ const api = {
     const m = a.marques[alumne] = a.marques[alumne] || {};
     if(on) m[camp]=true; else { delete m[camp]; if(!Object.keys(m).length) delete a.marques[alumne]; }
     await persist('autSet', {sub, alumne, camp, on:!!on});
+  },
+  /* --- Gestió de grups ---
+     `etiquetes` i cada `conjunt` es desen sencers (els edita qui els està tocant);
+     les marques, les notes i els noms són granulars per alumne → els tres tutors
+     poden marcar alhora sense trepitjar-se. */
+  async grupEtiquetes(llista){
+    const d = grupDades(); d.etiquetes = llista || [];
+    await persist('grupEtiquetes', {etiquetes:d.etiquetes});
+  },
+  async grupMarca(alumne, etiqueta, on){
+    const d = grupDades();
+    const m = d.marques[alumne] = d.marques[alumne] || {};
+    if(on) m[etiqueta]=true;
+    else { delete m[etiqueta]; if(!Object.keys(m).length) delete d.marques[alumne]; }
+    await persist('grupMarca', {alumne, etiqueta, on:!!on});
+  },
+  async grupNota(alumne, text){
+    const d = grupDades();
+    const t = String(text||'').trim();
+    if(t) d.notes[alumne]=t; else delete d.notes[alumne];
+    await persist('grupNota', {alumne, text:t});
+  },
+  async grupNom(alumne, nom){
+    const d = grupDades();
+    const n = String(nom||'').trim();
+    if(n) d.noms[alumne]=n; else delete d.noms[alumne];
+    await persist('grupNom', {alumne, nom:n});
+  },
+  async grupConjuntUpsert(conjunt){
+    const d = grupDades();
+    const i = d.conjunts.findIndex(x=>x.id===conjunt.id);
+    if(i>=0) d.conjunts[i]=conjunt; else d.conjunts.push(conjunt);
+    await persist('grupConjuntUpsert', {conjunt});
+  },
+  async grupConjuntDelete(id){
+    const d = grupDades();
+    d.conjunts = d.conjunts.filter(x=>x.id!==id);
+    await persist('grupConjuntDelete', {id});
   },
   /* --- Registre de llibres a casa ---
      `titols` es desa sencer (només l'edita qui personalitza la llista); les marques són
@@ -1990,6 +2075,10 @@ function normalizeState(){
   if(!STATE.autoritzacions) STATE.autoritzacions={};
   if(!STATE.llibres) STATE.llibres={titols:[],marques:{}};
   STATE.llibres.titols=STATE.llibres.titols||[]; STATE.llibres.marques=STATE.llibres.marques||{};
+  if(!STATE.grups) STATE.grups={etiquetes:[],marques:{},notes:{},noms:{},conjunts:[]};
+  STATE.grups.etiquetes=STATE.grups.etiquetes||[]; STATE.grups.marques=STATE.grups.marques||{};
+  STATE.grups.notes=STATE.grups.notes||{}; STATE.grups.noms=STATE.grups.noms||{};
+  STATE.grups.conjunts=STATE.grups.conjunts||[];
   if(!STATE.reptes) STATE.reptes={caixes:[],registres:[],v:0};
   STATE.reptes.caixes=STATE.reptes.caixes||[]; STATE.reptes.registres=STATE.reptes.registres||[];
   (STATE.entries||[]).forEach(e=>{ e.readBy=e.readBy||[]; e.createdAt=e.createdAt||e.date; e.updatedAt=e.updatedAt||e.createdAt; });
@@ -2541,6 +2630,54 @@ function fbApply(state, action, payload){
         delete am[payload.camp];
         if(!Object.keys(am).length) delete as.marques[payload.alumne];
       }
+      break;
+    }
+    /* ---- Gestió de grups ----
+       `etiquetes` (PI, Conducta, les que calguin) i cada `conjunt` de grups es desen
+       sencers; `marques`, `notes` i `noms` són granulars per alumne, així els tres
+       tutors poden marcar alhora. `noms` és una capa de CORRECCIONS a sobre de la
+       llista del full: no canvia cap clau, només com es mostra el nom. */
+    case 'grupEtiquetes': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.etiquetes = payload.etiquetes || [];
+      break;
+    }
+    case 'grupMarca': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.marques = state.grups.marques || {};
+      var gm = state.grups.marques[payload.alumne] = state.grups.marques[payload.alumne] || {};
+      if(payload.on) gm[payload.etiqueta] = true;
+      else {
+        delete gm[payload.etiqueta];
+        if(!Object.keys(gm).length) delete state.grups.marques[payload.alumne];
+      }
+      break;
+    }
+    case 'grupNota': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.notes = state.grups.notes || {};
+      if(payload.text) state.grups.notes[payload.alumne] = payload.text;
+      else delete state.grups.notes[payload.alumne];
+      break;
+    }
+    case 'grupNom': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.noms = state.grups.noms || {};
+      if(payload.nom) state.grups.noms[payload.alumne] = payload.nom;
+      else delete state.grups.noms[payload.alumne];
+      break;
+    }
+    case 'grupConjuntUpsert': {   // idempotent per id
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.conjunts = state.grups.conjunts || [];
+      var gc = payload.conjunt, gl = state.grups.conjunts, gi = -1;
+      for(var g0=0;g0<gl.length;g0++){ if(gl[g0].id===gc.id){ gi=g0; break; } }
+      if(gi>=0) gl[gi]=gc; else gl.push(gc);
+      break;
+    }
+    case 'grupConjuntDelete': {
+      state.grups = state.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+      state.grups.conjunts = (state.grups.conjunts||[]).filter(function(x){ return x.id!==payload.id; });
       break;
     }
     /* ---- Registre de llibres a casa ----
@@ -3209,7 +3346,7 @@ function buildLlibresPanel(){
       renderDash(); toast('Tornat!');
     };
     row.appendChild(box);
-    const t=el('div','htitle'); t.textContent=x.nom+' · '+x.llibre.nom; row.appendChild(t);
+    const t=el('div','htitle'); t.textContent=stMostra(x.cls,x.nom)+' · '+x.llibre.nom; row.appendChild(t);
     if(!meva){ const g=el('span','hstatus'); const pg=pillPaint(classColor(x.cls));
       g.style.background=pg.bg; g.style.color=pg.ink; g.textContent=x.cls; row.appendChild(g); }
     const d=el('span','hcorreu-date'); d.textContent=x.dies+' dies';
@@ -3322,16 +3459,17 @@ function sectionBadge(sec){
 }
 function renderBento(){
   const b=$('#bento'); b.innerHTML='';
+  let pillWrap=null;                  // el comparteixen totes les píndoles (veure el CSS)
   SECTIONS.forEach(sec=>{
     if(sec.size==='pill'){
-      const wrap=el('div','tile-pill-wrap');
+      if(!pillWrap){ pillWrap=el('div','tile-pill-wrap'); b.appendChild(pillWrap); }
       const pill=el('button','tile-pill');
       pill.style.background=`linear-gradient(180deg, ${sec.color}, ${shade(sec.color,-16)})`;
       pill.innerHTML=`<svg class="icon" viewBox="0 0 24 24">${ICONS[sec.ico]}</svg><span>${esc(sec.name)}</span>`;
       const badge=sectionBadge(sec);
       if(badge>0){ const bg=el('span','pill-badge'); bg.textContent=badge; pill.appendChild(bg); }
       pill.onclick=()=>openSection(sec.id);
-      wrap.appendChild(pill); b.appendChild(wrap);
+      pillWrap.appendChild(pill);
       return;
     }
     const tile=el('button','tile '+sec.size);
@@ -3362,6 +3500,12 @@ function metaLabel(sec){
   if(sec.type==='agenda'){ const dated=STATE.entries.filter(e=>e.section===sec.id&&e.eventDate).length; const pend=STATE.entries.filter(e=>e.section===sec.id&&!e.eventDate).length; return pend? `${dated} ${plural(dated,'data','dates')} · ${pend} per agendar` : `${dated} ${plural(dated,'data','dates')}`; }
   if(sec.type==='avaluacio'){ return 'Frases per trimestre'; }
   if(sec.type==='programacio'){ return 'Setmanal · 3 assignatures'; }
+  if(sec.type==='grups'){
+    const m=Object.keys((STATE.grups&&STATE.grups.marques)||{}).length;
+    const c=((STATE.grups&&STATE.grups.conjunts)||[]).length;
+    const p=[]; if(m) p.push(m+' '+plural(m,'marcat','marcats')); if(c) p.push(c+' '+plural(c,'repartiment','repartiments'));
+    return p.length ? p.join(' · ') : 'Marques i grups de classe';
+  }
   if(sec.type==='correus'){ const n=(STATE.correus||[]).filter(c=>!(c.sent&&c.sent[ME])).length; return n? (n+' per enviar') : 'Tot enviat'; }
   const n=STATE.entries.filter(e=>e.section===sec.id).length;
   return n? `${n} entrad${n===1?'a':'es'}` : 'Encara buit';
@@ -3433,6 +3577,8 @@ let AV_TRI=null, AV_SUBJECT=null, PENDING_AV=null;
 let EINA=null, PENDING_EINA=null;
 let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
 /* ---------- Registre de llibres a casa (dins STATE.llibres → sincronitzat entre els tres) ---------- */
+/* ---------- Gestió de grups (secció pròpia, dins STATE.grups) ---------- */
+let GRUPS_VIEW='alumnes', GRUPS_CLASS=null, GRUPS_CONJ=null, GRUPS_ETIQ_CFG=false, GRUPS_NAV=false;
 let LLIB_VIEW='llibres', LLIB_BOOK=null, LLIB_CLASS=null, LLIB_ALUMNE=null, LLIB_CONFIG=false;
 /* Com PROG_NAV: qui ve d'un avís de la portada ja ha triat la vista, i openSection
    no l'hi ha de reiniciar (si no, el clic aterrava sempre a la llista de llibres). */
@@ -4080,7 +4226,7 @@ function cvLliuratBlock(give){
   const grid=el('div','att-grid');
   roster.forEach(name=>{
     const on=stLlegeix(cvLliuratsDe(give),CV_CLASS,name);
-    const chip=el('button','att-chip cv-chip'+(on?' fet':'')); chip.type='button'; chip.textContent=name;
+    const chip=el('button','att-chip cv-chip'+(on?' fet':'')); chip.type='button'; chip.textContent=stMostra(CV_CLASS,name);
     chip.onclick=async()=>{ const nou=!chip.classList.contains('fet');
       chip.classList.toggle('fet', nou);
       await api.cvLliurat(give, stKey(CV_CLASS,name), nou);
@@ -4513,6 +4659,8 @@ function openSection(id){
   if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null; }
   if(id==='eines' && id!==CURRENT && !LLIB_NAV){ LLIB_VIEW='llibres'; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; }
   LLIB_NAV=false;
+  if(id==='grups' && id!==CURRENT && !GRUPS_NAV){ GRUPS_VIEW='alumnes'; GRUPS_CONJ=null; GRUPS_ETIQ_CFG=false; }
+  GRUPS_NAV=false;
   /* PROG_NAV: qui ve de la cerca o d'un avis de la portada ja ha triat setmana o
      cicle. Sense aquesta marca, openSection ho reiniciava a la setmana d'avui i
      el clic aterrava sempre al lloc equivocat. */
@@ -4530,6 +4678,7 @@ function openSection(id){
   else if(sec.type==='programacio') renderProgramacio(S,sec);
   else if(sec.type==='correus') renderCorreus(S,sec);
   else if(sec.type==='eines') renderEines(S,sec);
+  else if(sec.type==='grups') renderGestioGrups(S,sec);
   else if(sec.id==='comandes') renderComandes(S,sec);
   else renderEntries(S,sec,null);
   animateIn(S);
@@ -4623,7 +4772,7 @@ function renderPicnic(S, section, subId, sub){
     const grid=el('div','att-grid');
     (STATE.students[c]||[]).forEach(name=>{
       // stLlegeix: les marques es desen com a CLASSE|NOM (amb pic[name] sortien totes apagades)
-      const chip=el('button','pic-chip'+(stLlegeix(pic,c,name)?' on':'')); chip.type='button'; chip.textContent=name;
+      const chip=el('button','pic-chip'+(stLlegeix(pic,c,name)?' on':'')); chip.type='button'; chip.textContent=stMostra(c,name);
       chip.onclick=async()=>{ const now=!chip.classList.contains('on'); chip.classList.toggle('on',now); if(now) pic[stKey(c,name)]=true; else stEsborra(pic,c,name); setCnt(); await api.picnicToggle(subId, stKey(c,name), now); };
       grid.appendChild(chip);
     });
@@ -4713,7 +4862,7 @@ function autTextQueFalta(subId, sub){
     const c=autCompta(subId, camp.id);
     L.push(camp.nom+' — falten '+(c.total-c.fets)+' de '+c.total+':');
     classes.forEach(cls=>{
-      const falten=(STATE.students[cls]||[]).filter(n=>!autTe(subId,cls,n,camp.id));
+      const falten=(STATE.students[cls]||[]).filter(n=>!autTe(subId,cls,n,camp.id)).map(n=>stMostra(cls,n));
       if(falten.length) L.push('  '+cls+': '+falten.join(', '));
     });
     if(c.fets===c.total) L.push('  (tots)');
@@ -4815,7 +4964,7 @@ function renderAutoritzacions(S, section, subId, sub){
   taula.appendChild(cap);
   (STATE.students[AUT_CLASS]||[]).forEach(nom=>{
     const fila=el('div','aut-fila');
-    const n=el('div','aut-nom'); n.textContent=nom; fila.appendChild(n);
+    const n=el('div','aut-nom'); n.textContent=stMostra(AUT_CLASS,nom); fila.appendChild(n);
     camps.forEach(camp=>{
       const on=autTe(subId, AUT_CLASS, nom, camp.id);
       const b=el('button','aut-check'+(on?' on':'')); b.type='button';
@@ -5188,7 +5337,7 @@ function makeGroups(students, size, constraints, opts){
 }
 function generateGroups(size, mix, constraints, hetero){
   const byClass=STATE.students||{};
-  const marked=STATE.flags||{};
+  const marked=grupMarcatsPlans();
   const classes=Object.keys(byClass).filter(c=>byClass[c] && byClass[c].length);
   if(!classes.length) return {error:'No hi ha alumnes. Omple la pestanya \u201cAlumnes\u201d del full de càlcul.'};
   if(mix){
@@ -5245,6 +5394,562 @@ function renderEinesList(S){
   });
   S.appendChild(grid);
 }
+/* ============ GESTIÓ DE GRUPS ============
+   Secció pròpia (píndola al costat de Programació). Tres coses:
+   1) MARQUES a tenir en compte en fer els grups: PI, Conducta, les etiquetes que
+      calguin, i una nota lliure per alumne.
+   2) NOMS: una capa de CORRECCIONS a sobre de la llista del full. El full segueix
+      dient QUI hi ha (Apps Script la torna a pujar cada hora); l'app corregeix com
+      es MOSTRA el nom. Així la correcció sobreviu la sincronització i, sobretot, no
+      orfena cap registre: llibres, autoritzacions, reptes i carpeta viatgera van
+      lligats a la clau CLASSE|NOM original, que no canvia mai.
+   3) REPARTIMENTS de grups desats: crear-los, posar-hi nom, moure alumnes, esborrar.
+   El generador automàtic es queda a Eines; des d'aquí hi ha un botó per anar-hi, i
+   des d'allà un per desar el resultat com a repartiment.
+   ⚠️ `etiquetes` i cada `conjunt` es desen SENCERS: si dos tutors retoquen el MATEIX
+   repartiment exactament alhora, l'últim que desa es queda (com la programació, §7).
+   Les marques, les notes i els noms són granulars → això no els passa. */
+const GRUP_ETIQ_SEED=[{id:'pi', nom:'PI'}, {id:'conducta', nom:'Conducta'}];
+function grupDades(){
+  STATE.grups = STATE.grups || {etiquetes:[], marques:{}, notes:{}, noms:{}, conjunts:[]};
+  const g=STATE.grups;
+  g.etiquetes=g.etiquetes||[]; g.marques=g.marques||{}; g.notes=g.notes||{};
+  g.noms=g.noms||{}; g.conjunts=g.conjunts||[];
+  return g;
+}
+/* La llista desada manda; si no s'ha tocat mai, la sembra (PI i Conducta) */
+function grupEtiq(){ const e=grupDades().etiquetes; return e.length ? e : GRUP_ETIQ_SEED; }
+function grupClasses(){ return autClasses(); }
+function grupTe(cls, nom, etiq){ const m=grupDades().marques[stKey(cls,nom)]; return !!(m && m[etiq]); }
+function grupNotaDe(cls, nom){ return grupDades().notes[stKey(cls,nom)] || ''; }
+/* ---- Capa de noms ----
+   stMostra(classe, nom) és l'ÚNIC lloc que decideix com es pinta un nom. La clau
+   (stKey) no canvia mai: les marques ja desades segueixen valent. */
+function stMostra(cls, nom){ return (STATE.grups && STATE.grups.noms && STATE.grups.noms[stKey(cls,nom)]) || nom; }
+/* Quan només tenim el nom (p. ex. el generador de grups, que treballa amb noms solts) */
+function stMostraNom(nom){
+  const s=String(nom==null?'':nom);
+  const cls=studentClass(s);
+  if(!cls) return s;
+  const m=s.match(/^(.*) \(([^()]+)\)$/);                 // «Marc Soler (2nB)»
+  if(m && m[2]===cls) return stMostra(cls, m[1])+' ('+cls+')';
+  return stMostra(cls, s);
+}
+function grupCompta(etiq){
+  let n=0; grupClasses().forEach(c=>(STATE.students[c]||[]).forEach(x=>{ if(grupTe(c,x,etiq)) n++; }));
+  return n;
+}
+function grupTeAlgunaCosa(cls, nom){
+  return grupEtiq().some(e=>grupTe(cls,nom,e.id)) || !!grupNotaDe(cls,nom);
+}
+/* Llista d'una classe amb els noms ja corregits, per enganxar-la a la columna del full */
+function grupTextLlista(cls){ return (STATE.students[cls]||[]).map(n=>stMostra(cls,n)).join('\n'); }
+/* ---- Repartiments ---- */
+function grupConjunts(){ return grupDades().conjunts; }
+function grupConjuntDe(id){ return grupConjunts().find(c=>c.id===id)||null; }
+function grupMembresTots(conj){ const s=[]; (conj.grups||[]).forEach(g=>s.push(...(g.membres||[]))); return s; }
+/* Els alumnes del repartiment que encara no són a cap grup */
+function grupPool(conj){
+  const posats=new Set(grupMembresTots(conj));
+  const out=[];
+  (conj.classes||[]).forEach(c=>(STATE.students[c]||[]).forEach(n=>{
+    const k=stKey(c,n); if(!posats.has(k)) out.push(k);
+  }));
+  return out;
+}
+/* Una clau CLASSE|NOM → {cls, nom, mostra}. Tolera les claus sense classe. */
+function grupParteix(clau){
+  const s=String(clau||''), i=s.indexOf('|');
+  if(i<0) return {cls:'', nom:s, mostra:stMostraNom(s)};
+  const cls=s.slice(0,i), nom=s.slice(i+1);
+  return {cls, nom, mostra:stMostra(cls,nom)};
+}
+function grupFmtData(iso){
+  try{ const d=new Date(iso); const m=['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+    return d.getDate()+' '+deDe(m[d.getMonth()]); }catch(e){ return ''; }
+}
+/* Les marques que ha de tenir en compte el generador (`makeGroups` les busca pel nom
+   solt). Suma les del full (STATE.flags, que escriu Apps Script i segueixen valent) i
+   les que es posen des d'aquí. Amb dos homònims de classes diferents, el nom solt es
+   confon: només afecta el REPARTIMENT dels marcats, no qui va a cada grup. */
+function grupMarcatsPlans(){
+  const out=Object.assign({}, STATE.flags||{});
+  const m=grupDades().marques;
+  Object.keys(m).forEach(k=>{
+    if(!Object.keys(m[k]||{}).length) return;
+    const i=String(k).indexOf('|');
+    out[i<0 ? k : String(k).slice(i+1)]=true;
+  });
+  return out;
+}
+/* El generador treballa amb noms SOLTS, i amb dos homònims de classes diferents (una
+   Anna Puig a 2nA i una altra a 2nC) el nom sol no diu de qui es tracta. Es resol per
+   ordre: el sufix «(2nB)» si el porta; la classe de la secció, si la secció és una
+   classe; i si no, la primera classe que tingui aquest nom i encara no s'hagi fet
+   servir en aquest repartiment (el generador reparteix cada alumne una sola vegada,
+   així que les dues Annes acaben ben assignades). */
+function grupResolClau(nom, etiquetaSeccio, gastats){
+  const t=String(nom==null?'':nom), classes=grupClasses();
+  const te=(c,n)=>(STATE.students[c]||[]).indexOf(n)>=0;
+  const m=t.match(/^(.*) \(([^()]+)\)$/);
+  if(m && classes.indexOf(m[2])>=0 && te(m[2],m[1])) return stKey(m[2], m[1]);
+  if(etiquetaSeccio && classes.indexOf(etiquetaSeccio)>=0 && te(etiquetaSeccio,t)) return stKey(etiquetaSeccio, t);
+  for(const c of classes){ if(te(c,t) && !(gastats && gastats.has(stKey(c,t)))) return stKey(c,t); }
+  const cls=studentClass(t);
+  return cls ? stKey(cls,t) : t;
+}
+async function grupDesaDelGenerador(){
+  if(!GRP_RESULT || GRP_RESULT.error || !GRP_RESULT.sections) return;
+  const seccions=GRP_RESULT.sections, varies=seccions.length>1;
+  const grups=[], classes=new Set(), gastats=new Set();
+  seccions.forEach(sc=>{
+    (sc.groups||[]).forEach((membres,i)=>{
+      const claus=(membres||[]).map(m=>{
+        const k=grupResolClau(m, sc.label, gastats);
+        gastats.add(k);
+        const p=grupParteix(k); if(p.cls) classes.add(p.cls);
+        return k;
+      });
+      grups.push({id:'g'+uid(), nom:(varies? sc.label+' · ' : '')+'Grup '+(i+1), membres:claus});
+    });
+  });
+  const conj={id:'c'+uid(), nom:'Grups de '+GRP_SIZE+' · '+grupFmtData(new Date().toISOString()),
+    creat:new Date().toISOString(), by:ME, classes:[...classes], grups:grups};
+  await api.grupConjuntUpsert(conj);
+  GRUPS_VIEW='conjunts'; GRUPS_CONJ=conj.id; GRUPS_NAV=true;
+  openSection('grups');
+  toast('Repartiment desat ✓');
+}
+
+function renderGestioGrups(S, sec){
+  if(GRUPS_VIEW==='conjunts' && GRUPS_CONJ && grupConjuntDe(GRUPS_CONJ)){
+    const conj=grupConjuntDe(GRUPS_CONJ);
+    buildSecHero(S, sec, {title:esc(conj.nom), desc:'Mou els alumnes d’un grup a l’altre, canvia’ls el nom o afegeix-ne.',
+      back:{label:sec.name, onClick:()=>{ GRUPS_CONJ=null; openSection('grups'); }}});
+    renderGrupsConjunt(S, conj);
+    return;
+  }
+  buildSecHero(S, sec, {title:sec.name, desc:sec.desc});
+  const classes=grupClasses();
+  if(!classes.length){
+    const e=el('div','empty-feed');
+    e.innerHTML='<div class="big">👥</div>No hi ha alumnes. Omple la pestanya “Alumnes” del full.';
+    S.appendChild(e); return;
+  }
+  const seg=el('div','prog-seg');
+  const nConj=grupConjunts().length;
+  [['alumnes','🧒 Alumnes'],['conjunts','👥 Repartiments'+(nConj?' ('+nConj+')':'')]].forEach(([v,lbl])=>{
+    const b=el('button','prog-segbtn'+(GRUPS_VIEW===v?' on':'')); b.type='button'; b.textContent=lbl;
+    b.onclick=()=>{ GRUPS_VIEW=v; GRUPS_CONJ=null; GRUPS_ETIQ_CFG=false; openSection('grups'); };
+    seg.appendChild(b);
+  });
+  S.appendChild(seg);
+  if(GRUPS_VIEW==='conjunts') renderGrupsConjunts(S);
+  else renderGrupsAlumnes(S);
+}
+
+/* ---- Vista «Alumnes»: marques, notes i noms ---- */
+function renderGrupsAlumnes(S){
+  const classes=grupClasses(), etiq=grupEtiq();
+  const repinta=()=>openSection('grups');
+
+  const top=el('div','aut-top');
+  etiq.forEach(e=>{
+    const p=el('div','aut-resum');
+    p.innerHTML='<b>'+esc(e.nom)+'</b><span>'+grupCompta(e.id)+'</span>';
+    top.appendChild(p);
+  });
+  const cfg=el('button','btn btn-ghost aut-cfg'); cfg.type='button';
+  cfg.innerHTML='<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Què marquem';
+  cfg.onclick=()=>{ GRUPS_ETIQ_CFG=!GRUPS_ETIQ_CFG; repinta(); };
+  top.appendChild(cfg);
+  S.appendChild(top);
+
+  if(GRUPS_ETIQ_CFG) renderGrupsEtiqConfig(S, repinta);
+
+  if(!GRUPS_CLASS || classes.indexOf(GRUPS_CLASS)<0) GRUPS_CLASS=pickTutorClass(classes);
+  const selRow=el('div','att-classsel');
+  classes.forEach(c=>{
+    const t=el('button','att-tab'+(c===GRUPS_CLASS?' on':'')); t.type='button';
+    if(c===GRUPS_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    const roster=STATE.students[c]||[];
+    const n=roster.filter(x=>grupTeAlgunaCosa(c,x)).length;
+    t.textContent=c+' ('+n+'/'+roster.length+')';
+    t.title=c+': '+n+' de '+roster.length+' tenen alguna cosa marcada';
+    t.onclick=()=>{ GRUPS_CLASS=c; repinta(); };
+    selRow.appendChild(t);
+  });
+  S.appendChild(selRow);
+
+  const hint=el('div','att-info');
+  const h=el('span','att-hint');
+  h.textContent=etiq.map(e=>e.nom).join(' · ')+' · 💬 una nota · ✏️ corregeix el nom';
+  hint.appendChild(h); S.appendChild(hint);
+
+  /* --- graella: nom + una casella per etiqueta + la nota --- */
+  const taula=el('div','aut-taula');
+  const cap=el('div','aut-fila aut-cap');
+  cap.appendChild(el('div','aut-nom'));
+  etiq.forEach(e=>{ const c=el('div','aut-cel'); c.textContent=autInicials(e.nom); c.title=e.nom; cap.appendChild(c); });
+  const cn=el('div','llib-h'); cn.textContent='💬'; cn.title='Alguna cosa a tenir en compte'; cap.appendChild(cn);
+  taula.appendChild(cap);
+
+  (STATE.students[GRUPS_CLASS]||[]).forEach(nom=>{
+    const cls=GRUPS_CLASS, clau=stKey(cls,nom);
+    const fila=el('div','aut-fila');
+    const wrap=el('div','aut-nom gg-nom-wrap');
+    const nm=el('span','gg-nom');
+    const pintaNom=()=>{
+      const mostra=stMostra(cls,nom);
+      nm.textContent=mostra;
+      nm.classList.toggle('gg-nom-canviat', mostra!==nom);
+      nm.title = mostra!==nom ? 'Al full hi diu «'+nom+'»' : '';
+    };
+    pintaNom(); wrap.appendChild(nm);
+    const llapis=el('button','gg-llapis'); llapis.type='button'; llapis.title='Corregeix com es mostra el nom';
+    llapis.setAttribute('aria-label','Corregeix el nom de '+nom);
+    llapis.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>';
+    llapis.onclick=()=>{
+      askPrompt({icon:'✏️', title:'Com es mostra el nom', value:stMostra(cls,nom),
+        label:'Al full hi diu «'+nom+'». Aquí pots corregir com es mostra a l’app (buit = com al full).',
+        confirmLabel:'Desa', aria:'Nom de l’alumne'}, val=>{
+        const n=String(val||'').trim();
+        api.grupNom(clau, n===nom ? '' : n).then(()=>{ pintaNom(); toast('Desat ✓'); });
+      });
+    };
+    wrap.appendChild(llapis);
+    fila.appendChild(wrap);
+
+    etiq.forEach(e=>{
+      const on=grupTe(cls,nom,e.id);
+      const b=el('button','aut-check'+(on?' on':'')); b.type='button';
+      b.setAttribute('aria-label', nom+' · '+e.nom); b.title=e.nom;
+      b.setAttribute('aria-pressed', on?'true':'false');
+      b.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+      b.onclick=async()=>{
+        const ara=!b.classList.contains('on');
+        b.classList.toggle('on', ara); b.setAttribute('aria-pressed', ara?'true':'false');
+        await api.grupMarca(clau, e.id, ara);
+        const resums=S.querySelectorAll('.aut-resum span');
+        etiq.forEach((e2,i)=>{ if(resums[i]) resums[i].textContent=grupCompta(e2.id); });
+        const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(cls)===0);
+        if(tab){ const roster=STATE.students[cls]||[];
+          tab.textContent=cls+' ('+roster.filter(x=>grupTeAlgunaCosa(cls,x)).length+'/'+roster.length+')'; }
+      };
+      fila.appendChild(b);
+    });
+
+    /* nota lliure: «alguna cosa a tenir en compte» */
+    const sub=el('div','gg-fila-sub'); sub.hidden=true;
+    const pintaNota=()=>{
+      const t=grupNotaDe(cls,nom);
+      sub.innerHTML=''; sub.hidden=!t;
+      if(t){ const ch=el('span','gg-etiq'); ch.textContent='💬 '+t; sub.appendChild(ch); }
+    };
+    const nb=el('button','gg-nota-ico'); nb.type='button';
+    const pintaBoto=()=>{ const t=grupNotaDe(cls,nom);
+      nb.classList.toggle('on', !!t);
+      nb.title=t || 'Afegeix alguna cosa a tenir en compte';
+      nb.setAttribute('aria-label', (t?'Canvia':'Afegeix')+' la nota de '+nom); };
+    nb.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>';
+    pintaBoto();
+    nb.onclick=()=>{
+      askPrompt({icon:'💬', title:'A tenir en compte', value:grupNotaDe(cls,nom),
+        label:nom+' — què cal tenir en compte en fer els grups? (buit = treu la nota)',
+        confirmLabel:'Desa', aria:'Nota'}, val=>{
+        api.grupNota(clau, val).then(()=>{ pintaBoto(); pintaNota(); toast('Desat ✓'); });
+      });
+    };
+    fila.appendChild(nb);
+    taula.appendChild(fila);
+    pintaNota();
+    taula.appendChild(sub);
+  });
+  S.appendChild(taula);
+
+  /* --- copiar la llista corregida per enganxar-la al full --- */
+  const actions=el('div','att-actions');
+  const cp=el('button','btn btn-ghost'); cp.type='button';
+  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia la llista de '+esc(GRUPS_CLASS);
+  cp.title='Els noms tal com es mostren, per enganxar-los a la columna del full';
+  cp.onclick=()=>{
+    const txt=grupTextLlista(GRUPS_CLASS);
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiada!')).catch(()=>{});
+    const box=S.querySelector('.att-result') || el('div','att-result');
+    box.innerHTML='';
+    const lbl=el('div','att-hint'); lbl.style.marginBottom='8px';
+    lbl.textContent='Enganxa-ho a la columna de '+GRUPS_CLASS+' del full i les correccions ja no caldran.';
+    box.appendChild(lbl);
+    const pre=el('pre'); pre.textContent=txt; box.appendChild(pre);
+    if(!box.parentNode) S.appendChild(box);
+  };
+  actions.appendChild(cp);
+  S.appendChild(actions);
+}
+/* ---- Quines etiquetes marquem ---- */
+function renderGrupsEtiqConfig(S, repinta){
+  const etiq=grupEtiq();
+  const box=el('div','aut-config');
+  const t=el('div','aut-config-t'); t.textContent='Què marquem dels alumnes'; box.appendChild(t);
+  const llista=el('div','aut-config-list');
+  etiq.forEach(e=>{
+    const row=el('div','aut-config-row');
+    const inp=el('input'); inp.type='text'; inp.value=e.nom; inp.setAttribute('aria-label','Nom de l’etiqueta');
+    inp.onchange=async()=>{
+      const nom=inp.value.trim(); if(!nom){ inp.value=e.nom; return; }
+      await api.grupEtiquetes(grupEtiq().map(x=>x.id===e.id?{id:x.id, nom:nom}:x));
+      toast('Desat ✓'); repinta();
+    };
+    row.appendChild(inp);
+    const del=el('button','icon-btn danger'); del.type='button'; del.title='Treu aquesta etiqueta';
+    del.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
+    del.onclick=()=>{
+      askConfirm('Vols treure l’etiqueta «'+e.nom+'»? Deixarà de sortir; si la tornes a posar, les marques encara hi seran.', async()=>{
+        const nous=grupEtiq().filter(x=>x.id!==e.id);
+        await api.grupEtiquetes(nous.length?nous:GRUP_ETIQ_SEED.slice(0,1)); repinta();
+      }, {title:'Treure l’etiqueta', confirmLabel:'Treu-la', danger:true});
+    };
+    if(etiq.length>1) row.appendChild(del);
+    llista.appendChild(row);
+  });
+  box.appendChild(llista);
+  const afegir=el('div','aut-config-add');
+  GRUP_ETIQ_SEED.filter(p=>!etiq.some(x=>x.id===p.id)).forEach(p=>{
+    const b=el('button','btn btn-ghost'); b.type='button'; b.textContent='+ '+p.nom;
+    b.onclick=async()=>{ await api.grupEtiquetes(grupEtiq().concat([{id:p.id, nom:p.nom}])); repinta(); };
+    afegir.appendChild(b);
+  });
+  const altra=el('button','btn btn-ghost'); altra.type='button'; altra.textContent='+ Una altra…';
+  altra.onclick=()=>{
+    askPrompt({icon:'🏷️', title:'Etiqueta nova', label:'Què més vols poder marcar?', placeholder:'p. ex. Lectoescriptura',
+      confirmLabel:'Afegeix', errorMsg:'Posa-hi un nom que no hi sigui ja.'}, val=>{
+      const nom=String(val||'').trim();
+      if(!nom) return false;
+      if(grupEtiq().some(x=>norm(x.nom)===norm(nom))) return false;
+      api.grupEtiquetes(grupEtiq().concat([{id:'e'+uid(), nom:nom}])).then(repinta);
+    });
+  };
+  afegir.appendChild(altra);
+  box.appendChild(afegir);
+  S.appendChild(box);
+}
+/* ---- Vista «Repartiments»: la llista ---- */
+function renderGrupsConjunts(S){
+  const llista=grupConjunts();
+  const repinta=()=>openSection('grups');
+
+  const actions=el('div','att-actions');
+  const nou=el('button','btn btn-primary'); nou.type='button';
+  nou.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Repartiment nou';
+  nou.onclick=()=>{
+    const classes=grupClasses(), meva=pickTutorClass(classes);
+    askPrompt({icon:'👥', title:'Repartiment nou', label:'Com el vols dir?', placeholder:'p. ex. Grups de treball 1r trimestre',
+      confirmLabel:'Crea', errorMsg:'Posa-hi un nom.'}, val=>{
+      const nom=String(val||'').trim();
+      if(!nom) return false;
+      const conj={id:'c'+uid(), nom:nom, creat:new Date().toISOString(), by:ME, classes:[meva],
+        grups:[1,2,3,4].map(i=>({id:'g'+uid(), nom:'Grup '+i, membres:[]}))};
+      api.grupConjuntUpsert(conj).then(()=>{ GRUPS_CONJ=conj.id; repinta(); });
+    });
+  };
+  actions.appendChild(nou);
+  const gen=el('button','btn btn-ghost'); gen.type='button';
+  gen.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/><circle cx="12" cy="12" r="3"/></svg>Generador automàtic';
+  gen.title='Fa els grups sols per mida, repartint els alumnes marcats. Des d’allà els pots desar aquí.';
+  gen.onclick=()=>{ PENDING_EINA='grups'; LLIB_NAV=true; openSection('eines'); };
+  actions.appendChild(gen);
+  S.appendChild(actions);
+
+  if(!llista.length){
+    const e=el('div','empty-feed');
+    e.innerHTML='<div class="big">👥</div>Encara no hi ha cap repartiment. Fes-ne un a mà o genera’ls automàticament i desa’ls.';
+    S.appendChild(e); return;
+  }
+  const grid=el('div','gg-conj-grid');
+  llista.slice().sort((a,b)=>String(b.creat||'').localeCompare(String(a.creat||''))).forEach(c=>{
+    const card=el('button','gg-conj-card'); card.type='button';
+    const n=el('div','cn'); n.textContent=c.nom; card.appendChild(n);
+    const ng=(c.grups||[]).length, nm=grupMembresTots(c).length, fora=grupPool(c).length;
+    const m=el('div','cm');
+    m.textContent=ng+' '+plural(ng,'grup','grups')+' · '+nm+' '+plural(nm,'alumne','alumnes')
+      +(fora? ' · '+fora+' sense grup' : '')+(c.creat? ' · '+grupFmtData(c.creat) : '');
+    card.appendChild(m);
+    card.onclick=()=>{ GRUPS_CONJ=c.id; openSection('grups'); };
+    grid.appendChild(card);
+  });
+  S.appendChild(grid);
+}
+/* ---- Un repartiment: moure, reanomenar, afegir i treure grups ---- */
+function renderGrupsConjunt(S, conj){
+  const repinta=()=>{ GRUPS_NAV=true; openSection('grups'); };
+  const desa=async(c)=>{ await api.grupConjuntUpsert(c); };
+
+  /* --- barra d'accions --- */
+  const actions=el('div','att-actions');
+  const ren=el('button','btn btn-ghost'); ren.type='button';
+  ren.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Canvia el nom';
+  ren.onclick=()=>{
+    askPrompt({icon:'✏️', title:'Nom del repartiment', value:conj.nom, confirmLabel:'Desa', errorMsg:'Posa-hi un nom.'}, val=>{
+      const n=String(val||'').trim(); if(!n) return false;
+      conj.nom=n; desa(conj).then(repinta);
+    });
+  };
+  actions.appendChild(ren);
+  const addG=el('button','btn btn-ghost'); addG.type='button';
+  addG.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Afegeix un grup';
+  addG.onclick=()=>{
+    conj.grups=(conj.grups||[]).concat([{id:'g'+uid(), nom:'Grup '+((conj.grups||[]).length+1), membres:[]}]);
+    desa(conj).then(repinta);
+  };
+  actions.appendChild(addG);
+  S.appendChild(actions);
+
+  /* --- quines classes entren en aquest repartiment --- */
+  const totes=grupClasses();
+  const dins=new Set(conj.classes||[]);
+  const clsRow=el('div','att-classsel');
+  totes.forEach(c=>{
+    const t=el('button','att-tab'+(dins.has(c)?' on':'')); t.type='button';
+    if(dins.has(c)){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    t.textContent=(dins.has(c)?'✓ ':'+ ')+c;
+    t.title=dins.has(c)?'Treu '+c+' del repartiment':'Afegeix '+c+' al repartiment';
+    t.onclick=async()=>{
+      if(dins.has(c)){
+        /* treure una classe: fora dels grups també, si no quedarien alumnes fantasma */
+        const seus=new Set((STATE.students[c]||[]).map(n=>stKey(c,n)));
+        conj.classes=(conj.classes||[]).filter(x=>x!==c);
+        (conj.grups||[]).forEach(g=>{ g.membres=(g.membres||[]).filter(k=>!seus.has(k)); });
+      } else {
+        conj.classes=(conj.classes||[]).concat([c]);
+      }
+      await desa(conj); repinta();
+    };
+    clsRow.appendChild(t);
+  });
+  S.appendChild(clsRow);
+
+  const pool=grupPool(conj);
+  const hint=el('div','att-info');
+  const h=el('span','att-hint');
+  h.textContent='Tria el grup de cada alumne al desplegable. Les marques surten al costat del nom.';
+  hint.appendChild(h); S.appendChild(hint);
+
+  /* --- el desplegable de destí, compartit --- */
+  const opcions=()=>{
+    const o=[{v:'', t:'— sense grup —'}];
+    (conj.grups||[]).forEach(g=>o.push({v:g.id, t:g.nom}));
+    return o;
+  };
+  const selectDe=(clau, actual)=>{
+    const sel=el('select');
+    sel.setAttribute('aria-label','Grup de '+grupParteix(clau).mostra);
+    opcions().forEach(o=>{ const op=el('option'); op.value=o.v; op.textContent=o.t; if(o.v===actual) op.selected=true; sel.appendChild(op); });
+    sel.onchange=async()=>{
+      (conj.grups||[]).forEach(g=>{ g.membres=(g.membres||[]).filter(k=>k!==clau); });
+      const dest=(conj.grups||[]).find(g=>g.id===sel.value);
+      if(dest) dest.membres=(dest.membres||[]).concat([clau]);
+      await desa(conj); repinta();
+    };
+    return sel;
+  };
+  const filaMembre=(clau, grupId)=>{
+    const p=grupParteix(clau);
+    const row=el('div','gg-membre');
+    const nm=el('span','mn'); nm.textContent=p.mostra; row.appendChild(nm);
+    if(p.cls && (conj.classes||[]).length>1){
+      const chip=el('span','grp-cls'); const cc=classColor(p.cls);
+      chip.style.cssText='background:'+cc+'22;color:'+cc; chip.textContent=p.cls; row.appendChild(chip);
+    }
+    grupEtiq().forEach(e=>{ if(p.cls && grupTe(p.cls,p.nom,e.id)){
+      const ch=el('span','gg-etiq '+(e.id==='pi'||e.id==='conducta'?e.id:'')); ch.textContent=autInicials(e.nom); ch.title=e.nom; row.appendChild(ch); } });
+    const nota=p.cls ? grupNotaDe(p.cls,p.nom) : '';
+    if(nota){ const ch=el('span','gg-etiq'); ch.textContent='💬'; ch.title=nota; row.appendChild(ch); }
+    row.appendChild(selectDe(clau, grupId));
+    return row;
+  };
+
+  /* --- els alumnes que encara no són a cap grup --- */
+  if(pool.length){
+    const box=el('div','gg-pool');
+    const cap=el('div','gg-pool-cap');
+    cap.textContent='Sense grup · '+pool.length;
+    const rep=el('button','btn btn-ghost'); rep.type='button'; rep.style.cssText='margin-left:auto;padding:.35em .7em;font-size:.78rem';
+    rep.textContent='Reparteix-los';
+    rep.title='Els posa al grup que tingui menys gent, per ordre';
+    rep.onclick=async()=>{
+      if(!(conj.grups||[]).length){ toast('Afegeix-hi algun grup abans'); return; }
+      pool.forEach(k=>{
+        const dest=conj.grups.slice().sort((a,b)=>(a.membres||[]).length-(b.membres||[]).length)[0];
+        dest.membres=(dest.membres||[]).concat([k]);
+      });
+      await desa(conj); repinta();
+    };
+    cap.appendChild(rep);
+    box.appendChild(cap);
+    pool.forEach(k=>box.appendChild(filaMembre(k, '')));
+    S.appendChild(box);
+  }
+
+  /* --- els grups --- */
+  const grid=el('div','gg-grups');
+  (conj.grups||[]).forEach(g=>{
+    const card=el('div','gg-grup');
+    const cap=el('div','gg-grup-cap');
+    const inp=el('input'); inp.type='text'; inp.value=g.nom; inp.setAttribute('aria-label','Nom del grup');
+    inp.onchange=async()=>{
+      const n=inp.value.trim(); if(!n){ inp.value=g.nom; return; }
+      g.nom=n; await desa(conj); toast('Desat ✓'); repinta();
+    };
+    cap.appendChild(inp);
+    const ct=el('span','gc'); ct.textContent=(g.membres||[]).length; cap.appendChild(ct);
+    const del=el('button','icon-btn danger'); del.type='button'; del.title='Treu aquest grup';
+    del.style.cssText='width:32px;height:32px';
+    del.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
+    del.onclick=()=>{
+      const n=(g.membres||[]).length;
+      const msg=n? 'Vols treure «'+g.nom+'»? Els seus '+n+' '+plural(n,'alumne','alumnes')+' quedaran sense grup.'
+                 : 'Vols treure «'+g.nom+'»?';
+      askConfirm(msg, async()=>{
+        conj.grups=(conj.grups||[]).filter(x=>x.id!==g.id);
+        await desa(conj); repinta();
+      }, {title:'Treure el grup', confirmLabel:'Treu-lo', danger:true});
+    };
+    cap.appendChild(del);
+    card.appendChild(cap);
+    if(!(g.membres||[]).length){ const b=el('div','gg-buit'); b.textContent='Encara buit'; card.appendChild(b); }
+    else (g.membres||[]).forEach(k=>card.appendChild(filaMembre(k, g.id)));
+    grid.appendChild(card);
+  });
+  S.appendChild(grid);
+
+  /* --- copiar i esborrar --- */
+  const baix=el('div','att-actions');
+  const cp=el('button','btn btn-primary'); cp.type='button';
+  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia els grups';
+  cp.onclick=()=>{
+    const L=[conj.nom, ''];
+    (conj.grups||[]).forEach(g=>{
+      L.push(g.nom+' ('+(g.membres||[]).length+'):');
+      (g.membres||[]).forEach(k=>L.push('- '+grupParteix(k).mostra));
+      L.push('');
+    });
+    const fora=grupPool(conj);
+    if(fora.length){ L.push('Sense grup:'); fora.forEach(k=>L.push('- '+grupParteix(k).mostra)); }
+    const txt=L.join('\n').trim();
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiats!')).catch(()=>{});
+    const box=S.querySelector('.att-result') || el('div','att-result');
+    box.innerHTML=''; const pre=el('pre'); pre.textContent=txt; box.appendChild(pre);
+    if(!box.parentNode) S.appendChild(box);
+  };
+  baix.appendChild(cp);
+  const esb=el('button','btn btn-danger'); esb.type='button'; esb.textContent='Esborra el repartiment';
+  esb.onclick=()=>askConfirm('Vols esborrar «'+conj.nom+'»? No es podrà desfer. Les marques dels alumnes no es toquen.', async()=>{
+    await api.grupConjuntDelete(conj.id); GRUPS_CONJ=null; openSection('grups'); toast('Esborrat');
+  }, {title:'Esborrar el repartiment', confirmLabel:'Esborra', danger:true});
+  baix.appendChild(esb);
+  S.appendChild(baix);
+}
+
 /* ============ REGISTRE DE LLIBRES A CASA ============
    Els llibres de l'escola que els nens i nenes s'emporten a casa per llegir.
    Cal poder marcar les DUES coses: que se l'ha emportat i que l'ha tornat.
@@ -5319,7 +6024,7 @@ function llibTextPendents(){
     const seus=p.filter(x=>x.cls===c);
     if(!seus.length) return;
     L.push(c+':');
-    seus.forEach(x=>L.push('- '+x.nom+' — '+x.llibre.nom+' (des del '+llibFmtDia(x.des)+', '+x.dies+' dies)'));
+    seus.forEach(x=>L.push('- '+stMostra(x.cls,x.nom)+' — '+x.llibre.nom+' (des del '+llibFmtDia(x.des)+', '+x.dies+' dies)'));
     L.push('');
   });
   return L.join('\n').trim();
@@ -5518,7 +6223,7 @@ function renderLlibresBook(S){
   taula.appendChild(llibCapCols());
   (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
     const fila=el('div','aut-fila');
-    const n=el('div','aut-nom'); n.textContent=nom; fila.appendChild(n);
+    const n=el('div','aut-nom'); n.textContent=stMostra(LLIB_CLASS,nom); fila.appendChild(n);
     const refresca=()=>{ fila.querySelectorAll('.llib-check').forEach(b=>{ if(b.__pinta) b.__pinta(); }); pintaResum(); pintaTabs(); };
     fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'e', refresca));
     fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'r', refresca));
@@ -5548,7 +6253,7 @@ function renderLlibresAlumnes(S){
   (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
     const c=llibComptaAlumne(LLIB_CLASS, nom);
     const row=el('button','llib-rowbtn'); row.type='button';
-    const nm=el('div','nm'); nm.textContent=nom; row.appendChild(nm);
+    const nm=el('div','nm'); nm.textContent=stMostra(LLIB_CLASS,nom); row.appendChild(nm);
     if(c.casa){ const xip=el('span','llib-chip'); xip.textContent='🏠 '+c.casa; row.appendChild(xip); }
     const ct=el('div','ct'); ct.textContent='✅ '+c.tornat+'/'+c.total; row.appendChild(ct);
     const fletxa=el('div','ct'); fletxa.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'; row.appendChild(fletxa);
@@ -5617,7 +6322,7 @@ function renderLlibresCasa(S){
     const g={cls:c, cap:cap, files:[]}; grups.push(g);
     seus.forEach(x=>{
       const row=el('div','llib-pend-row');
-      const n=el('div','n'); n.textContent=x.nom; row.appendChild(n);
+      const n=el('div','n'); n.textContent=stMostra(x.cls,x.nom); row.appendChild(n);
       const l=el('div','l'); l.textContent=x.llibre.nom; row.appendChild(l);
       const d=el('div','d'+(x.dies>=LLIB_DIES_AVIS?' alerta':''));
       d.textContent=x.dies+' d'; d.title='Des del '+llibFmtDia(x.des);
@@ -5893,7 +6598,7 @@ function renderReptesAlumne(S){
     if(!inp.value.trim()){ hint.textContent='Cerca un alumne per veure i gestionar les seves caixes.'; return; }
     if(!c.length){ hint.textContent='Cap alumne es diu així. Revisa com s’escriu.'; return; }
     hint.textContent = c.length===1 ? 'Toca el nom per obrir-lo.' : c.length+' alumnes hi encaixen. Toca el que busques.';
-    c.slice(0,12).forEach(n=>{ const b=el('button','rept-alu-hit'); b.type='button'; b.textContent=n;
+    c.slice(0,12).forEach(n=>{ const b=el('button','rept-alu-hit'); b.type='button'; b.textContent=stMostraNom(n);
       const fets=reptFetsAlumne(n); if(fets){ const s=el('span','rept-alu-hit-n'); s.textContent=fets+' '+plural(fets,'caixa','caixes'); b.appendChild(s); }
       b.onclick=()=>obre(n); hits.appendChild(b); });
   };
@@ -5901,7 +6606,7 @@ function renderReptesAlumne(S){
 }
 function renderReptesAlumneManage(S){
   const back=el('button','prog-jump'); back.type='button'; back.innerHTML='‹ Nova cerca'; back.onclick=()=>{ REPTES_ALUMNE=null; openSection('eines'); }; S.appendChild(back);
-  const h0=el('div','rept-recent-h'); h0.textContent=REPTES_ALUMNE; S.appendChild(h0);
+  const h0=el('div','rept-recent-h'); h0.textContent=stMostraNom(REPTES_ALUMNE); S.appendChild(h0);
   let mostrades=0, curs=0;
   ['mat','catala'].forEach(mat=>{
     const caixes=REPTES.caixes.filter(c=>c.materia===mat && reptRegDe(c.id,REPTES_ALUMNE)).sort((a,b)=>(a.tema||0)-(b.tema||0)||(a.nivell||0)-(b.nivell||0));
@@ -6009,7 +6714,7 @@ function buildAbsentText(){
   classes.forEach(c=>{
     const abs=(STATE.students[c]||[]).filter(n=>stLlegeix(absents,c,n));
     lines.push(c+':');
-    if(abs.length){ abs.forEach(n=>lines.push('- '+n)); total+=abs.length; }
+    if(abs.length){ abs.forEach(n=>lines.push('- '+stMostra(c,n))); total+=abs.length; }
     else lines.push('- (cap absent)');
     lines.push('');
   });
@@ -6033,7 +6738,7 @@ function buildAbsentBody(){
   classes.forEach(c=>{
     const abs=(STATE.students[c]||[]).filter(n=>stLlegeix(absents,c,n));
     lines.push(c+':');
-    if(abs.length){ abs.forEach(n=>lines.push('- '+n)); total+=abs.length; }
+    if(abs.length){ abs.forEach(n=>lines.push('- '+stMostra(c,n))); total+=abs.length; }
     else lines.push('- (cap absent)');
     lines.push('');
   });
@@ -6099,7 +6804,7 @@ function renderAttendance(S){
   // graella d'alumnes
   const grid=el('div','att-grid');
   roster.forEach(name=>{
-    const chip=el('button','att-chip'+(stLlegeix(absents,ATT_CLASS,name)?' absent':'')); chip.type='button'; chip.textContent=name;
+    const chip=el('button','att-chip'+(stLlegeix(absents,ATT_CLASS,name)?' absent':'')); chip.type='button'; chip.textContent=stMostra(ATT_CLASS,name);
     chip.onclick=async()=>{
       const now=!chip.classList.contains('absent');
       chip.classList.toggle('absent', now);
@@ -6171,7 +6876,7 @@ function renderGroupTool(S){
   consWrap.appendChild(cl);
   const addRow=el('div','grp-cons-add');
   const selA=el('select','input'); const selB=el('select','input');
-  [[selA,'Alumne A…'],[selB,'Alumne B…']].forEach(([sel,ph])=>{ const o=el('option'); o.value=''; o.textContent=ph; sel.appendChild(o); names.forEach(n=>{ const op=el('option'); op.value=n; op.textContent=n; sel.appendChild(op); }); });
+  [[selA,'Alumne A…'],[selB,'Alumne B…']].forEach(([sel,ph])=>{ const o=el('option'); o.value=''; o.textContent=ph; sel.appendChild(o); names.forEach(n=>{ const op=el('option'); op.value=n; op.textContent=stMostraNom(n); sel.appendChild(op); }); });
   const sep=el('span'); sep.textContent='✕'; sep.style.cssText='font-weight:800;color:var(--muted)';
   const addBtn=el('button','btn btn-ghost'); addBtn.type='button'; addBtn.textContent='Afegeix';
   addBtn.onclick=()=>{ const a=selA.value,b=selB.value; if(!a||!b||a===b){ toast('Tria dos alumnes diferents'); return; }
@@ -6181,7 +6886,7 @@ function renderGroupTool(S){
   consWrap.appendChild(addRow);
   if(GRP_CONSTRAINTS.length){
     const list=el('div','grp-cons-list');
-    GRP_CONSTRAINTS.forEach((p,idx)=>{ const chip=el('span','grp-cons'); chip.innerHTML=`${esc(p[0])} <span style="color:var(--muted)">✕</span> ${esc(p[1])}`;
+    GRP_CONSTRAINTS.forEach((p,idx)=>{ const chip=el('span','grp-cons'); chip.innerHTML=`${esc(stMostraNom(p[0]))} <span style="color:var(--muted)">✕</span> ${esc(stMostraNom(p[1]))}`;
       const x=el('button','gx'); x.type='button'; x.innerHTML='×'; x.onclick=()=>{ GRP_CONSTRAINTS.splice(idx,1); openSection('eines'); }; chip.appendChild(x); list.appendChild(chip); });
     consWrap.appendChild(list);
   }
@@ -6197,6 +6902,8 @@ function renderGroupTool(S){
 }
 function renderGroupResults(S){
   if(GRP_RESULT.error){ const e=el('div','empty-feed'); e.innerHTML=`<div class="big">🤔</div>${esc(GRP_RESULT.error)}`; S.appendChild(e); return; }
+  const marcat=grupMarcatsPlans();
+  const gastats=new Set();          // perquè dos homònims no es confonguin (veure grupResolClau)
   const res=el('div','grp-results');
   GRP_RESULT.sections.forEach(sc=>{
     const title=el('div','grp-section-title');
@@ -6210,10 +6917,19 @@ function renderGroupResults(S){
       const h=el('h4'); h.innerHTML=`Grup ${i+1}<span class="gcount">${members.length}</span>`; card.appendChild(h);
       members.forEach(m=>{
         const row=el('div','grp-member');
-        const nm=el('span','gm-name'); nm.textContent=m; row.appendChild(nm);
+        const clau=grupResolClau(m, sc.label, gastats); gastats.add(clau);
+        const p=grupParteix(clau);
+        /* el nom ja corregit (§ Gestió de grups); la classe la diu el xip del costat */
+        const nm=el('span','gm-name'); nm.textContent=p.mostra || m; row.appendChild(nm);
         const cls=studentClass(m);
         if(cls){ const chip=el('span','grp-cls'); const cc=classColor(cls); chip.style.cssText=`background:${cc}22;color:${cc}`; chip.textContent=cls; row.appendChild(chip); }
-        if((STATE.flags||{})[m]){ const mk=el('span','grp-mark'); mk.title='Marcat (PI o conducta)'; mk.textContent='★'; row.appendChild(mk); }
+        const etqs=p.cls ? grupEtiq().filter(e=>grupTe(p.cls,p.nom,e.id)).map(e=>e.nom) : [];
+        const nota=p.cls ? grupNotaDe(p.cls,p.nom) : '';
+        if(etqs.length || nota || marcat[m]){
+          const mk=el('span','grp-mark'); mk.textContent='★';
+          mk.title=etqs.concat(nota?['💬 '+nota]:[]).join(' · ') || 'Marcat al full';
+          row.appendChild(mk);
+        }
         card.appendChild(row);
       });
       grid.appendChild(card);
@@ -6221,6 +6937,15 @@ function renderGroupResults(S){
     res.appendChild(grid);
   });
   S.appendChild(res);
+
+  /* --- desar-los a Gestió de grups --- */
+  const bar=el('div','att-actions');
+  const desa=el('button','btn btn-primary'); desa.type='button';
+  desa.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7"/></svg>Desa’ls a Gestió de grups';
+  desa.title='Els guarda com a repartiment, i allà els podràs retocar';
+  desa.onclick=()=>{ grupDesaDelGenerador(); };
+  bar.appendChild(desa);
+  S.appendChild(bar);
 }
 
 /* ---------- AVALUACIÓ ---------- */
