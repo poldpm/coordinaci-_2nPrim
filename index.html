@@ -426,6 +426,10 @@ a{color:var(--teal)}
 .gg-nota-ico.on{background:#fff4de;border-color:#eccf9a;color:#8a5a06}
 .gg-nota-ico:hover{border-color:var(--cyan)}
 .gg-fila-sub{display:flex;gap:6px;flex-wrap:wrap;padding:0 .7em .5em calc(.7em + 34px + 10px)}
+/* Sense això, l'atribut `hidden` no feia res: el display:flex de la classe guanya al
+   [hidden]{display:none} del navegador i quedava una franja buida sota cada alumne
+   que no tingués nota. */
+.gg-fila-sub[hidden]{display:none}
 .gg-nom-wrap{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .gg-nom{min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gg-nom-canviat{border-bottom:1.5px dashed var(--cyan);cursor:help}
@@ -460,7 +464,7 @@ a{color:var(--teal)}
   text-transform:uppercase;letter-spacing:.04em}
 /* --- Avisos ràpids --- */
 .avis-panel{border-left:5px solid var(--avis)}
-.avis-panel .hpanel-head .icon{stroke:var(--avis)}
+.avis-panel .hpanel-head .icon{stroke:var(--avis);fill:var(--avis)}
 .avis-panel .hpanel-count{background:var(--avis);color:#fff}
 .avis-nou{font-weight:800;color:var(--avis-ink)}
 .avis-av{flex:none}
@@ -1331,7 +1335,7 @@ button.subtheme-card,button.rept-card{
       <span class="lbl">Cerca</span>
     </button>
     <button class="avis-pill" id="avisBtn" title="Avisos ràpids">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M12 7.6v3.3"/><path d="M12 13.2h.01"/></svg>
+      <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.2 2.6h9.6a4.6 4.6 0 0 1 4.6 4.6v6.4a4.6 4.6 0 0 1-4.6 4.6h-2.5l-1.55 3.3a.85.85 0 0 1-1.5 0L9.7 18.2H7.2a4.6 4.6 0 0 1-4.6-4.6V7.2a4.6 4.6 0 0 1 4.6-4.6zM12 6.2a1.4 1.4 0 0 0-1.4 1.4v3.6a1.4 1.4 0 0 0 2.8 0V7.6A1.4 1.4 0 0 0 12 6.2zm0 7.7a1.35 1.35 0 0 0-1.35 1.35v.15a1.35 1.35 0 0 0 2.7 0v-.15A1.35 1.35 0 0 0 12 13.9z"/></svg>
       <span class="lbl">Avisos</span>
     </button>
     <button class="me" id="meBtn" title="El teu perfil i opcions">
@@ -1540,7 +1544,7 @@ const ICONS = {
   eines:'<path d="M14.5 6.5a3.5 3.5 0 0 0-4.6 4.6L3 18l3 3 6.9-6.9a3.5 3.5 0 0 0 4.6-4.6l-2.3 2.3-2.2-.5-.5-2.2z"/>',
   grups:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16 14h1a4 4 0 0 1 4 4v2"/>',
   /* bafarada amb un signe d'alerta a dins (avisos) */
-  avis:'<path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M12 7.6v3.3"/><path d="M12 13.2h.01"/>',
+  avis:'<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.2 2.6h9.6a4.6 4.6 0 0 1 4.6 4.6v6.4a4.6 4.6 0 0 1-4.6 4.6h-2.5l-1.55 3.3a.85.85 0 0 1-1.5 0L9.7 18.2H7.2a4.6 4.6 0 0 1-4.6-4.6V7.2a4.6 4.6 0 0 1 4.6-4.6zM12 6.2a1.4 1.4 0 0 0-1.4 1.4v3.6a1.4 1.4 0 0 0 2.8 0V7.6A1.4 1.4 0 0 0 12 6.2zm0 7.7a1.35 1.35 0 0 0-1.35 1.35v.15a1.35 1.35 0 0 0 2.7 0v-.15A1.35 1.35 0 0 0 12 13.9z"/>',
   comandes:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>',
   programacio:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13 5l-2 14"/>',
 };
@@ -3316,7 +3320,7 @@ function obreAvisRapid(){
   const acts=el('div','modal-actions');
   const no=el('button','btn btn-ghost'); no.type='button'; no.textContent='Cancel·la';
   const si=el('button','btn btn-primary'); si.type='button';
-  si.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Publica l’avís';
+  si.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.2 2.6h9.6a4.6 4.6 0 0 1 4.6 4.6v6.4a4.6 4.6 0 0 1-4.6 4.6h-2.5l-1.55 3.3a.85.85 0 0 1-1.5 0L9.7 18.2H7.2a4.6 4.6 0 0 1-4.6-4.6V7.2a4.6 4.6 0 0 1 4.6-4.6zM12 6.2a1.4 1.4 0 0 0-1.4 1.4v3.6a1.4 1.4 0 0 0 2.8 0V7.6A1.4 1.4 0 0 0 12 6.2zm0 7.7a1.35 1.35 0 0 0-1.35 1.35v.15a1.35 1.35 0 0 0 2.7 0v-.15A1.35 1.35 0 0 0 12 13.9z"/></svg>Publica l’avís';
   acts.appendChild(no); acts.appendChild(si); box.appendChild(acts);
 
   const veure=el('button','avis-veure'); veure.type='button';
@@ -3371,7 +3375,9 @@ function buildAvisosPanel(){
         ev.stopPropagation(); box.disabled=true;
         await api.entryRead(e.id);
         if(entryHasUnseenComments(e.id)) await api.commentSeen(e.id);
-        renderDash(); renderNovetats(); updateAvisBadge(); toast('Llegit ✓');
+        /* refreshHome() i no renderDash(): cal repintar TAMBÉ el bento, si no la banda
+           d'avisos es quedava amb el comptador vell fins al proper repintat. */
+        refreshHome(); toast('Llegit ✓');
       };
       row.appendChild(box);
     } else {
@@ -3697,6 +3703,12 @@ function renderBento(){
   const b=$('#bento'); b.innerHTML='';
   let pillWrap=null;                  // el comparteixen totes les píndoles (veure el CSS)
   SECTIONS.forEach(sec=>{
+    /* La banda d'avisos NO és permanent: només surt quan hi ha alguna cosa a dir
+       (el mateix criteri que el panell, `avisActius`: cap per llegir, cap comentari
+       nou i els meus llegits per tothom → fora). Si no, una banda vermella fixa a
+       dalt de la portada deixa de voler dir res. Per veure l'històric sempre hi ha
+       el botó de la barra de dalt. */
+    if(sec.id===AVIS_SEC && !avisActius().length) return;
     if(sec.size==='pill'){
       if(!pillWrap){ pillWrap=el('div','tile-pill-wrap'); b.appendChild(pillWrap); }
       const pill=el('button','tile-pill');
@@ -3748,6 +3760,11 @@ function metaLabel(sec){
     const tall=t=>{ const s=stripHtml(t||'').replace(/\s+/g,' ').trim(); return s.length>64 ? s.slice(0,63)+'…' : s; };
     if(nous) return nous+' '+plural(nous,'avís nou','avisos nous')+(ultim? ' · '+tall(ultim.body) : '');
     if(cmt) return cmt+' '+(cmt===1?'avís amb comentaris nous':'avisos amb comentaris nous');
+    /* La banda també surt quan un avís MEU encara no l'ha llegit tothom: digues-ho,
+       que és el motiu pel qual es veu. */
+    const meu=avisosTots().find(e=>e.author===ME && avisQuiFalta(e).length);
+    if(meu){ const f=avisQuiFalta(meu).map(u=>u.name);
+      return 'Falta que el llegeixi '+f.join(' i ')+' · '+tall(meu.body); }
     if(ultim) return 'Últim: '+tall(ultim.body);
     return 'Res de nou · toca per escriure’n un';
   }
