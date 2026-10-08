@@ -387,26 +387,11 @@ a{color:var(--teal)}
 .aut-check.on{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
 @media (max-width:420px){ .aut-check,.aut-cel{width:38px} .aut-check{height:38px} }
 /* --- Registre de llibres a casa (eina) --- */
-.llib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:12px;margin-bottom:18px}
-.llib-card{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:14px;background:var(--panel);cursor:pointer;transition:.15s;font:inherit;color:inherit}
-.llib-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--cyan)}
-.llib-card .llib-t{font-family:var(--font-d);font-weight:600;font-size:1.02rem;color:var(--teal-ink);line-height:1.18}
-.llib-card .llib-m{font-weight:800;font-size:.79rem;color:var(--muted);margin-top:7px}
-.llib-bar{height:5px;border-radius:5px;margin-top:9px;background:var(--line);overflow:hidden}
-.llib-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--acabada),#3ba06f)}
 .llib-chip{display:inline-block;font-weight:800;font-size:.74rem;padding:.18em .5em;border-radius:999px;background:#fff4de;color:#8a5a06;margin-right:5px}
-.llib-h{width:44px;text-align:center;flex:none;font-size:.95rem}
-.llib-rowbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;font:inherit;color:inherit;padding:.55em .7em;border-top:1px solid var(--line);cursor:pointer}
-.llib-rowbtn:first-child{border-top:0}
-.llib-rowbtn:hover{background:var(--bg)}
-.llib-rowbtn .nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.llib-rowbtn .ct{font-weight:800;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
 .llib-check{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;color:transparent;transition:.12s;cursor:pointer}
 .llib-check .icon{width:20px;height:20px;stroke-width:3}
 .llib-check:hover{border-color:var(--cyan)}
-.llib-check.on.e{background:linear-gradient(180deg,#eca33f,#d2871b);border-color:transparent;color:#fff}
 .llib-check.on.r{background:linear-gradient(180deg,var(--acabada),#3ba06f);border-color:transparent;color:#fff}
-.llib-pend{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper);margin-bottom:16px}
 .llib-pend-cls{background:var(--bg);font-weight:800;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:.5em .8em;border-top:1px solid var(--line)}
 .llib-pend-cls:first-child{border-top:0}
 .llib-pend-row{display:flex;align-items:center;gap:10px;padding:.5em .8em;border-top:1px solid var(--line)}
@@ -414,7 +399,39 @@ a{color:var(--teal)}
 .llib-pend-row .l{flex:1;min-width:0;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .llib-pend-row .d{font-weight:800;font-size:.8rem;color:#8a5a06;background:#fff4de;border-radius:999px;padding:.2em .6em;flex:none}
 .llib-pend-row .d.alerta{color:#a3301f;background:#ffe6e1}
-@media (max-width:420px){ .llib-check,.llib-h{width:38px} .llib-check{height:38px} }
+@media (max-width:420px){ .llib-check{width:38px;height:38px} }
+/* --- Cicles de llibres --- */
+.llib-ciclenav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.llib-ciclesel{flex:1;min-width:190px;border:1.5px solid var(--line);border-radius:12px;padding:.6em .7em;
+  font:inherit;font-weight:800;color:var(--teal-ink);background:var(--panel);cursor:pointer}
+.llib-dates-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.llib-data{display:flex;flex-direction:column;gap:4px}
+.llib-data span{font-weight:800;font-size:.76rem;color:var(--muted)}
+.llib-data input{border:1.5px solid var(--line);border-radius:11px;padding:.5em .6em;font:inherit;
+  font-weight:700;background:var(--bg);color:var(--ink)}
+.llib-esb{margin-left:auto;color:var(--cristina)}
+/* el llibre assignat a cada alumne (botó que obre la tria) */
+.llib-pick{flex:1;min-width:0;text-align:left;border:1.5px solid var(--line);background:var(--bg);
+  border-radius:11px;padding:.45em .7em;font:inherit;font-weight:700;font-size:.9rem;color:var(--teal-ink);
+  cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:.12s}
+.llib-pick:hover{border-color:var(--cyan)}
+.llib-pick.buit{color:var(--muted);font-style:italic;border-style:dashed}
+.aut-fila .aut-nom{flex:0 0 38%}
+@media (max-width:520px){ .aut-fila .aut-nom{flex:0 0 34%;font-size:.9rem} .llib-pick{font-size:.82rem} }
+/* la tria de llibre */
+.llib-tria{text-align:center}
+.llib-tria p{color:var(--muted);font-weight:800;margin:0 0 12px}
+.llib-tria-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin-bottom:14px;text-align:left}
+.llib-tria-op{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--bg);
+  border-radius:12px;padding:.6em .8em;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;transition:.12s}
+.llib-tria-op:hover{border-color:var(--cyan);background:#fff}
+.llib-tria-op .n{flex:1;min-width:0}
+.llib-tria-op .x{font-weight:800;font-size:.72rem;color:var(--muted);background:var(--panel-2);
+  border-radius:999px;padding:.15em .55em;flex:none}
+.llib-tria-op.ja{opacity:.62}
+.llib-tria-op.on{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 10%,#fff)}
+.llib-avis{font-weight:800;font-size:.84rem;color:#8a5a06;background:#fff4de;border:1.5px solid #eccf9a;
+  border-radius:12px;padding:.6em .8em;margin-bottom:12px;text-align:left}
 /* --- Gestió de grups --- */
 .gg-etiq{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:.72rem;padding:.18em .55em;border-radius:999px;
   background:color-mix(in srgb,var(--cyan) 15%,#fff);color:var(--teal-ink);white-space:nowrap}
@@ -1812,17 +1829,31 @@ const api = {
     d.titols = titols || [];
     await persist('llibTitols', {titols:d.titols});
   },
-  async llibSet(alumne, llibre, camp, data){
+  /* Meta del cicle (nom i dates). Upsert per id: crear i editar amb la mateixa acció. */
+  async llibCicleSet(id, patch){
     const d = llibDades();
-    const m = d.marques[alumne] = d.marques[alumne] || {};
-    const b = m[llibre] = m[llibre] || {};
-    if(data) b[camp] = data;
-    else {
-      delete b[camp];
-      if(!Object.keys(b).length) delete m[llibre];
-      if(!Object.keys(m).length) delete d.marques[alumne];
-    }
-    await persist('llibSet', {alumne, llibre, camp, data: data||null});
+    let c = d.cicles.find(x=>x.id===id);
+    if(!c){ c = {id:id, nom:'', dona:'', recull:'', alumnes:{}}; d.cicles.push(c); }
+    Object.keys(patch||{}).forEach(k=>{ c[k] = patch[k]; });
+    c.alumnes = c.alumnes || {};
+    await persist('llibCicleSet', {id, patch:patch||{}});
+  },
+  /* Un alumne dins d'un cicle: quin llibre té i si l'ha tornat. GRANULAR (els tres
+     tutors poden repartir i recollir alhora); els camps es fusionen, null els treu. */
+  async llibAlumne(cicle, alumne, patch){
+    const d = llibDades();
+    const c = d.cicles.find(x=>x.id===cicle);
+    if(!c) return;
+    c.alumnes = c.alumnes || {};
+    const a = c.alumnes[alumne] = c.alumnes[alumne] || {};
+    Object.keys(patch||{}).forEach(k=>{ if(patch[k]==null) delete a[k]; else a[k]=patch[k]; });
+    if(!Object.keys(a).length) delete c.alumnes[alumne];
+    await persist('llibAlumne', {cicle, alumne, patch:patch||{}});
+  },
+  async llibCicleDelete(id){
+    const d = llibDades();
+    d.cicles = d.cicles.filter(x=>x.id!==id);
+    await persist('llibCicleDelete', {id});
   },
   async cvLliurat(key, alumne, on){
     STATE.cvLliurat = STATE.cvLliurat || {};
@@ -2134,8 +2165,8 @@ function normalizeState(){
   if(!STATE.comments) STATE.comments={};
   if(!STATE.cvLliurat) STATE.cvLliurat={};
   if(!STATE.autoritzacions) STATE.autoritzacions={};
-  if(!STATE.llibres) STATE.llibres={titols:[],marques:{}};
-  STATE.llibres.titols=STATE.llibres.titols||[]; STATE.llibres.marques=STATE.llibres.marques||{};
+  if(!STATE.llibres) STATE.llibres={titols:[],cicles:[]};
+  STATE.llibres.titols=STATE.llibres.titols||[]; STATE.llibres.cicles=STATE.llibres.cicles||[];
   if(!STATE.grups) STATE.grups={etiquetes:[],marques:{},notes:{},noms:{},conjunts:[]};
   STATE.grups.etiquetes=STATE.grups.etiquetes||[]; STATE.grups.marques=STATE.grups.marques||{};
   STATE.grups.notes=STATE.grups.notes||{}; STATE.grups.noms=STATE.grups.noms||{};
@@ -2743,28 +2774,47 @@ function fbApply(state, action, payload){
       state.grups.conjunts = (state.grups.conjunts||[]).filter(function(x){ return x.id!==payload.id; });
       break;
     }
-    /* ---- Registre de llibres a casa ----
+    /* ---- Registre de llibres a casa (per CICLES) ----
        `titols` és la llista de llibres (es desa sencera: només l'edita qui la personalitza).
-       `marques` és granular per alumne i llibre → els tres tutors poden marcar alhora.
-       Cada llibre d'un alumne guarda {e: data que se l'emporta, r: data que el torna}. */
+       `cicles` són els repartiments: tothom s'emporta un llibre el mateix dia i el torna
+       el mateix dia. Cada cicle = {id, nom, dona, recull, alumnes}, i dins `alumnes`
+       la clau CLASSE|NOM → {llibre: idDelTitol, tornat: dataISO}.
+       La meta del cicle es desa sencera (només l'edita qui el configura); el que cada
+       alumne té és GRANULAR i fusionat → els tres tutors poden marcar alhora. */
     case 'llibTitols': {
-      state.llibres = state.llibres || {titols:[], marques:{}};
+      state.llibres = state.llibres || {titols:[], cicles:[]};
       state.llibres.titols = payload.titols || [];
-      state.llibres.marques = state.llibres.marques || {};
+      state.llibres.cicles = state.llibres.cicles || [];
       break;
     }
-    case 'llibSet': {
-      state.llibres = state.llibres || {titols:[], marques:{}};
-      state.llibres.titols = state.llibres.titols || [];
-      state.llibres.marques = state.llibres.marques || {};
-      var lm = state.llibres.marques[payload.alumne] = state.llibres.marques[payload.alumne] || {};
-      var lb = lm[payload.llibre] = lm[payload.llibre] || {};
-      if(payload.data) lb[payload.camp] = payload.data;
-      else {
-        delete lb[payload.camp];
-        if(!Object.keys(lb).length) delete lm[payload.llibre];
-        if(!Object.keys(lm).length) delete state.llibres.marques[payload.alumne];
-      }
+    case 'llibCicleSet': {   // meta del cicle; upsert per id
+      state.llibres = state.llibres || {titols:[], cicles:[]};
+      state.llibres.cicles = state.llibres.cicles || [];
+      var lcs = state.llibres.cicles, lci = -1;
+      for(var l0=0;l0<lcs.length;l0++){ if(lcs[l0].id===payload.id){ lci=l0; break; } }
+      if(lci<0){ lcs.push({id:payload.id, nom:'', dona:'', recull:'', alumnes:{}}); lci=lcs.length-1; }
+      var lcp = payload.patch || {};
+      for(var lk in lcp){ if(Object.prototype.hasOwnProperty.call(lcp,lk)) lcs[lci][lk] = lcp[lk]; }
+      lcs[lci].alumnes = lcs[lci].alumnes || {};
+      break;
+    }
+    case 'llibAlumne': {   // quin llibre té i si l'ha tornat; granular i fusionat
+      state.llibres = state.llibres || {titols:[], cicles:[]};
+      state.llibres.cicles = state.llibres.cicles || [];
+      var lac = null, lal = state.llibres.cicles;
+      for(var l1=0;l1<lal.length;l1++){ if(lal[l1].id===payload.cicle){ lac=lal[l1]; break; } }
+      if(!lac) break;
+      lac.alumnes = lac.alumnes || {};
+      var laa = lac.alumnes[payload.alumne] = lac.alumnes[payload.alumne] || {};
+      var lap = payload.patch || {};
+      for(var l2 in lap){ if(!Object.prototype.hasOwnProperty.call(lap,l2)) continue;
+        if(lap[l2] == null) delete laa[l2]; else laa[l2] = lap[l2]; }
+      if(!Object.keys(laa).length) delete lac.alumnes[payload.alumne];
+      break;
+    }
+    case 'llibCicleDelete': {
+      state.llibres = state.llibres || {titols:[], cicles:[]};
+      state.llibres.cicles = (state.llibres.cicles||[]).filter(function(x){ return x.id!==payload.id; });
       break;
     }
     case 'cvLliurat': {   // qui ha entregat la carpeta viatgera d'un cicle
@@ -3556,53 +3606,95 @@ function buildReptesPanel(){
    Només de la MEVA classe: cadascú reclama els seus i no val la pena molestar els
    altres dos amb els seus. Si no es pot saber quina és (les lletres del full no
    coincideixen amb TUTOR_CLASS), s'ensenyen totes i es diu al títol. */
-const LLIB_PANEL_MAX=6;      // perquè un descuit de mig trimestre no ompli la portada
+const LLIB_PANEL_MAX=6;      // si no torna mitja classe, que no ompli la portada
 function buildLlibresPanel(){
   if(!STATE.llibres || !STATE.students) return null;
+  const cicle=llibCicleActual();
+  if(!cicle) return null;
+  const retard=llibDiesDeRetard(cicle);        // dies des del dia de recollir
   const vol=TUTOR_CLASS[ME];
   const meva=vol && Object.keys(STATE.students).find(c=>c.toLowerCase()===vol.toLowerCase());
-  const tots=llibPendents().filter(x=>x.dies>=LLIB_DIES_AVIS && (!meva || x.cls===meva));
-  if(!tots.length) return null;
-  const obre=(cls)=>{ PENDING_EINA='llibres'; LLIB_VIEW='casa'; if(cls) LLIB_CLASS=cls;
-    LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; LLIB_NAV=true; openSection('eines'); };
+  const falten=llibFalten(cicle).filter(x=>!meva || x.cls===meva);
+  const comp=llibComptaCicle(cicle);
+  const senseRepartir=comp.total-comp.assignats;
+
+  /* Tres motius per sortir, per ordre d'urgència:
+     1) ja tocava recollir-los i falten → insisteix cada dia fins que tornin
+     2) avui és el dia de donar-los o de recollir-los
+     3) el cicle encara no s'ha repartit i el dia de donar-los ja ha arribat
+     (3) només mentre el cicle és viu: passat el dia de recollir ja no té sentit
+     repartir-ne més, i si no falta cap llibre el cicle s'ha acabat) */
+  const toca = cicle.dona===llibAvui() || cicle.recull===llibAvui();
+  const vencut = retard>=0 && falten.length;
+  const perRepartir = senseRepartir>0 && cicle.dona && llibDies(cicle.dona)>=0 && retard<0;
+  if(!vencut && !toca && !perRepartir) return null;
+
+  const obre=(cls)=>{ PENDING_EINA='llibres'; LLIB_CICLE=cicle.id; if(cls) LLIB_CLASS=cls;
+    LLIB_CONFIG=false; LLIB_NAV=true; openSection('eines'); };
 
   const card=el('div','hpanel');
   const head=el('div','hpanel-head');
+  const titol = vencut ? 'Llibres per tornar' : (perRepartir && !toca ? 'Llibres per repartir' : 'Llibres a casa');
   head.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h12v15"/><path d="M6 17h12v3H6a2 2 0 0 1 0-3z"/><path d="M8 7h7"/></svg>'
-    +'<h3>Llibres per reclamar'+(meva?'':' (totes les classes)')+'</h3><span class="hpanel-count">'+tots.length+'</span>';
+    +'<h3>'+titol+(meva?'':' (totes les classes)')+'</h3>'
+    +(vencut?'<span class="hpanel-count">'+falten.length+'</span>':'');
   card.appendChild(head);
 
-  const mostra=tots.slice(0, LLIB_PANEL_MAX);
+  if(perRepartir && !vencut){
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
+    const t=el('div','htitle');
+    t.textContent=(cicle.nom||'El cicle')+': falten '+senseRepartir+' '+plural(senseRepartir,'alumne','alumnes')+' per repartir';
+    row.appendChild(t);
+    row.onclick=()=>obre(meva||null);
+    card.appendChild(row);
+  }
+  if(toca && !vencut){
+    const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
+    row.addEventListener('keydown',e=>{ if(e.target!==row) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
+    const ico=el('span','hcv-ico'); ico.textContent = cicle.recull===llibAvui() ? '\uD83D\uDCE5' : '\uD83D\uDCE4';
+    row.appendChild(ico);
+    const t=el('div','htitle');
+    t.textContent = (cicle.recull===llibAvui() ? 'Avui es recullen els llibres' : 'Avui es donen els llibres')
+      + ' \u00b7 ' + (cicle.nom||'');
+    row.appendChild(t);
+    row.onclick=()=>obre(meva||null);
+    card.appendChild(row);
+  }
+  /* Qui no l'ha tornat: insisteix mentre no el torni */
+  const mostra=falten.slice(0, LLIB_PANEL_MAX);
   mostra.forEach(x=>{
     const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
     row.addEventListener('keydown',e=>{ if(e.target!==row) return;
       if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
-    /* Marcar-lo tornat sense sortir de la portada (com les tasques pendents) */
-    const box=el('button','hbox'); box.title='L’ha tornat';
-    box.setAttribute('aria-label', x.nom+' ha tornat «'+x.llibre.nom+'»');
+    const box=el('button','hbox'); box.type='button'; box.title='L\u2019ha tornat';
+    box.setAttribute('aria-label', x.mostra+' ha tornat \u00ab'+x.llibre+'\u00bb');
     box.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
     box.onclick=async(ev)=>{
       ev.stopPropagation(); box.disabled=true;
-      try{ await llibToggle(x.cls, x.nom, x.llibre.id, 'r', true); }
-      finally{ box.disabled=false; }
-      renderDash(); toast('Tornat!');
+      await api.llibAlumne(cicle.id, stKey(x.cls,x.nom), {tornat:llibAvui()});
+      refreshHome(); toast('Tornat \u2713');
     };
     row.appendChild(box);
-    const t=el('div','htitle'); t.textContent=stMostra(x.cls,x.nom)+' · '+x.llibre.nom; row.appendChild(t);
+    const t=el('div','htitle'); t.textContent=x.mostra+' \u00b7 '+x.llibre; row.appendChild(t);
     if(!meva){ const g=el('span','hstatus'); const pg=pillPaint(classColor(x.cls));
       g.style.background=pg.bg; g.style.color=pg.ink; g.textContent=x.cls; row.appendChild(g); }
-    const d=el('span','hcorreu-date'); d.textContent=x.dies+' dies';
-    d.title='A casa des del '+llibFmtDia(x.des); row.appendChild(d);
+    if(vencut && retard>0){
+      const d=el('span','hcorreu-date'); d.textContent=retard+' '+plural(retard,'dia','dies')+' tard';
+      d.title='S\u2019havien de recollir el '+llibFmtDia(cicle.recull); row.appendChild(d);
+    }
     row.onclick=()=>obre(x.cls);
     card.appendChild(row);
   });
-  if(tots.length>mostra.length){
-    const resta=tots.length-mostra.length;
+  if(falten.length>mostra.length){
+    const resta=falten.length-mostra.length;
     const row=el('div','hrow'); row.setAttribute('tabindex','0'); row.setAttribute('role','button');
     row.addEventListener('keydown',e=>{ if(e.target!==row) return;
       if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(row.onclick) row.onclick(e); } });
     const t=el('div','htitle'); t.style.color='var(--muted)';
-    t.textContent='i '+resta+' '+plural(resta,'llibre més','llibres més');
+    t.textContent='i '+resta+' '+plural(resta,'alumne m\u00e9s','alumnes m\u00e9s');
     row.appendChild(t);
     row.onclick=()=>obre(meva||null);
     card.appendChild(row);
@@ -3848,7 +3940,7 @@ let GRP_SIZE=4, GRP_MIX=false, GRP_CONSTRAINTS=[], GRP_RESULT=null;
 /* ---------- Registre de llibres a casa (dins STATE.llibres → sincronitzat entre els tres) ---------- */
 /* ---------- Gestió de grups (secció pròpia, dins STATE.grups) ---------- */
 let GRUPS_VIEW='alumnes', GRUPS_CLASS=null, GRUPS_CONJ=null, GRUPS_ETIQ_CFG=false, GRUPS_NAV=false;
-let LLIB_VIEW='llibres', LLIB_BOOK=null, LLIB_CLASS=null, LLIB_ALUMNE=null, LLIB_CONFIG=false;
+let LLIB_CICLE=null, LLIB_CLASS=null, LLIB_CONFIG=false;
 /* Com PROG_NAV: qui ve d'un avís de la portada ja ha triat la vista, i openSection
    no l'hi ha de reiniciar (si no, el clic aterrava sempre a la llista de llibres). */
 let LLIB_NAV=false;
@@ -4926,7 +5018,7 @@ function openSection(id){
   if(id!==CURRENT || CURRENT_SUB) EDITING=null;
   if(id!=='calendari') SCHEDULING=null;
   if(id!==CURRENT){ AV_TRI=null; AV_SUBJECT=null; EINA=null; GRP_RESULT=null; ATT_CLASS=null; ATT_RESULT=null; PICNIC_SUB=null; PICNIC_RESULT=null; AUT_SUB=null; AUT_CONFIG=false; COMANDA_NEW=false; COMANDA_EDIT=null; }
-  if(id==='eines' && id!==CURRENT && !LLIB_NAV){ LLIB_VIEW='llibres'; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; }
+  if(id==='eines' && id!==CURRENT && !LLIB_NAV){ LLIB_CICLE=null; LLIB_CONFIG=false; }
   LLIB_NAV=false;
   if(id==='grups' && id!==CURRENT && !GRUPS_NAV){ GRUPS_VIEW='alumnes'; GRUPS_CONJ=null; GRUPS_ETIQ_CFG=false; }
   GRUPS_NAV=false;
@@ -5638,8 +5730,8 @@ function renderEines(S,sec){
       back:{label:sec.name, onClick:()=>{ EINA=null; openSection('eines'); }}});
     renderAttendance(S);
   } else if(EINA==='llibres'){
-    buildSecHero(S,sec,{title:'📚 Registre llibres a casa', desc:'Qui s’ha emportat cada llibre a casa i qui ja l’ha tornat.',
-      back:{label:sec.name, onClick:()=>{ EINA=null; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; LLIB_VIEW='llibres'; openSection('eines'); }}});
+    buildSecHero(S,sec,{title:'📚 Registre llibres a casa', desc:'Per cicles: a cada nen un llibre, i qui no el torna no es perd de vista.',
+      back:{label:sec.name, onClick:()=>{ EINA=null; LLIB_CICLE=null; LLIB_CONFIG=false; openSection('eines'); }}});
     renderLlibres(S);
   } else {
     buildSecHero(S,sec,{title:sec.name, desc:'Tria una eina.'});
@@ -5651,7 +5743,7 @@ function renderEinesList(S){
   const tools=[
     {id:'reptes', name:'🎯 El racó dels reptes', desc:'Caixes de treball autònom: escaneja l’NFC, marca qui l’ha fet, controla còpies i evolució.'},
     {id:'grups', name:'👥 Generador de grups', desc:'Fes grups per mida, amb o sense barrejar classes.'},
-    {id:'llibres', name:'📚 Registre llibres a casa', desc:'Qui s’ha emportat cada llibre i qui ja l’ha tornat, llibre per llibre o alumne per alumne.'},
+    {id:'llibres', name:'📚 Registre llibres a casa', desc:'Per cicles: reparteix un llibre a cada alumne i marca qui l’ha tornat.'},
     {id:'assistencia', name:'🚌 Assistència d\u2019excursió', desc:'Passa llista del teu grup i treu els absents per administració.'},
   ];
   tools.forEach(t=>{
@@ -6220,14 +6312,27 @@ function renderGrupsConjunt(S, conj){
 }
 
 /* ============ REGISTRE DE LLIBRES A CASA ============
-   Els llibres de l'escola que els nens i nenes s'emporten a casa per llegir.
-   Cal poder marcar les DUES coses: que se l'ha emportat i que l'ha tornat.
-   Model: STATE.llibres = {titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e,r}}}}
-     e = data (ISO) del dia que se l'emporta · r = data del dia que el torna
-   Les marques són granulars i idempotents (una per alumne, llibre i camp), com les
-   autoritzacions i la carpeta viatgera → els tres tutors poden marcar alhora.
-   Amb 11 llibres una graella alumnes × llibres no cap al mòbil, així que hi ha tres
-   vistes: per llibre, per alumne, i «a casa» (els que encara no han tornat). */
+   Els llibres de l'aula que els nens i nenes s'emporten a casa per llegir.
+
+   ⚠️ COM FUNCIONA DE DEBÒ (llegeix-ho abans de tocar res):
+   va per CICLES, com la carpeta viatgera. Un dia es donen els llibres —a cada nen
+   un títol DIFERENT— i un altre dia es recullen tots. Qui no el torna, surt a l'avís.
+   Al cicle següent se li assigna un altre llibre. Com a molt 3 cicles en tot el curs.
+
+   Model: STATE.llibres = {titols:[{id,nom}], cicles:[{id, nom, dona, recull, alumnes}]}
+     alumnes: { 'CLASSE|NOM': {llibre:'l03', tornat:'ISO'} }
+   Les marques són **granulars per alumne i cicle** (`api.llibAlumne`, camps fusionats
+   com a `progSetCell`) → els tres tutors poden repartir i recollir alhora sense
+   trepitjar-se. La meta del cicle (nom, dates) es desa a part (`api.llibCicleSet`).
+
+   Històric: el que ha llegit un nen es dedueix de TOTS els cicles (`llibJaTingut`), i
+   per això el repartiment automàtic no li repeteix mai un títol que ja ha tingut.
+
+   ⚠️ Dos models anteriors, tots dos mal plantejats, per no tornar-hi:
+   (1) graella alumnes × 11 títols amb «X/25 tornats» per llibre — només tindria sentit
+       si tothom passés per tots els llibres, i no és així;
+   (2) préstecs solts quan vulguis — perd que tot el grup va alhora, que és justament
+       el que fa que es pugui reclamar «qui falta» d'un cop. */
 const LLIB_SEED=[
   {id:'l01', nom:'Tumbili'},
   {id:'l02', nom:'Història d’una orella'},
@@ -6241,108 +6346,138 @@ const LLIB_SEED=[
   {id:'l10', nom:'Ha nascut en Marçal'},
   {id:'l11', nom:'La Festa Major'},
 ];
-const LLIB_DIES_AVIS=15;        // a partir d'aquí el comptador de dies surt en vermell
 function llibDades(){
-  STATE.llibres = STATE.llibres || {titols:[], marques:{}};
-  STATE.llibres.titols = STATE.llibres.titols || [];
-  STATE.llibres.marques = STATE.llibres.marques || {};
-  return STATE.llibres;
+  STATE.llibres = STATE.llibres || {titols:[], cicles:[]};
+  const d=STATE.llibres;
+  d.titols=d.titols||[]; d.cicles=d.cicles||[];
+  return d;
 }
-/* La llista desada manar; si encara no s'ha tocat mai, la sembra (com la programació) */
+/* La llista desada mana; si encara no s'ha tocat mai, la sembra (com la programació) */
 function llibTitols(){ const t=llibDades().titols; return t.length ? t : LLIB_SEED; }
+function llibTitol(id){ const t=llibTitols().find(x=>x.id===id); return t ? t.nom : '(llibre tret de la llista)'; }
 function llibClasses(){ return autClasses(); }   // les classes que tenen alumnes al full
 /* Data d'avui en hora LOCAL. Amb toISOString() a la nit sortia el dia d'abans. */
 function llibAvui(){ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
 function llibDies(iso){
   const a=Date.parse(String(iso)+'T00:00:00'), b=Date.parse(llibAvui()+'T00:00:00');
   if(!a || !b) return 0;
-  return Math.max(0, Math.round((b-a)/864e5));
+  return Math.round((b-a)/864e5);
 }
 function llibFmtDia(iso){ const p=String(iso||'').split('-'); return p.length===3 ? p[2]+'/'+p[1] : ''; }
-function llibMarca(cls, nom, llibre){ const x=llibDades().marques[stKey(cls,nom)]; return (x && x[llibre]) || {}; }
-/* 'res' = no l'ha tingut · 'casa' = se l'ha emportat i no l'ha tornat · 'tornat' = fet */
-function llibEstat(cls, nom, llibre){ const k=llibMarca(cls,nom,llibre); return k.r ? 'tornat' : (k.e ? 'casa' : 'res'); }
-function llibCompta(llibre){
-  let casa=0, tornat=0, total=0;
-  llibClasses().forEach(c=>(STATE.students[c]||[]).forEach(n=>{
-    total++; const s=llibEstat(c,n,llibre);
-    if(s==='tornat') tornat++; else if(s==='casa') casa++;
-  }));
-  return {casa, tornat, total};
+/* ---- Cicles ---- */
+function llibCicles(){
+  return llibDades().cicles.slice().sort((a,b)=>String(a.dona||'').localeCompare(String(b.dona||'')));
 }
-function llibComptaAlumne(cls, nom){
-  const t=llibTitols(); let casa=0, tornat=0;
-  t.forEach(l=>{ const s=llibEstat(cls,nom,l.id); if(s==='tornat') tornat++; else if(s==='casa') casa++; });
-  return {casa, tornat, total:t.length};
+function llibCicle(id){ return llibDades().cicles.find(c=>c.id===id)||null; }
+/* El cicle «d'ara»: el primer que encara no s'ha recollit del tot; si no, l'últim. */
+function llibCicleActual(){
+  const cs=llibCicles();
+  if(!cs.length) return null;
+  const obert=cs.find(c=>llibFalten(c).length);
+  return obert || cs[cs.length-1];
 }
-/* Tots els (alumne, llibre) que són a casa ara mateix, els que fa més dies primer */
-function llibPendents(){
-  const out=[], tit=llibTitols();
+function llibAlu(cicle, cls, nom){ return ((cicle&&cicle.alumnes)||{})[stKey(cls,nom)] || {}; }
+/* Qui té un llibre assignat en aquest cicle i encara no l'ha tornat */
+function llibFalten(cicle){
+  const out=[];
+  if(!cicle) return out;
   llibClasses().forEach(c=>(STATE.students[c]||[]).forEach(n=>{
-    tit.forEach(l=>{ const k=llibMarca(c,n,l.id);
-      if(k.e && !k.r) out.push({cls:c, nom:n, llibre:l, des:k.e, dies:llibDies(k.e)}); });
+    const a=llibAlu(cicle,c,n);
+    if(a.llibre && !a.tornat) out.push({cls:c, nom:n, mostra:stMostra(c,n), llibre:llibTitol(a.llibre)});
   }));
-  out.sort((a,b)=> b.dies-a.dies || a.cls.localeCompare(b.cls) || a.nom.localeCompare(b.nom));
   return out;
 }
-function llibTextPendents(){
-  const p=llibPendents();
-  if(!p.length) return 'Llibres a casa: cap. Tots tornats ✓';
-  const L=['Llibres a casa ('+p.length+'):',''];
+function llibComptaCicle(cicle){
+  let assignats=0, tornats=0, total=0;
+  llibClasses().forEach(c=>(STATE.students[c]||[]).forEach(n=>{
+    total++; const a=llibAlu(cicle,c,n);
+    if(a.llibre) assignats++;
+    if(a.llibre && a.tornat) tornats++;
+  }));
+  return {assignats, tornats, total, falten:assignats-tornats};
+}
+/* Tots els títols que un alumne ja ha tingut (en qualsevol ALTRE cicle) */
+function llibJaTingut(cls, nom, exceptoCicleId){
+  const k=stKey(cls,nom), out={};
+  llibDades().cicles.forEach(c=>{
+    if(c.id===exceptoCicleId) return;
+    const a=(c.alumnes||{})[k];
+    if(a && a.llibre) out[a.llibre]=true;
+  });
+  return out;
+}
+/* Els dies que fa que s'havia de recollir (negatiu = encara no toca) */
+function llibDiesDeRetard(cicle){ return cicle && cicle.recull ? llibDies(cicle.recull) : -999; }
+function llibTextFalten(cicle){
+  const f=llibFalten(cicle);
+  if(!f.length) return 'Tots els llibres tornats ✓';
+  const L=[(cicle.nom||'Llibres')+' — falten '+f.length+':',''];
   llibClasses().forEach(c=>{
-    const seus=p.filter(x=>x.cls===c);
+    const seus=f.filter(x=>x.cls===c);
     if(!seus.length) return;
     L.push(c+':');
-    seus.forEach(x=>L.push('- '+stMostra(x.cls,x.nom)+' — '+x.llibre.nom+' (des del '+llibFmtDia(x.des)+', '+x.dies+' dies)'));
+    seus.forEach(x=>L.push('- '+x.mostra+' — '+x.llibre));
     L.push('');
   });
   return L.join('\n').trim();
 }
-/* Marca o desmarca, mantenint el parell coherent:
-   - treure «emportat» treu també «tornat» (no es pot tornar el que no s'ha endut)
-   - marcar «tornat» sense «emportat» marca també «emportat» (el mateix dia) */
-async function llibToggle(cls, nom, llibre, camp, vol){
-  const clau=stKey(cls,nom), avui=llibAvui(), k=llibMarca(cls,nom,llibre);
-  if(camp==='e'){
-    if(vol) await api.llibSet(clau, llibre, 'e', avui);
-    else { if(k.r) await api.llibSet(clau, llibre, 'r', null); await api.llibSet(clau, llibre, 'e', null); }
-  } else {
-    if(vol){ if(!k.e) await api.llibSet(clau, llibre, 'e', avui); await api.llibSet(clau, llibre, 'r', avui); }
-    else await api.llibSet(clau, llibre, 'r', null);
+/* Repartiment automàtic d'una classe: dona a cada nen un títol que NO hagi tingut mai,
+   i reparteix les còpies el més igualades possible. No toca els que ja tenen llibre. */
+function llibReparteix(cicle, cls){
+  const tit=llibTitols();
+  if(!tit.length) return [];
+  const usos={}; tit.forEach(t=>usos[t.id]=0);
+  const alum=(STATE.students[cls]||[]);
+  alum.forEach(n=>{ const a=llibAlu(cicle,cls,n); if(a.llibre && usos[a.llibre]!==undefined) usos[a.llibre]++; });
+  const canvis=[];
+  alum.forEach(nom=>{
+    if(llibAlu(cicle,cls,nom).llibre) return;                 // ja en té un: no s'hi toca
+    const ja=llibJaTingut(cls,nom,cicle.id);
+    const lliures=tit.filter(t=>!ja[t.id]);
+    const pot=(lliures.length?lliures:tit).slice()            // si ja els ha tingut tots, repetim
+      .sort((a,b)=>usos[a.id]-usos[b.id]);
+    const tria=pot[0];
+    usos[tria.id]++;
+    canvis.push({nom:nom, llibre:tria.id});
+  });
+  return canvis;
+}
+/* Tria de llibre per a un alumne, marcant els que ja ha tingut */
+function llibTriaLlibre(cicle, cls, nom, fet){
+  const ja=llibJaTingut(cls,nom,cicle.id), actual=llibAlu(cicle,cls,nom).llibre;
+  const modal=el('div','modal open');
+  const scrim=el('div','scrim'); modal.appendChild(scrim);
+  const box=el('div','modal-box llib-tria');
+  const h=el('h3'); h.textContent='Quin llibre li toca?';
+  box.innerHTML='<div class="modal-ico">📚</div>';
+  box.appendChild(h);
+  const qui=el('p'); qui.textContent=stMostra(cls,nom); box.appendChild(qui);
+  const llista=el('div','llib-tria-list');
+  llibTitols().forEach(t=>{
+    const b=el('button','llib-tria-op'+(ja[t.id]?' ja':'')+(actual===t.id?' on':'')); b.type='button';
+    const n=el('span','n'); n.textContent=t.nom; b.appendChild(n);
+    if(ja[t.id]){ const x=el('span','x'); x.textContent='ja el va tenir'; b.appendChild(x); }
+    else if(actual===t.id){ const x=el('span','x'); x.textContent='el que té ara'; b.appendChild(x); }
+    b.onclick=async()=>{ tanca(); await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:t.id}); if(fet) fet(); };
+    llista.appendChild(b);
+  });
+  box.appendChild(llista);
+  const acts=el('div','modal-actions');
+  const no=el('button','btn btn-ghost'); no.type='button'; no.textContent='Cancel·la';
+  acts.appendChild(no);
+  if(actual){
+    const treu=el('button','btn btn-danger'); treu.type='button'; treu.textContent='Treu-li el llibre';
+    treu.onclick=async()=>{ tanca(); await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:null, tornat:null}); if(fet) fet(); };
+    acts.appendChild(treu);
   }
+  box.appendChild(acts);
+  modal.appendChild(box); document.body.appendChild(modal);
+  let desmunta=()=>{};
+  const tanca=()=>{ desmunta(); modal.remove(); };
+  no.onclick=tanca; scrim.onclick=tanca;
+  desmunta=wireModal(box, tanca, h);
 }
-/* Una casella (emportat o tornat) d'un alumne i un llibre. `onCanvi` refresca els comptadors. */
-function llibCheck(cls, nom, llibre, camp, onCanvi){
-  const ICO={ e:'<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>', r:'<path d="M5 12.5l4.5 4.5L19 7.5"/>' };
-  const QUE={ e:'se l’ha emportat a casa', r:'l’ha tornat' };
-  const b=el('button','llib-check '+camp); b.type='button';
-  b.innerHTML='<svg class="icon" viewBox="0 0 24 24">'+ICO[camp]+'</svg>';
-  const pinta=()=>{
-    const k=llibMarca(cls,nom,llibre), on=!!k[camp];
-    b.classList.toggle('on', on);
-    b.setAttribute('aria-pressed', on?'true':'false');
-    b.setAttribute('aria-label', nom+' · '+QUE[camp]);
-    b.title = on ? (camp==='e'?'Emportat el ':'Tornat el ')+llibFmtDia(k[camp]) : QUE[camp].charAt(0).toUpperCase()+QUE[camp].slice(1);
-  };
-  pinta();
-  b.onclick=async()=>{
-    const vol=!b.classList.contains('on');
-    b.disabled=true;
-    try{ await llibToggle(cls, nom, llibre, camp, vol); }
-    finally{ b.disabled=false; }
-    if(onCanvi) onCanvi();        // repinta les dues caselles i els comptadors
-  };
-  b.__pinta=pinta;
-  return b;
-}
-/* Capçalera de les dues columnes de caselles */
-function llibCapCols(primera){
-  const cap=el('div','aut-fila aut-cap');
-  const n=el('div','aut-nom'); n.textContent=primera||''; cap.appendChild(n);
-  const h1=el('div','llib-h'); h1.textContent='🏠'; h1.title='Se l’ha emportat a casa'; cap.appendChild(h1);
-  const h2=el('div','llib-h'); h2.textContent='✅'; h2.title='L’ha tornat'; cap.appendChild(h2);
-  return cap;
-}
+
 function renderLlibres(S){
   const classes=llibClasses();
   if(!classes.length){
@@ -6350,67 +6485,211 @@ function renderLlibres(S){
     e.innerHTML='<div class="big">📚</div>No hi ha alumnes. Omple la pestanya “Alumnes” del full.';
     S.appendChild(e); return;
   }
-  /* --- pestanyes de vista --- */
-  const seg=el('div','prog-seg');
-  const pend=llibPendents().length;
-  [['llibres','📚 Llibres'],['alumnes','🧒 Per alumne'],['casa','🏠 A casa'+(pend?' ('+pend+')':'')]].forEach(([v,lbl])=>{
-    const b=el('button','prog-segbtn'+(LLIB_VIEW===v?' on':'')); b.type='button'; b.textContent=lbl;
-    b.onclick=()=>{ LLIB_VIEW=v; LLIB_BOOK=null; LLIB_ALUMNE=null; LLIB_CONFIG=false; openSection('eines'); };
-    seg.appendChild(b);
+  if(LLIB_CONFIG){ renderLlibresConfig(S); return; }
+
+  const cicles=llibCicles();
+  if(!cicles.length){ renderLlibresBuit(S); return; }
+  if(!LLIB_CICLE || !llibCicle(LLIB_CICLE)){ const a=llibCicleActual(); LLIB_CICLE=a?a.id:null; }
+  const cicle=llibCicle(LLIB_CICLE);
+  if(!cicle){ renderLlibresBuit(S); return; }
+
+  /* Selector de cicle + accions */
+  const nav=el('div','llib-ciclenav');
+  const sel=el('select','llib-ciclesel'); sel.setAttribute('aria-label','Cicle');
+  cicles.forEach(c=>{
+    const f=llibComptaCicle(c);
+    const o=el('option'); o.value=c.id;
+    o.textContent=(c.nom||'Cicle')+(f.falten? '  ·  falten '+f.falten : (f.assignats? '  ·  tots tornats' : '  ·  sense repartir'));
+    if(c.id===cicle.id) o.selected=true;
+    sel.appendChild(o);
   });
-  S.appendChild(seg);
+  sel.onchange=()=>{ LLIB_CICLE=sel.value; openSection('eines'); };
+  nav.appendChild(sel);
+  const nou=el('button','btn btn-ghost'); nou.type='button'; nou.textContent='+ Cicle nou';
+  nou.onclick=()=>llibCicleNou();
+  nav.appendChild(nou);
+  const cfg=el('button','btn btn-ghost'); cfg.type='button'; cfg.textContent='⚙ Llibres';
+  cfg.title='Edita la llista de títols';
+  cfg.onclick=()=>{ LLIB_CONFIG=true; openSection('eines'); };
+  nav.appendChild(cfg);
+  S.appendChild(nav);
 
-  if(LLIB_VIEW==='casa'){ renderLlibresCasa(S); return; }
-  if(LLIB_VIEW==='alumnes'){
-    if(LLIB_ALUMNE) renderLlibresAlumne(S);
-    else renderLlibresAlumnes(S);
-    return;
-  }
-  if(LLIB_BOOK){ renderLlibresBook(S); return; }
-  renderLlibresLlista(S);
+  renderLlibresCicle(S, cicle);
 }
-/* ---- Vista «Llibres»: una targeta per llibre ---- */
-function renderLlibresLlista(S){
-  const tit=llibTitols();
+function renderLlibresBuit(S){
+  const e=el('div','empty-feed');
+  e.innerHTML='<div class="big">📚</div>Encara no hi ha cap cicle. Crea’n un per repartir els llibres.';
+  S.appendChild(e);
+  const a=el('div','att-actions');
+  const nou=el('button','btn btn-primary'); nou.type='button';
+  nou.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Crea el primer cicle';
+  nou.onclick=()=>llibCicleNou();
+  a.appendChild(nou);
+  const cfg=el('button','btn btn-ghost'); cfg.type='button'; cfg.textContent='⚙ Llibres';
+  cfg.onclick=()=>{ LLIB_CONFIG=true; openSection('eines'); };
+  a.appendChild(cfg);
+  S.appendChild(a);
+}
+function llibCicleNou(){
+  const n=llibCicles().length+1;
+  askPrompt({icon:'📚', title:'Cicle nou', label:'Com el vols dir?', value:'Llibres '+n,
+    confirmLabel:'Crea', errorMsg:'Posa-hi un nom.'}, val=>{
+    const nom=String(val||'').trim();
+    if(!nom) return false;
+    const id='lc'+uid();
+    api.llibCicleSet(id, {nom:nom, dona:llibAvui(), recull:''}).then(()=>{
+      LLIB_CICLE=id; LLIB_CONFIG=false; openSection('eines'); toast('Cicle creat ✓');
+    });
+  });
+}
+/* ---- Un cicle: repartir, marcar tornats ---- */
+function renderLlibresCicle(S, cicle){
+  const classes=llibClasses();
   const repinta=()=>openSection('eines');
+  const f=llibComptaCicle(cicle);
 
+  /* Resum + dates */
   const top=el('div','aut-top');
-  const totCasa=llibPendents().length;
-  const resum=el('div','aut-resum');
-  resum.innerHTML='<b>'+tit.length+' llibres</b><span>'+(totCasa?totCasa+' a casa':'cap a casa')+'</span>';
-  top.appendChild(resum);
-  const cfg=el('button','btn btn-ghost aut-cfg'); cfg.type='button';
-  cfg.innerHTML='<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Quins llibres';
-  cfg.onclick=()=>{ LLIB_CONFIG=!LLIB_CONFIG; repinta(); };
-  top.appendChild(cfg);
+  const r1=el('div','aut-resum'+(f.assignats&&!f.falten?' ple':''));
+  r1.innerHTML='<b>Repartits</b><span>'+f.assignats+'/'+f.total+'</span>';
+  top.appendChild(r1);
+  const r2=el('div','aut-resum'+(f.assignats&&!f.falten?' ple':''));
+  r2.innerHTML='<b>Tornats</b><span>'+f.tornats+'/'+f.assignats+'</span>';
+  top.appendChild(r2);
   S.appendChild(top);
 
-  if(LLIB_CONFIG){ renderLlibresConfig(S, repinta); }
+  const dates=el('div','llib-dates-row');
+  const camp=(etiqueta, valor, onCanvi)=>{
+    const w=el('label','llib-data');
+    const l=el('span'); l.textContent=etiqueta; w.appendChild(l);
+    const i=el('input'); i.type='date'; i.value=valor||'';
+    i.onchange=()=>onCanvi(i.value);
+    w.appendChild(i); return w;
+  };
+  dates.appendChild(camp('Es donen el', cicle.dona, v=>api.llibCicleSet(cicle.id,{dona:v}).then(repinta)));
+  dates.appendChild(camp('Es recullen el', cicle.recull, v=>api.llibCicleSet(cicle.id,{recull:v}).then(repinta)));
+  const ren=el('button','btn btn-ghost'); ren.type='button'; ren.textContent='✏️ Nom';
+  ren.onclick=()=>askPrompt({icon:'✏️', title:'Nom del cicle', value:cicle.nom||'', confirmLabel:'Desa', errorMsg:'Posa-hi un nom.'}, val=>{
+    const n=String(val||'').trim(); if(!n) return false;
+    api.llibCicleSet(cicle.id,{nom:n}).then(repinta);
+  });
+  dates.appendChild(ren);
+  const esb=el('button','btn btn-ghost llib-esb'); esb.type='button'; esb.textContent='🗑 Esborra';
+  esb.onclick=()=>askConfirm('Vols esborrar el cicle «'+(cicle.nom||'')+'»? Es perd qui tenia cada llibre.', async()=>{
+    await api.llibCicleDelete(cicle.id); LLIB_CICLE=null; openSection('eines'); toast('Esborrat');
+  }, {title:'Esborrar el cicle', confirmLabel:'Esborra', danger:true});
+  dates.appendChild(esb);
+  S.appendChild(dates);
+
+  /* Pestanyes de classe */
+  if(!LLIB_CLASS || classes.indexOf(LLIB_CLASS)<0) LLIB_CLASS=pickTutorClass(classes);
+  const selRow=el('div','att-classsel');
+  classes.forEach(c=>{
+    const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
+    if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
+    const roster=STATE.students[c]||[];
+    const tor=roster.filter(n=>{ const a=llibAlu(cicle,c,n); return a.llibre && a.tornat; }).length;
+    const asg=roster.filter(n=>llibAlu(cicle,c,n).llibre).length;
+    t.textContent=c+' ('+tor+'/'+asg+')';
+    t.title=c+': '+tor+' tornats de '+asg+' repartits';
+    t.onclick=()=>{ LLIB_CLASS=c; repinta(); };
+    selRow.appendChild(t);
+  });
+  S.appendChild(selRow);
+
+  /* Repartiment automàtic */
+  const roster=STATE.students[LLIB_CLASS]||[];
+  const senseLlibre=roster.filter(n=>!llibAlu(cicle,LLIB_CLASS,n).llibre).length;
+  const bar=el('div','att-actions');
+  if(senseLlibre){
+    const rep=el('button','btn btn-primary'); rep.type='button';
+    rep.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg>'
+      +(senseLlibre===1 ? 'Reparteix el que falta' : 'Reparteix els '+senseLlibre+' que falten');
+    rep.title='Dona un llibre a qui no en té, sense repetir-li cap que ja hagi tingut';
+    rep.onclick=async()=>{
+      rep.disabled=true;
+      const canvis=llibReparteix(cicle, LLIB_CLASS);
+      for(const c of canvis) await api.llibAlumne(cicle.id, stKey(LLIB_CLASS,c.nom), {llibre:c.llibre});
+      repinta(); toast(canvis.length+' '+plural(canvis.length,'llibre repartit','llibres repartits'));
+    };
+    bar.appendChild(rep);
+  }
+  const cp=el('button','btn btn-ghost'); cp.type='button';
+  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui falta';
+  cp.onclick=async()=>{
+    await refrescaEstat();
+    const txt=llibTextFalten(llibCicle(cicle.id)||cicle);
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
+    const caixa=S.querySelector('.att-result') || el('div','att-result');
+    caixa.innerHTML=''; const pre=el('pre'); pre.textContent=txt; caixa.appendChild(pre);
+    if(!caixa.parentNode) S.appendChild(caixa);
+  };
+  bar.appendChild(cp);
+  S.appendChild(bar);
 
   const hint=el('div','att-info');
-  const h=el('span','att-hint'); h.textContent='Tria un llibre per marcar qui se l’ha emportat i qui l’ha tornat';
+  const h=el('span','att-hint'); h.textContent='Toca el llibre per canviar-lo · ✅ quan el torna';
   hint.appendChild(h); S.appendChild(hint);
 
-  const grid=el('div','llib-grid');
-  tit.forEach(l=>{
-    const c=llibCompta(l.id);
-    const card=el('button','llib-card'); card.type='button';
-    const t=el('div','llib-t'); t.textContent=l.nom; card.appendChild(t);
-    const m=el('div','llib-m');
-    m.innerHTML=(c.casa?'<span class="llib-chip">🏠 '+c.casa+' a casa</span>':'')+'✅ '+c.tornat+'/'+c.total+' tornats';
-    card.appendChild(m);
-    const bar=el('div','llib-bar'); const i=el('i');
-    i.style.width=(c.total? Math.round(c.tornat/c.total*100):0)+'%'; bar.appendChild(i); card.appendChild(bar);
-    card.onclick=()=>{ LLIB_BOOK=l.id; LLIB_CONFIG=false; openSection('eines'); };
-    grid.appendChild(card);
+  /* La graella: alumne · llibre · tornat */
+  const taula=el('div','aut-taula');
+  roster.forEach(nom=>{
+    const clau=stKey(LLIB_CLASS,nom);
+    const fila=el('div','aut-fila');
+    const n=el('div','aut-nom'); n.textContent=stMostra(LLIB_CLASS,nom); fila.appendChild(n);
+
+    const lb=el('button','llib-pick'); lb.type='button';
+    const pintaLb=()=>{
+      const a=llibAlu(llibCicle(cicle.id)||cicle, LLIB_CLASS, nom);
+      lb.classList.toggle('buit', !a.llibre);
+      lb.textContent=a.llibre ? llibTitol(a.llibre) : 'Tria un llibre…';
+      lb.title=a.llibre ? 'Toca per canviar-lo' : 'Toca per assignar-ne un';
+      lb.setAttribute('aria-label', stMostra(LLIB_CLASS,nom)+' · '+(a.llibre?llibTitol(a.llibre):'sense llibre'));
+    };
+    pintaLb();
+    lb.onclick=()=>llibTriaLlibre(cicle, LLIB_CLASS, nom, repinta);
+    fila.appendChild(lb);
+
+    const a0=llibAlu(cicle, LLIB_CLASS, nom);
+    const b=el('button','llib-check r'+(a0.tornat?' on':'')); b.type='button';
+    b.disabled=!a0.llibre;
+    b.title=a0.tornat ? 'Tornat el '+llibFmtDia(a0.tornat) : 'Marca’l com a tornat';
+    b.setAttribute('aria-pressed', a0.tornat?'true':'false');
+    b.setAttribute('aria-label', stMostra(LLIB_CLASS,nom)+' · tornat');
+    b.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+    b.onclick=async()=>{
+      const ara=!b.classList.contains('on');
+      b.classList.toggle('on', ara); b.setAttribute('aria-pressed', ara?'true':'false');
+      await api.llibAlumne(cicle.id, clau, {tornat: ara ? llibAvui() : null});
+      b.title=ara ? 'Tornat el '+llibFmtDia(llibAvui()) : 'Marca’l com a tornat';
+      /* comptadors, sense repintar (no perdre el punt on ets) */
+      const c2=llibComptaCicle(llibCicle(cicle.id)||cicle);
+      const sp=S.querySelectorAll('.aut-resum span');
+      if(sp[0]) sp[0].textContent=c2.assignats+'/'+c2.total;
+      if(sp[1]) sp[1].textContent=c2.tornats+'/'+c2.assignats;
+      const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(LLIB_CLASS)===0);
+      if(tab){ const cc=llibCicle(cicle.id)||cicle;
+        const tor=roster.filter(x=>{ const y=llibAlu(cc,LLIB_CLASS,x); return y.llibre && y.tornat; }).length;
+        const asg=roster.filter(x=>llibAlu(cc,LLIB_CLASS,x).llibre).length;
+        tab.textContent=LLIB_CLASS+' ('+tor+'/'+asg+')'; }
+    };
+    fila.appendChild(b);
+    taula.appendChild(fila);
   });
-  S.appendChild(grid);
+  S.appendChild(taula);
 }
-/* ---- Personalitzar la llista de llibres ---- */
-function renderLlibresConfig(S, repinta){
+/* ---- La llista de títols ---- */
+function renderLlibresConfig(S){
   const tit=llibTitols();
+  const repinta=()=>openSection('eines');
+  const barra=el('div','att-actions');
+  const tornar=el('button','btn btn-ghost'); tornar.type='button';
+  tornar.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Tornar als cicles';
+  tornar.onclick=()=>{ LLIB_CONFIG=false; openSection('eines'); };
+  barra.appendChild(tornar); S.appendChild(barra);
+
   const box=el('div','aut-config');
-  const t=el('div','aut-config-t'); t.textContent='Llibres que donem'; box.appendChild(t);
+  const t=el('div','aut-config-t'); t.textContent='Llibres de l’aula'; box.appendChild(t);
   const llista=el('div','aut-config-list');
   tit.forEach(l=>{
     const row=el('div','aut-config-row');
@@ -6424,9 +6703,8 @@ function renderLlibresConfig(S, repinta){
     const del=el('button','icon-btn danger'); del.type='button'; del.title='Treu aquest llibre';
     del.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
     del.onclick=()=>{
-      askConfirm('Vols treure «'+l.nom+'» de la llista? Deixarà de sortir; si el tornes a posar, les marques encara hi seran.', async()=>{
-        const nous=llibTitols().filter(x=>x.id!==l.id);
-        await api.llibTitols(nous); repinta();
+      askConfirm('Vols treure «'+l.nom+'» de la llista? Els cicles que ja el tinguin assignat no es toquen.', async()=>{
+        await api.llibTitols(llibTitols().filter(x=>x.id!==l.id)); repinta();
       }, {title:'Treure el llibre', confirmLabel:'Treu-lo', danger:true});
     };
     if(tit.length>1) row.appendChild(del);
@@ -6436,196 +6714,17 @@ function renderLlibresConfig(S, repinta){
   const afegir=el('div','aut-config-add');
   const nou=el('button','btn btn-ghost'); nou.type='button'; nou.textContent='+ Un altre llibre…';
   nou.onclick=()=>{
-    /* errorMsg va DINS d'opts: askPrompt(opts, onConfirm) només té dos paràmetres */
     askPrompt({icon:'📚', title:'Llibre nou', label:'Com es diu?', placeholder:'p. ex. El cargol i la formiga',
       confirmLabel:'Afegeix', errorMsg:'Posa-hi un títol que no hi sigui ja a la llista.'}, val=>{
       const nom=String(val||'').trim();
       if(!nom) return false;
-      if(llibTitols().some(x=>norm(x.nom)===norm(nom))) return false;   // ja hi és
+      if(llibTitols().some(x=>norm(x.nom)===norm(nom))) return false;
       api.llibTitols(llibTitols().concat([{id:'l'+uid(), nom:nom}])).then(repinta);
     });
   };
   afegir.appendChild(nou);
   box.appendChild(afegir);
   S.appendChild(box);
-}
-/* ---- Un llibre: tots els alumnes d'una classe ---- */
-function renderLlibresBook(S){
-  const l=llibTitols().find(x=>x.id===LLIB_BOOK);
-  if(!l){ LLIB_BOOK=null; renderLlibresLlista(S); return; }
-  const classes=llibClasses();
-
-  const tornar=el('button','btn btn-ghost'); tornar.type='button';
-  tornar.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Tots els llibres';
-  tornar.onclick=()=>{ LLIB_BOOK=null; openSection('eines'); };
-  const barra=el('div','att-actions'); barra.appendChild(tornar); S.appendChild(barra);
-
-  const top=el('div','aut-top');
-  const resum=el('div','aut-resum');
-  const pintaResum=()=>{ const c=llibCompta(l.id);
-    resum.classList.toggle('ple', c.tornat===c.total && c.total>0);
-    resum.innerHTML='<b>'+esc(l.nom)+'</b><span>'+(c.casa?'🏠 '+c.casa+' · ':'')+'✅ '+c.tornat+'/'+c.total+'</span>'; };
-  pintaResum(); top.appendChild(resum); S.appendChild(top);
-
-  if(!LLIB_CLASS || classes.indexOf(LLIB_CLASS)<0) LLIB_CLASS=pickTutorClass(classes);
-  const selRow=el('div','att-classsel');
-  const pintaTabs=()=>{
-    selRow.innerHTML='';
-    classes.forEach(c=>{
-      const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
-      if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
-      const roster=STATE.students[c]||[];
-      const fets=roster.filter(n=>llibEstat(c,n,l.id)==='tornat').length;
-      t.textContent=c+' ('+fets+'/'+roster.length+')';
-      t.title=c+': '+fets+' de '+roster.length+' l’han tornat';
-      t.onclick=()=>{ LLIB_CLASS=c; openSection('eines'); };
-      selRow.appendChild(t);
-    });
-  };
-  pintaTabs(); S.appendChild(selRow);
-
-  const hint=el('div','att-info');
-  const h=el('span','att-hint'); h.textContent='🏠 se l’ha emportat · ✅ l’ha tornat';
-  hint.appendChild(h); S.appendChild(hint);
-
-  const taula=el('div','aut-taula');
-  taula.appendChild(llibCapCols());
-  (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
-    const fila=el('div','aut-fila');
-    const n=el('div','aut-nom'); n.textContent=stMostra(LLIB_CLASS,nom); fila.appendChild(n);
-    const refresca=()=>{ fila.querySelectorAll('.llib-check').forEach(b=>{ if(b.__pinta) b.__pinta(); }); pintaResum(); pintaTabs(); };
-    fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'e', refresca));
-    fila.appendChild(llibCheck(LLIB_CLASS, nom, l.id, 'r', refresca));
-    taula.appendChild(fila);
-  });
-  S.appendChild(taula);
-}
-/* ---- Vista «Per alumne»: la llista de la classe ---- */
-function renderLlibresAlumnes(S){
-  const classes=llibClasses();
-  if(!LLIB_CLASS || classes.indexOf(LLIB_CLASS)<0) LLIB_CLASS=pickTutorClass(classes);
-  const selRow=el('div','att-classsel');
-  classes.forEach(c=>{
-    const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
-    if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
-    t.textContent=c+' ('+(STATE.students[c]||[]).length+')';
-    t.onclick=()=>{ LLIB_CLASS=c; openSection('eines'); };
-    selRow.appendChild(t);
-  });
-  S.appendChild(selRow);
-
-  const hint=el('div','att-info');
-  const h=el('span','att-hint'); h.textContent='Tria un alumne per veure i marcar els seus llibres';
-  hint.appendChild(h); S.appendChild(hint);
-
-  const taula=el('div','aut-taula');
-  (STATE.students[LLIB_CLASS]||[]).forEach(nom=>{
-    const c=llibComptaAlumne(LLIB_CLASS, nom);
-    const row=el('button','llib-rowbtn'); row.type='button';
-    const nm=el('div','nm'); nm.textContent=stMostra(LLIB_CLASS,nom); row.appendChild(nm);
-    if(c.casa){ const xip=el('span','llib-chip'); xip.textContent='🏠 '+c.casa; row.appendChild(xip); }
-    const ct=el('div','ct'); ct.textContent='✅ '+c.tornat+'/'+c.total; row.appendChild(ct);
-    const fletxa=el('div','ct'); fletxa.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'; row.appendChild(fletxa);
-    row.onclick=()=>{ LLIB_ALUMNE=nom; openSection('eines'); };
-    taula.appendChild(row);
-  });
-  S.appendChild(taula);
-}
-/* ---- Un alumne: tots els llibres ---- */
-function renderLlibresAlumne(S){
-  const nom=LLIB_ALUMNE, cls=LLIB_CLASS;
-  if(!nom || (STATE.students[cls]||[]).indexOf(nom)<0){ LLIB_ALUMNE=null; renderLlibresAlumnes(S); return; }
-
-  const tornar=el('button','btn btn-ghost'); tornar.type='button';
-  tornar.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>'+esc(cls);
-  tornar.onclick=()=>{ LLIB_ALUMNE=null; openSection('eines'); };
-  const barra=el('div','att-actions'); barra.appendChild(tornar); S.appendChild(barra);
-
-  const top=el('div','aut-top');
-  const resum=el('div','aut-resum');
-  const pintaResum=()=>{ const c=llibComptaAlumne(cls,nom);
-    resum.classList.toggle('ple', c.tornat===c.total && c.total>0);
-    resum.innerHTML='<b>'+esc(nom)+'</b><span>'+(c.casa?'🏠 '+c.casa+' · ':'')+'✅ '+c.tornat+'/'+c.total+'</span>'; };
-  pintaResum(); top.appendChild(resum); S.appendChild(top);
-
-  const hint=el('div','att-info');
-  const h=el('span','att-hint'); h.textContent='🏠 se l’ha emportat · ✅ l’ha tornat';
-  hint.appendChild(h); S.appendChild(hint);
-
-  const taula=el('div','aut-taula');
-  taula.appendChild(llibCapCols('Llibre'));
-  llibTitols().forEach(l=>{
-    const fila=el('div','aut-fila');
-    const n=el('div','aut-nom'); n.textContent=l.nom;
-    const k=llibMarca(cls,nom,l.id);
-    if(k.e && !k.r) n.title='A casa des del '+llibFmtDia(k.e)+' ('+llibDies(k.e)+' dies)';
-    fila.appendChild(n);
-    const refresca=()=>{ fila.querySelectorAll('.llib-check').forEach(b=>{ if(b.__pinta) b.__pinta(); }); pintaResum(); };
-    fila.appendChild(llibCheck(cls, nom, l.id, 'e', refresca));
-    fila.appendChild(llibCheck(cls, nom, l.id, 'r', refresca));
-    taula.appendChild(fila);
-  });
-  S.appendChild(taula);
-}
-/* ---- Vista «A casa»: qui té un llibre sense tornar ---- */
-function renderLlibresCasa(S){
-  const p=llibPendents();
-  if(!p.length){
-    const e=el('div','empty-feed');
-    e.innerHTML='<div class="big">✅</div>Cap llibre a casa. Tots tornats!';
-    S.appendChild(e); return;
-  }
-  const top=el('div','aut-top');
-  const resum=el('div','aut-resum');
-  resum.innerHTML='<b>Llibres a casa</b><span>'+p.length+'</span>';
-  top.appendChild(resum); S.appendChild(top);
-
-  /* Marcar «tornat» aquí treu la fila i prou. Abans repintava la secció sencera i
-     saltava a dalt de tot: si n'havies de marcar quatre seguits, perdies el lloc cada cop. */
-  const box=el('div','llib-pend');
-  const grups=[];
-  llibClasses().forEach(c=>{
-    const seus=p.filter(x=>x.cls===c);
-    if(!seus.length) return;
-    const cap=el('div','llib-pend-cls'); cap.textContent=c+' · '+seus.length; box.appendChild(cap);
-    const g={cls:c, cap:cap, files:[]}; grups.push(g);
-    seus.forEach(x=>{
-      const row=el('div','llib-pend-row');
-      const n=el('div','n'); n.textContent=stMostra(x.cls,x.nom); row.appendChild(n);
-      const l=el('div','l'); l.textContent=x.llibre.nom; row.appendChild(l);
-      const d=el('div','d'+(x.dies>=LLIB_DIES_AVIS?' alerta':''));
-      d.textContent=x.dies+' d'; d.title='Des del '+llibFmtDia(x.des);
-      row.appendChild(d);
-      const b=llibCheck(x.cls, x.nom, x.llibre.id, 'r', ()=>{
-        row.remove();
-        g.files=g.files.filter(f=>f!==row);
-        if(!g.files.length) g.cap.remove(); else g.cap.textContent=g.cls+' · '+g.files.length;
-        const queden=llibPendents().length;
-        const sp=resum.querySelector('span'); if(sp) sp.textContent=queden;
-        const seg=S.querySelector('.prog-seg');
-        if(seg && seg.children[2]) seg.children[2].textContent='🏠 A casa'+(queden?' ('+queden+')':'');
-        if(!queden) openSection('eines');   // ja no queda cap: ensenya l'estat buit
-      });
-      b.title='L’ha tornat'; row.appendChild(b);
-      g.files.push(row);
-      box.appendChild(row);
-    });
-  });
-  S.appendChild(box);
-
-  const actions=el('div','att-actions');
-  const cp=el('button','btn btn-primary'); cp.type='button';
-  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui té llibres a casa';
-  cp.onclick=async()=>{
-    await refrescaEstat();
-    const txt=llibTextPendents();
-    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
-    const caixa=S.querySelector('.att-result') || el('div','att-result');
-    caixa.innerHTML=''; const pre=el('pre'); pre.textContent=txt; caixa.appendChild(pre);
-    if(!caixa.parentNode) S.appendChild(caixa);
-  };
-  actions.appendChild(cp);
-  S.appendChild(actions);
 }
 
 /* ============ EL RACÓ DELS REPTES ============ */

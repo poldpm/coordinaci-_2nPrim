@@ -125,7 +125,8 @@ correus[]        // {id, title, body, date, sent:{tutor:true}, author, createdAt
 emailReminders{} // opt-in del correu recordatori: { tutor: true }
 cvLliurat{}      // qui ha entregat la carpeta viatgera: { dataISO_del_cicle: { 'Nom alumne': true } }
 comments{}       // comentaris per entrada (estil Google): { entryId: [ {id, author, text, createdAt, resolved, resolvedBy, replies:[{id,author,text,createdAt}]} ] } — veure §9
-llibres{}        // llibres que s'emporten a casa: { titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e:dataISO, r:dataISO}}} } — veure §9
+llibres{}        // llibres que s'emporten a casa, per CICLES: { titols:[{id,nom}],
+                 //   cicles:[{id, nom, dona:dataISO, recull:dataISO, alumnes:{'CLASSE|Nom':{llibre:llibreId, tornat:dataISO}}}] } — veure §9
 grups{}          // gestió de grups: { etiquetes:[{id,nom}], marques:{'CLASSE|Nom':{etiqId:true}}, notes:{'CLASSE|Nom':text},
                  //                   noms:{'CLASSE|Nom':'Nom corregit'}, conjunts:[{id,nom,creat,by,classes[],grups:[{id,nom,membres[]}]}] } — veure §9
 ```
@@ -421,44 +422,59 @@ nom estandarditzat.
   Dret de veu → DV, Dret d'imatge → DI) i `autTextQueFalta` (botó «Copia qui falta»).
   Les pestanyes de classe compten els alumnes que tenen **totes** les caselles.
 - **Registre llibres a casa** (dins `eines`, `EINA='llibres'`): els llibres de l'escola que els
-  nens i nenes s'emporten a casa per llegir. Cal poder marcar les **DUES** coses: que se l'ha
-  emportat i que l'ha tornat.
-  Model: `STATE.llibres = {titols:[{id,nom}], marques:{'CLASSE|Nom':{llibreId:{e,r}}}}`, on
-  `e` = data ISO del dia que se l'emporta i `r` = data ISO del dia que el torna. `titols` es desa
-  sencer (`api.llibTitols` → `llibTitols`); les marques són **granulars i idempotents**
-  (`api.llibSet(alumne, llibre, camp, data)` → `llibSet`, una per alumne/llibre/camp) → els tres
-  tutors poden marcar alhora. La clau d'alumne és composta `CLASSE|NOM` (`stKey`).
+  nens i nenes s'emporten a casa per llegir. ⚠️ **Funciona per CICLES, no és una graella de
+  tothom × tots els llibres** (així estava plantejat al principi i era un error): no tots
+  s'emporten els 11 llibres; cada nen en té UN, tots se l'emporten el MATEIX dia i el tornen el
+  MATEIX dia, i quan l'ha tornat ja se li pot assignar un altre al cicle següent. Com a molt en
+  llegiran 3 en tot el curs. **Qui no el torna ha de seguir sortint a l'avís.**
+  Model: `STATE.llibres = {titols:[{id,nom}], cicles:[{id, nom, dona, recull, alumnes}]}`, on
+  `dona`/`recull` són dates ISO i `alumnes` va per clau composta `CLASSE|NOM` (`stKey`) →
+  `{llibre:'l03', tornat:'2026-10-02'}`. `titols` i la **meta del cicle** (nom i dates) es desen
+  senceres (`api.llibTitols` → `llibTitols`; `api.llibCicleSet(id,patch)` → `llibCicleSet`, upsert
+  per `id` que **fusiona** el patch, així dos tutors que toquin camps diferents no es trepitgen);
+  el que té cada alumne és **granular i idempotent** (`api.llibAlumne(cicleId, clau, patch)` →
+  `llibAlumne`, un camp o dos per alumne, `null` esborra el camp) → els tres tutors poden repartir
+  i marcar alhora. Esborrar un cicle: `api.llibCicleDelete` → `llibCicleDelete`.
   **11 llibres sembrats** a `LLIB_SEED` (ids estables `l01..l11`): Tumbili, Història d'una orella,
   Llista d'aniversari, Plou, Mal a la mà mal al peu, En Ton i la Neus, Titelles fades i follets,
   Anem a la masia, Ai Terri Terri..., Ha nascut en Marçal, La Festa Major. Com la programació, és
   **sembra mandrosa**: `llibTitols()` torna la llista desada i, si encara no s'ha tocat mai, la
-  sembra; la primera edició la materialitza. Treure un títol **no** esborra les marques (si el
-  tornes a posar, hi són).
-  **El parell es manté coherent** (`llibToggle`): marcar «tornat» sense «emportat» marca també
-  «emportat» el mateix dia; treure «emportat» treu també «tornat». Així no hi pot haver un llibre
-  tornat que ningú s'hagi endut.
-  **Tres vistes** (`LLIB_VIEW`), perquè amb 11 llibres una graella alumnes × llibres no cap al
-  mòbil: *Llibres* (targeta per llibre amb «🏠 N a casa · ✅ N/N tornats» i barra; clic → graella
-  d'alumnes de la classe), *Per alumne* (clic a un alumne → els seus 11 llibres) i *A casa* (els
-  que encara no s'han tornat, **agrupats per classe** i, dins de cada classe, els que fa més dies
-  primer; a partir de `LLIB_DIES_AVIS`=15 dies el comptador surt en vermell, i hi ha «Copia qui té
-  llibres a casa»). Marcar «tornat» des de *A casa* **treu només aquella fila** (no repinta la
-  secció: si no, saltava a dalt de tot a cada marca).
-  **Avís a la portada** (`buildLlibresPanel`, dins `renderDash`): «Llibres per reclamar», els que
-  fa ≥`LLIB_DIES_AVIS` dies que són a casa. Només de **la meva classe** (`TUTOR_CLASS[ME]`):
-  cadascú reclama els seus. Si la lletra no es troba a `STATE.students` (§13: pendent de confirmar
-  2nA/B/C), ensenya **totes** les classes, ho diu al títol i posa el xip de classe a cada fila.
-  Topall de `LLIB_PANEL_MAX`=6 files + «i N llibres més», perquè un descuit de mig trimestre no
-  ompli la portada. Cada fila porta la casella ✓ per marcar-lo **tornat sense sortir de la
-  portada** (com les tasques pendents); el clic obre la vista *A casa* de l'eina.
-  `LLIB_NAV` fa el mateix paper que `PROG_NAV`: sense ell, `openSection` reiniciava `LLIB_VIEW`
-  en entrar a `eines` des de fora i el clic de l'avís aterrava sempre a la llista de llibres.
-  Funcions: `renderLlibres` + `renderLlibres{Llista,Config,Book,Alumnes,Alumne,Casa}`,
-  `llibDades/llibTitols/llibMarca/llibEstat/llibCompta/llibComptaAlumne/llibPendents/llibToggle/
-  llibCheck/llibDies/llibAvui/llibFmtDia/llibTextPendents`. Estat: `LLIB_VIEW`, `LLIB_BOOK`,
-  `LLIB_CLASS`, `LLIB_ALUMNE`, `LLIB_CONFIG`.
+  sembra; la primera edició la materialitza. Treure un títol **no** toca els cicles que ja el
+  tinguin assignat (`llibTitol` d'un id que ja no hi és diu «(llibre tret de la llista)»).
+  **La vista** és UNA de sola (ja no calen tres): selector de cicle a dalt (amb «falten N» /
+  «tots tornats» / «sense repartir»), els dos comptadors (Repartits X/total · Tornats X/repartits),
+  les dates, pestanyes de classe amb `(tornats/repartits)` i, a sota, una fila per alumne amb el
+  **botó del llibre** (`llibTriaLlibre`, modal que marca els que ja ha tingut en ALTRES cicles i
+  el que té ara, i permet treure'l) i la casella ✅ de tornat (desactivada si no té llibre).
+  Marcar tornat **no repinta la secció**: actualitza els comptadors i la pestanya a mà, per no
+  perdre el punt on ets.
+  **«Reparteix els N que falten»**: `llibReparteix(cicle, classe)` dona un llibre a qui no en té,
+  **sense repetir-li cap que ja hagi tingut en un altre cicle** (`llibJaTingut`) i repartint les
+  còpies el més igualades possible dins la classe. **No toca els que ja en tenen** i no surt si no
+  falta ningú. Si ja els ha tingut tots, repeteix (val més això que deixar-lo sense).
+  **Avís a la portada** (`buildLlibresPanel`, dins `renderDash`), amb tres motius per ordre:
+  (1) **vençut** — ja tocava recollir-los i en falten → insisteix cada dia, amb els dies de retard;
+  (2) **toca** — avui és el dia de donar-los o de recollir-los; (3) **per repartir** — el dia de
+  donar-los ja ha arribat i encara queda gent sense llibre, **només mentre el cicle és viu** (si ja
+  ha passat el dia de recollir no té sentit repartir-ne més). Si no es compleix cap, no surt res.
+  Només de **la meva classe** (`TUTOR_CLASS[ME]`): cadascú reclama els seus. Si la lletra no es
+  troba a `STATE.students` (§13: pendent de confirmar 2nA/B/C), ensenya **totes** les classes, ho
+  diu al títol i posa el xip de classe a cada fila. Topall de `LLIB_PANEL_MAX`=6 files + «i N
+  alumnes més». Cada fila porta la casella ✓ per marcar-lo **tornat sense sortir de la portada**
+  (crida `refreshHome()`, no `renderDash()`: si no, la rajola de la portada es quedava amb el
+  número vell — el mateix bug que va sortir als avisos). El clic obre l'eina **al cicle i la classe
+  bons**; `LLIB_NAV` fa el mateix paper que `PROG_NAV`.
+  **El cicle «d'ara»** (`llibCicleActual`) és el primer que encara té llibres sense tornar i, si
+  tots estan tancats, l'últim. Així un llibre que no torna mai no deixa que el cicle vell
+  desaparegui de la vista.
+  Funcions: `renderLlibres` + `renderLlibres{Buit,Cicle,Config}`, `llibCicleNou`, `llibTriaLlibre`,
+  `llibDades/llibTitols/llibTitol/llibClasses/llibAvui/llibDies/llibFmtDia/llibCicles/llibCicle/
+  llibCicleActual/llibAlu/llibFalten/llibComptaCicle/llibJaTingut/llibDiesDeRetard/llibTextFalten/
+  llibReparteix`. Estat: `LLIB_CICLE`, `LLIB_CLASS`, `LLIB_CONFIG`, `LLIB_NAV`.
   ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
-  abans. Casos `llibTitols` i `llibSet` al `doPost`: ✅ al `.gs` i Web App redesplegat (08-10-2026).
+  abans. Casos `llibTitols`, `llibCicleSet`, `llibAlumne` i `llibCicleDelete` al `doPost`: cal el
+  `.gs` actualitzat i **un desplegament nou del Web App** (§11). El `llibSet` d'abans ja no hi és;
+  les dades velles de `llibres.marques` segueixen a Firestore però ja no es llegeixen.
 - **Gestió de grups** (secció pròpia `grups`, píndola al costat de Programació): tres coses.
   Model: `STATE.grups = {etiquetes, marques, notes, noms, conjunts}` (§5).
   1. **Marques a tenir en compte en fer els grups.** Etiquetes sembrades a `GRUP_ETIQ_SEED`:
@@ -624,6 +640,8 @@ reinstal·lar la PWA per veure els canvis.
   ```bash
   npm i playwright-core && npx playwright install chromium   # un sol cop
   node scripts/prova_navegador.js                            # captures a .qa/
+  # si ja hi ha un Chromium al sistema (o la versió no lliga amb la de playwright-core):
+  CHROMIUM=/ruta/al/chrome node scripts/prova_navegador.js
   ```
   Segur per disseny: a `127.0.0.1` l'app fa servir **`coord_proves`** (§3), mai la de
   producció, i el script a més **talla tota la sortida a internet** i sembra una còpia

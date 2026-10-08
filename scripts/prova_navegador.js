@@ -67,11 +67,15 @@ const ESTAT = {
   autoritzacions:{},
   students: { '2nA':['Anna Puig','Bru Soler'], '2nB':['Cesc Mir'], '2nC':['Dídac Roca','Emma Vila','Anna Puig'] },
   flags: {},
-  llibres: { titols: [], marques: {
-    '2nC|Dídac Roca': { l01: { e: fa(30) } },            // 30 dies a casa → s'ha de reclamar
-    '2nC|Emma Vila':  { l02: { e: fa(5) } },             // només 5: encara no
-    '2nA|Anna Puig':  { l03: { e: fa(40), r: fa(2) } },  // ja tornat
-  } },
+  llibres: { titols: [], cicles: [
+    /* un cicle que s'havia de recollir fa 6 dies i encara en falten dos (§9) */
+    { id:'lc1', nom:'Llibres 1 · La tardor', dona: fa(20), recull: fa(6), alumnes: {
+      '2nC|Dídac Roca': { llibre:'l01' },                   // no l'ha tornat → s'ha de reclamar
+      '2nC|Emma Vila':  { llibre:'l02', tornat: fa(6) },    // tornat el dia que tocava
+      '2nC|Anna Puig':  { llibre:'l03' },                   // tampoc
+      '2nA|Bru Soler':  { llibre:'l04' },                   // d'una altra classe: no és cosa meva
+    } },
+  ] },
   grups: { etiquetes: [], marques: { '2nC|Dídac Roca': { pi:true } },
     notes: { '2nC|Emma Vila': 'No la posis amb en Dídac' },
     noms: { '2nC|Anna Puig': 'Anna P.' },               // nom corregit (§9)
@@ -224,27 +228,51 @@ const igual = (a, b, q) => { const x=JSON.stringify(a), y=JSON.stringify(b);
   igual(await page.locator('#avisBtn .avis-badge').count(), 0, 'sense comptador');
   cal(await page.locator('#bento .tile').count() >= 10, 'la resta de la portada, intacta');
 
-  console.log('\n8. Llibres per reclamar (avís de la portada)');
-  const pll = page.locator('.hpanel').filter({ hasText:'Llibres per reclamar' });
+  console.log('\n8. Llibres per tornar (avís de la portada)');
+  const pll = page.locator('.hpanel').filter({ hasText:'Llibres per tornar' });
   igual(await pll.count(), 1, 'el panell hi és');
-  cal(/Dídac Roca/.test(await pll.textContent()), 'amb en Dídac (30 dies)');
-  cal(!/Emma Vila/.test(await pll.textContent()), 'i NO l’Emma (només 5 dies)');
-  cal(/30 dies/.test(await pll.textContent()), 'diu els dies');
+  const txtLl = await pll.textContent();
+  cal(/Dídac Roca/.test(txtLl), 'amb en Dídac, que no l’ha tornat');
+  cal(/Anna P\./.test(txtLl), 'i l’Anna, amb el nom CORREGIT');
+  cal(!/Emma Vila/.test(txtLl), 'i NO l’Emma, que sí que l’ha tornat');
+  cal(!/Bru Soler/.test(txtLl), 'ni en Bru, que és de 2nA (cadascú reclama els seus)');
+  cal(/6 dies tard/.test(txtLl), 'diu els dies de retard');
+  igual(await pll.locator('.hpanel-count').textContent(), '2', 'el comptador diu 2');
+  /* marcar-ne un de tornat des de la portada */
+  await pll.locator('.hrow').first().locator('.hbox').click();
+  await page.waitForTimeout(700);
+  igual(await page.locator('.hpanel').filter({ hasText:'Llibres per tornar' })
+    .locator('.hpanel-count').textContent(), '1', 'el comptador baixa a 1 sense sortir de la portada');
 
   console.log('\n9. L’eina de llibres');
   await page.locator('#bento .tile').filter({ hasText:'Eines' }).click();
   await page.waitForTimeout(500);
   await page.locator('.subtheme-card').filter({ hasText:'Registre llibres a casa' }).click();
   await page.waitForTimeout(500);
-  igual(await page.locator('.llib-card').count(), 11, 'les 11 targetes de llibre');
-  cal(/A casa \(2\)/.test(await page.locator('.prog-segbtn').nth(2).textContent()), 'la pestanya «A casa (2)»');
-  await page.locator('.prog-segbtn').nth(2).click();
+  igual(await page.locator('.llib-ciclesel option').count(), 1, 'un cicle al selector');
+  cal(/falten 2/.test(await page.locator('.llib-ciclesel').textContent()), 'i diu que en falten 2');
+  igual(await page.locator('.att-tab').count(), 3, 'les 3 pestanyes de classe');
+  cal(/^2nC \(2\/3\)/.test(await page.locator('.att-tab.on').textContent()), 'per defecte la del tutor (2nC), 2 de 3 tornats');
+  igual(await page.locator('.aut-fila').count(), 3, 'els 3 alumnes de 2nC');
+  igual(await page.locator('.llib-pick').count(), 3, 'cada un amb el seu botó de llibre');
+  cal(/Tumbili/.test(await page.locator('.llib-pick').first().textContent()), 'en Dídac té el Tumbili');
+  igual(await page.locator('.aut-resum span').allTextContents(), ['4/6', '2/4'], 'repartits 4/6, tornats 2/4');
+  /* canviar-li el llibre amb el modal de tria */
+  await page.locator('.llib-pick').first().click();
   await page.waitForTimeout(400);
-  igual(await page.locator('.llib-pend-row').count(), 2, '2 llibres a casa');
-  igual(await page.locator('.llib-pend-row .d.alerta').count(), 1, 'un en vermell (passa dels 15 dies)');
-  await page.locator('.llib-pend-row').first().locator('.llib-check').click();
-  await page.waitForTimeout(700);
-  igual(await page.locator('.llib-pend-row').count(), 1, 'marcant-ne un tornat, queda 1 fila');
+  igual(await page.locator('.llib-tria-op').count(), 11, 'el modal ensenya els 11 títols');
+  igual(await page.locator('.llib-tria-op.on').count(), 1, 'el que té ara surt marcat');
+  await page.locator('.llib-tria-op').nth(5).click();
+  await page.waitForTimeout(800);
+  cal(/En Ton i la Neus/.test(await page.locator('.llib-pick').first().textContent()), 'li canvia el llibre');
+  /* marcar tornada la que encara no l'ha tornat */
+  const filaA = page.locator('.aut-fila').filter({ hasText:'Anna P.' });
+  igual(await filaA.count(), 1, 'l’Anna hi és, amb el nom corregit');
+  await filaA.locator('.llib-check').click();
+  await page.waitForTimeout(600);
+  igual(await page.locator('.aut-resum span').allTextContents(), ['4/6', '3/4'], 'el comptador de tornats puja');
+  cal(/^2nC \(3\/3\)/.test(await page.locator('.att-tab.on').textContent()), 'i la pestanya de classe també');
+  await page.locator('#section').screenshot({ path: path.join(QA, 'llibres-cicle.png') });
 
   console.log('\n10. Gestió de grups');
   await page.locator('#homeBtn').click();
