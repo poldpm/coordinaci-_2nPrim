@@ -4,6 +4,11 @@ Codi_AppsScript.gs
 # Configuració local de Claude Code (permisos d'aquesta màquina, no compartir)
 .claude/settings.local.json
 
+# Dependencia NOMES de la prova en navegador (scripts/prova_navegador.js)
+node_modules/
+package-lock.json
+package.json
+
 # Fitxers temporals
 .DS_Store
 Thumbs.db

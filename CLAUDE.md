@@ -104,9 +104,13 @@ manifest.webmanifest     ← PWA
 .nojekyll                ← perquè GitHub Pages no "processi" res
 img/                     ← favicons + icones (3 pals) + logo.webp (hero, extern, ~182 KB)
 fitxes/                  ← 36 PDF imprimibles del Racó dels reptes (Fitxa_<CODI>_BN.pdf)
+scripts/                 ← eines de desenvolupament (NO van dins l'app):
+                           gen_fb_apply.js (copia _apply del .gs a index.html, §3)
+                           gen_prog_seed.js · gen_reptes_seed.js · gen_nfc_doc.js (§8, §9)
+                           validate.sh · prova_navegador.js (prova en Chromium real, §12)
 Codi_AppsScript.gs       ← BACKEND. NO va MAI a GitHub (veure §10). Local + Apps Script.
 CLAUDE.md                ← aquest fitxer
-.gitignore               ← exclou Codi_AppsScript.gs de git
+.gitignore               ← exclou Codi_AppsScript.gs, node_modules/ i .qa/ de git
 ```
 
 ## 5. Model de dades (`STATE`)
@@ -613,6 +617,22 @@ reinstal·lar la PWA per veure els canvis.
   ```
   La prova definitiva: executar `node scripts/gen_fb_apply.js` i comprovar que
   `git diff --quiet index.html` no detecta cap canvi.
+- **Prova en navegador de debò** (`scripts/prova_navegador.js`): obre `index.html` en un
+  Chromium real servit des de `127.0.0.1` i hi clica a sobre (portada, avisos, llibres,
+  gestió de grups). És l'única prova que veu **CSS i mides**, i per això val la pena
+  passar-la quan toques res de la portada o de la presentació:
+  ```bash
+  npm i playwright-core && npx playwright install chromium   # un sol cop
+  node scripts/prova_navegador.js                            # captures a .qa/
+  ```
+  Segur per disseny: a `127.0.0.1` l'app fa servir **`coord_proves`** (§3), mai la de
+  producció, i el script a més **talla tota la sortida a internet** i sembra una còpia
+  local. ⚠️ `node_modules/` i `package*.json` estan al `.gitignore`: la dependència és
+  **només** d'aquesta prova i el projecte segueix sense build.
+  Ja ha trobat dos bugs que les proves de taula no podien veure: la banda d'avisos es
+  quedava amb el comptador vell en marcar-ne un de llegit (es repintava `renderDash` i no
+  el bento), i les files de nota buides de Gestió de grups es veien igualment
+  (`display:flex` guanya a `[hidden]{display:none}`).
 - Cada canvi: edició petita i incremental, validar, i (si escau) provar la lògica
   de dates amb un mini-script de node abans de donar-ho per bo.
 
