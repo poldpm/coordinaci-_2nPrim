@@ -107,7 +107,10 @@ fitxes/                  ← 36 PDF imprimibles del Racó dels reptes (Fitxa_<CO
 scripts/                 ← eines de desenvolupament (NO van dins l'app):
                            gen_fb_apply.js (copia _apply del .gs a index.html, §3)
                            gen_prog_seed.js · gen_reptes_seed.js · gen_nfc_doc.js (§8, §9)
-                           validate.sh · prova_navegador.js (prova en Chromium real, §12)
+                           prova.sh (ho passa TOT) · validate.sh (sintaxi)
+                           prova_comu.js (bastida compartida de les proves de taula)
+                           prova_llibres.js · prova_grups.js · prova_avisos.js (jsdom)
+                           prova_navegador.js (Chromium real) — tot plegat a §12
 Codi_AppsScript.gs       ← BACKEND. NO va MAI a GitHub (veure §10). Local + Apps Script.
 CLAUDE.md                ← aquest fitxer
 .gitignore               ← exclou Codi_AppsScript.gs, node_modules/ i .qa/ de git
@@ -640,7 +643,8 @@ reinstal·lar la PWA per veure els canvis.
 - **Tota la informació es desa al Google Sheets.** localStorage només per a la
   còpia optimista i la cua `PENDING`. Mai com a magatzem principal.
 - **Sense frameworks**, sense build. Un sol `index.html`.
-- **Validació obligatòria a cada canvi** (fes-ho sempre):
+- **Validació obligatòria a cada canvi** (el camí curt és `bash scripts/prova.sh`;
+  a mà, si no tens Node per al llançador):
   ```bash
   # Frontend: extreu els <script> sense src i comprova sintaxi
   python3 - <<'PY'
@@ -669,24 +673,43 @@ reinstal·lar la PWA per veure els canvis.
   ```
   La prova definitiva: executar `node scripts/gen_fb_apply.js` i comprovar que
   `git diff --quiet index.html` no detecta cap canvi.
-- **Prova en navegador de debò** (`scripts/prova_navegador.js`): obre `index.html` en un
-  Chromium real servit des de `127.0.0.1` i hi clica a sobre (portada, avisos, llibres,
-  gestió de grups). És l'única prova que veu **CSS i mides**, i per això val la pena
-  passar-la quan toques res de la portada o de la presentació:
+- **Les proves** viuen a `scripts/` i van a git, perquè sobrevisquin a canviar
+  d'ordinador. Un sol llançador ho passa tot:
   ```bash
-  npm i playwright-core && npx playwright install chromium   # un sol cop
-  node scripts/prova_navegador.js                            # captures a .qa/
+  npm i jsdom playwright-core && npx playwright install chromium   # un sol cop
+  bash scripts/prova.sh
   # si ja hi ha un Chromium al sistema (o la versió no lliga amb la de playwright-core):
-  CHROMIUM=/ruta/al/chrome node scripts/prova_navegador.js
+  CHROMIUM=/ruta/al/chrome bash scripts/prova.sh
   ```
-  Segur per disseny: a `127.0.0.1` l'app fa servir **`coord_proves`** (§3), mai la de
-  producció, i el script a més **talla tota la sortida a internet** i sembra una còpia
-  local. ⚠️ `node_modules/` i `package*.json` estan al `.gitignore`: la dependència és
-  **només** d'aquesta prova i el projecte segueix sense build.
-  Ja ha trobat dos bugs que les proves de taula no podien veure: la banda d'avisos es
-  quedava amb el comptador vell en marcar-ne un de llegit (es repintava `renderDash` i no
-  el bento), i les files de nota buides de Gestió de grups es veien igualment
-  (`display:flex` guanya a `[hidden]{display:none}`).
+  `prova.sh` fa, per ordre: la sintaxi (`validate.sh`), la comparació de casos entre el
+  `.gs` i el web, les tres **proves de taula** i la **prova en navegador**. Si el `.gs`
+  no és en aquesta còpia (és fora de git) ho diu i segueix, en comptes de petar.
+  - **Proves de taula** (jsdom, `prova_llibres.js` · `prova_grups.js` · `prova_avisos.js`,
+    amb la bastida compartida a `prova_comu.js`): executen el codi **REAL** d'`index.html`
+    —se'n retalla el tros amb `tros()`— dins d'un DOM de mentida. Proven la lògica, el
+    pintat i els clics. Cada una comprova també que **`fbApply` acabi exactament igual
+    que l'aplicació local** i que reenviar el lot no dupliqui res.
+    ⚠️ Els dobles de l'`api` han de fer servir **els mateixos noms de camp** que l'api de
+    debò: enviar `etiq` on l'app envia `etiqueta` fa que el backend esborri coses que no
+    toquen. La comprovació de `fbApply` és justament per enxampar-ho (i ho va fer).
+    ⚠️ Les `let`/`const` de dins d'un `eval` **no surten** al nostre àmbit (les funcions
+    sí): per mirar o tocar una variable d'estat s'hi deixa una finestreta (`global.V`).
+  - **Prova en navegador** (`prova_navegador.js`): obre `index.html` en un Chromium real
+    servit des de `127.0.0.1` i hi clica a sobre. És l'**única que veu CSS i mides**, i
+    deixa captures a `.qa/`. Segur per disseny: a `127.0.0.1` l'app fa servir
+    **`coord_proves`** (§3), mai la de producció, i el script **talla tota la sortida a
+    internet** i sembra una còpia local.
+  ⚠️ `node_modules/` i `package*.json` estan al `.gitignore`: les dependències són
+  **només** de les proves i el projecte segueix **sense build**.
+  Bugs que han enxampat i que les altres no podien veure:
+  - la banda d'avisos es quedava amb el comptador vell en marcar-ne un de llegit
+    (es repintava `renderDash` i no el bento);
+  - les files de nota buides de Gestió de grups es veien igualment
+    (`display:flex` guanya a `[hidden]{display:none}`);
+  - el compositor d'avisos es quedava obert després de publicar, perquè el guard mirava
+    si **qualsevol** element tenia el focus i el navegador el dona al botó que cliques;
+  - assignar un llibre repintava la secció sencera (§9): saltava a dalt de tot i
+    pampalluguejava. La prova marca `.aut-taula` i comprova que segueixi sent la mateixa.
 - Cada canvi: edició petita i incremental, validar, i (si escau) provar la lògica
   de dates amb un mini-script de node abans de donar-ho per bo.
 
