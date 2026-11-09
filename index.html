@@ -3205,6 +3205,11 @@ function askConfirm(message, onYes, opts){
   $('#confirmTitle').textContent=opts.title||'Segur que ho vols esborrar?';
   $('#confirmMsg').textContent=message||'Aquesta acció no es pot desfer.';
   $('#confirmYes').textContent=opts.confirmLabel||'Esborra';
+  /* Gairebé sempre és per esborrar (per això la paperera i el botó vermell), però
+     no sempre: amb `icon` i `danger:false` serveix per a qualsevol confirmació.
+     Com que el modal és un sol element compartit, cal tornar-ho a posar cada cop. */
+  $('#confirm').querySelector('.modal-ico').textContent=opts.icon||'🗑️';
+  $('#confirmYes').className='btn '+(opts.danger===false ? 'btn-primary' : 'btn-danger');
   _confirmCb=onYes;
   $('#confirm').classList.add('open');
   if(_desmuntaConfirm) _desmuntaConfirm();
@@ -3448,11 +3453,19 @@ function obreAvisAmbComentaris(e){
 function renderAvisosHome(focusComp){
   const w=$('#avisWrap'), blk=$('#avisBlock');
   if(!w || !blk) return;
-  /* Mai esborris una resposta a mig escriure: si el focus és aquí dins, no toquis res
-     (l'estat ja està actualitzat i es veurà al proper repintat). */
+  /* Mai esborris una resposta a mig escriure: si el focus és en un CAMP de text d'aquí
+     dins, no toquis res (l'estat ja està actualitzat i es veurà al proper repintat).
+     ⚠️ Ha de ser només un camp de text, no qualsevol element: en clicar un botó, el
+     navegador li dona el focus, i amb la comprovació ampla el repintat que ve just
+     després del clic no es feia mai — el compositor es quedava obert després de
+     publicar i la targeta es quedava amb l'avís que acabaves de marcar com a llegit
+     (bug real, el va enxampar la prova en Chromium). */
   if(!focusComp){
     const ae=document.activeElement;
-    if(ae && ae!==document.body && w.contains(ae)) return;
+    if(ae && ae!==document.body && w.contains(ae)){
+      const t=(ae.tagName||'').toLowerCase();
+      if(t==='input' || t==='textarea' || ae.isContentEditable) return;
+    }
   }
   const card=buildAvisosPanel();
   w.innerHTML='';
@@ -3587,6 +3600,9 @@ function avisComposer(e){
     if(entryHasUnseenComments(e.id)) await api.commentSeen(e.id);
     await api.commentAdd(e.id, {id:uid(), author:ME, text:txt, createdAt:nowISO(),
       resolved:false, replies:[], seenBy:[ME]});
+    /* treu el focus del camp abans de repintar: si no, amb ⌘/Ctrl+Enter el guard de
+       dalt veuria el textarea amb el focus i el compositor es quedaria obert */
+    try{ ta.blur(); }catch(_){}
     AVIS_REPLY=null; AVIS_DRAFT='';
     refreshHome(); toast('Resposta publicada');
   };
@@ -6543,31 +6559,32 @@ function llibReparteix(cicle, cls){
   return canvis;
 }
 /* Tria de llibre per a un alumne, marcant els que ja ha tingut */
-function llibTriaLlibre(cicle, cls, nom, fet){
-  const ja=llibJaTingut(cls,nom,cicle.id), actual=llibAlu(cicle,cls,nom).llibre;
+/* El modal de tria de llibre. El comparteixen la tria d'UN alumne i la de tota la classe. */
+function llibModalTria(o){
   const modal=el('div','modal open');
   const scrim=el('div','scrim'); modal.appendChild(scrim);
   const box=el('div','modal-box llib-tria');
-  const h=el('h3'); h.textContent='Quin llibre li toca?';
+  const h=el('h3'); h.textContent=o.titol;
   box.innerHTML='<div class="modal-ico">📚</div>';
   box.appendChild(h);
-  const qui=el('p'); qui.textContent=stMostra(cls,nom); box.appendChild(qui);
+  const qui=el('p'); qui.textContent=o.qui; box.appendChild(qui);
   const llista=el('div','llib-tria-list');
+  const ja=o.ja||{};
   llibTitols().forEach(t=>{
-    const b=el('button','llib-tria-op'+(ja[t.id]?' ja':'')+(actual===t.id?' on':'')); b.type='button';
+    const b=el('button','llib-tria-op'+(ja[t.id]?' ja':'')+(o.actual===t.id?' on':'')); b.type='button';
     const n=el('span','n'); n.textContent=t.nom; b.appendChild(n);
     if(ja[t.id]){ const x=el('span','x'); x.textContent='ja el va tenir'; b.appendChild(x); }
-    else if(actual===t.id){ const x=el('span','x'); x.textContent='el que té ara'; b.appendChild(x); }
-    b.onclick=async()=>{ tanca(); await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:t.id}); if(fet) fet(); };
+    else if(o.actual===t.id){ const x=el('span','x'); x.textContent='el que té ara'; b.appendChild(x); }
+    b.onclick=()=>{ tanca(); o.onTria(t.id); };
     llista.appendChild(b);
   });
   box.appendChild(llista);
   const acts=el('div','modal-actions');
   const no=el('button','btn btn-ghost'); no.type='button'; no.textContent='Cancel·la';
   acts.appendChild(no);
-  if(actual){
+  if(o.onTreu){
     const treu=el('button','btn btn-danger'); treu.type='button'; treu.textContent='Treu-li el llibre';
-    treu.onclick=async()=>{ tanca(); await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:null, tornat:null}); if(fet) fet(); };
+    treu.onclick=()=>{ tanca(); o.onTreu(); };
     acts.appendChild(treu);
   }
   box.appendChild(acts);
@@ -6576,6 +6593,42 @@ function llibTriaLlibre(cicle, cls, nom, fet){
   const tanca=()=>{ desmunta(); modal.remove(); };
   no.onclick=tanca; scrim.onclick=tanca;
   desmunta=wireModal(box, tanca, h);
+}
+/* Tria per a UN alumne */
+function llibTriaLlibre(cicle, cls, nom, fet){
+  const actual=llibAlu(llibCicle(cicle.id)||cicle, cls, nom).llibre;
+  llibModalTria({
+    titol:'Quin llibre li toca?',
+    qui:stMostra(cls,nom),
+    ja:llibJaTingut(cls,nom,cicle.id),
+    actual:actual,
+    onTria:async id=>{ await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:id}); if(fet) fet(); },
+    onTreu:actual ? async()=>{ await api.llibAlumne(cicle.id, stKey(cls,nom), {llibre:null, tornat:null}); if(fet) fet(); } : null,
+  });
+}
+/* Tria per a TOTA la classe: el cas normal, perquè sovint llegeixen tots el mateix llibre.
+   Si algú ja en té un altre en aquest cicle, es demana abans de canviar-l'hi. */
+function llibTriaPerTots(cicle, cls, fet){
+  const roster=STATE.students[cls]||[];
+  if(!roster.length) return;
+  llibModalTria({
+    titol:'El mateix llibre per a tota la classe',
+    qui:cls+' · '+roster.length+' '+plural(roster.length,'alumne','alumnes'),
+    onTria:id=>{
+      const c=llibCicle(cicle.id)||cicle;
+      const altres=roster.filter(n=>{ const a=llibAlu(c,cls,n); return a.llibre && a.llibre!==id; });
+      const posa=async()=>{
+        for(const n of roster) await api.llibAlumne(cicle.id, stKey(cls,n), {llibre:id});
+        if(fet) fet();
+        toast(roster.length+' amb «'+llibTitol(id)+'»');
+      };
+      if(altres.length) askConfirm(
+        altres.length+' '+plural(altres.length,'alumne ja té','alumnes ja tenen')+' un altre llibre en aquest cicle. '
+        +'Els hi canviem tots per «'+llibTitol(id)+'»?',
+        posa, {title:'El mateix per a tothom', confirmLabel:'Canvia’ls', icon:'📚', danger:false});
+      else posa();
+    },
+  });
 }
 
 function renderLlibres(S){
@@ -6645,17 +6698,19 @@ function llibCicleNou(){
 /* ---- Un cicle: repartir, marcar tornats ---- */
 function renderLlibresCicle(S, cicle){
   const classes=llibClasses();
+  /* repinta() = tornar a pintar la secció sencera. Això fa dues coses que molesten:
+     animateIn() puja la pàgina a dalt de tot amb un scroll suau i torna a fer el
+     fos d'entrada de tot. Per això NOMÉS es fa servir quan de debò canvia el que
+     es mira (de classe o de cicle). Assignar o treure un llibre refresca la FILA i
+     els comptadors, i prou. (Bug real: amb 25 nens, cada llibre et tornava a dalt
+     de tot, la pantalla pampalluguejava i al cap d'uns quants es feia inservible.) */
   const repinta=()=>openSection('eines');
-  const f=llibComptaCicle(cicle);
+  const ara=()=>llibCicle(cicle.id)||cicle;     // l'objecte viu, després de desar
 
-  /* Resum + dates */
+  /* Resum */
   const top=el('div','aut-top');
-  const r1=el('div','aut-resum'+(f.assignats&&!f.falten?' ple':''));
-  r1.innerHTML='<b>Repartits</b><span>'+f.assignats+'/'+f.total+'</span>';
-  top.appendChild(r1);
-  const r2=el('div','aut-resum'+(f.assignats&&!f.falten?' ple':''));
-  r2.innerHTML='<b>Tornats</b><span>'+f.tornats+'/'+f.assignats+'</span>';
-  top.appendChild(r2);
+  const r1=el('div','aut-resum'); top.appendChild(r1);
+  const r2=el('div','aut-resum'); top.appendChild(r2);
   S.appendChild(top);
 
   const dates=el('div','llib-dates-row');
@@ -6666,12 +6721,12 @@ function renderLlibresCicle(S, cicle){
     i.onchange=()=>onCanvi(i.value);
     w.appendChild(i); return w;
   };
-  dates.appendChild(camp('Es donen el', cicle.dona, v=>api.llibCicleSet(cicle.id,{dona:v}).then(repinta)));
-  dates.appendChild(camp('Es recullen el', cicle.recull, v=>api.llibCicleSet(cicle.id,{recull:v}).then(repinta)));
+  dates.appendChild(camp('Es donen el', cicle.dona, v=>api.llibCicleSet(cicle.id,{dona:v}).then(()=>refrescaCaps())));
+  dates.appendChild(camp('Es recullen el', cicle.recull, v=>api.llibCicleSet(cicle.id,{recull:v}).then(()=>refrescaCaps())));
   const ren=el('button','btn btn-ghost'); ren.type='button'; ren.textContent='✏️ Nom';
   ren.onclick=()=>askPrompt({icon:'✏️', title:'Nom del cicle', value:cicle.nom||'', confirmLabel:'Desa', errorMsg:'Posa-hi un nom.'}, val=>{
     const n=String(val||'').trim(); if(!n) return false;
-    api.llibCicleSet(cicle.id,{nom:n}).then(repinta);
+    api.llibCicleSet(cicle.id,{nom:n}).then(()=>refrescaCaps());
   });
   dates.appendChild(ren);
   const esb=el('button','btn btn-ghost llib-esb'); esb.type='button'; esb.textContent='🗑 Esborra';
@@ -6687,44 +6742,13 @@ function renderLlibresCicle(S, cicle){
   classes.forEach(c=>{
     const t=el('button','att-tab'+(c===LLIB_CLASS?' on':'')); t.type='button';
     if(c===LLIB_CLASS){ const cc=classColor(c); t.style.background=cc; t.style.borderColor=cc; t.style.color='#fff'; }
-    const roster=STATE.students[c]||[];
-    const tor=roster.filter(n=>{ const a=llibAlu(cicle,c,n); return a.llibre && a.tornat; }).length;
-    const asg=roster.filter(n=>llibAlu(cicle,c,n).llibre).length;
-    t.textContent=c+' ('+tor+'/'+asg+')';
-    t.title=c+': '+tor+' tornats de '+asg+' repartits';
-    t.onclick=()=>{ LLIB_CLASS=c; repinta(); };
+    t.dataset.cls=c;
+    t.onclick=()=>{ if(c===LLIB_CLASS) return; LLIB_CLASS=c; repinta(); };
     selRow.appendChild(t);
   });
   S.appendChild(selRow);
 
-  /* Repartiment automàtic */
-  const roster=STATE.students[LLIB_CLASS]||[];
-  const senseLlibre=roster.filter(n=>!llibAlu(cicle,LLIB_CLASS,n).llibre).length;
   const bar=el('div','att-actions');
-  if(senseLlibre){
-    const rep=el('button','btn btn-primary'); rep.type='button';
-    rep.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg>'
-      +(senseLlibre===1 ? 'Reparteix el que falta' : 'Reparteix els '+senseLlibre+' que falten');
-    rep.title='Dona un llibre a qui no en té, sense repetir-li cap que ja hagi tingut';
-    rep.onclick=async()=>{
-      rep.disabled=true;
-      const canvis=llibReparteix(cicle, LLIB_CLASS);
-      for(const c of canvis) await api.llibAlumne(cicle.id, stKey(LLIB_CLASS,c.nom), {llibre:c.llibre});
-      repinta(); toast(canvis.length+' '+plural(canvis.length,'llibre repartit','llibres repartits'));
-    };
-    bar.appendChild(rep);
-  }
-  const cp=el('button','btn btn-ghost'); cp.type='button';
-  cp.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui falta';
-  cp.onclick=async()=>{
-    await refrescaEstat();
-    const txt=llibTextFalten(llibCicle(cicle.id)||cicle);
-    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
-    const caixa=S.querySelector('.att-result') || el('div','att-result');
-    caixa.innerHTML=''; const pre=el('pre'); pre.textContent=txt; caixa.appendChild(pre);
-    if(!caixa.parentNode) S.appendChild(caixa);
-  };
-  bar.appendChild(cp);
   S.appendChild(bar);
 
   const hint=el('div','att-info');
@@ -6732,51 +6756,110 @@ function renderLlibresCicle(S, cicle){
   hint.appendChild(h); S.appendChild(hint);
 
   /* La graella: alumne · llibre · tornat */
+  const roster=STATE.students[LLIB_CLASS]||[];
   const taula=el('div','aut-taula');
+  const files=[];
+  S.appendChild(taula);
+
+  /* --- refrescos en VIU, sense tornar a pintar la secció --- */
+  const refrescaCaps=()=>{                 // comptadors, pestanyes i selector de cicle
+    const c=ara(), f=llibComptaCicle(c);
+    const ple=f.assignats && !f.falten;
+    r1.className='aut-resum'+(ple?' ple':'');
+    r1.innerHTML='<b>Repartits</b><span>'+f.assignats+'/'+f.total+'</span>';
+    r2.className='aut-resum'+(ple?' ple':'');
+    r2.innerHTML='<b>Tornats</b><span>'+f.tornats+'/'+f.assignats+'</span>';
+    selRow.querySelectorAll('.att-tab').forEach(t=>{
+      const cls=t.dataset.cls, r=STATE.students[cls]||[];
+      const tor=r.filter(n=>{ const a=llibAlu(c,cls,n); return a.llibre && a.tornat; }).length;
+      const asg=r.filter(n=>llibAlu(c,cls,n).llibre).length;
+      t.textContent=cls+' ('+tor+'/'+asg+')';
+      t.title=cls+': '+tor+' tornats de '+asg+' repartits';
+    });
+    const sel=S.querySelector('.llib-ciclesel');
+    if(sel){ const op=[...sel.options].find(o=>o.value===c.id);
+      if(op) op.textContent=(c.nom||'Cicle')
+        +(f.falten? '  ·  falten '+f.falten : (f.assignats? '  ·  tots tornats' : '  ·  sense repartir')); }
+  };
+  const refrescaTot=()=>{ files.forEach(p=>p()); refrescaCaps(); pintaBarra(); };
+
+  /* --- els botons d'acció (canvien segons quants en falten) --- */
+  const copia=el('button','btn btn-ghost'); copia.type='button';
+  copia.innerHTML='<svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copia qui falta';
+  copia.onclick=async()=>{
+    await refrescaEstat();
+    const txt=llibTextFalten(ara());
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('Copiat!')).catch(()=>{});
+    const caixa=S.querySelector('.att-result') || el('div','att-result');
+    caixa.innerHTML=''; const pre=el('pre'); pre.textContent=txt; caixa.appendChild(pre);
+    if(!caixa.parentNode) S.appendChild(caixa);
+  };
+  function pintaBarra(){
+    bar.innerHTML='';
+    const c=ara();
+    const sense=roster.filter(n=>!llibAlu(c,LLIB_CLASS,n).llibre).length;
+    /* Sovint tota la classe llegeix el MATEIX llibre: per això va primer i destacat. */
+    if(roster.length){
+      const tots=el('button','btn '+(sense?'btn-primary':'btn-ghost')); tots.type='button';
+      tots.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 0 1 2-2h12v15"/><path d="M6 17h12v3H6a2 2 0 0 1 0-3z"/><path d="M8 8h7"/></svg>'
+        +'El mateix per a tota la classe';
+      tots.title='Dona el mateix llibre a tots els alumnes de '+LLIB_CLASS;
+      tots.onclick=()=>llibTriaPerTots(cicle, LLIB_CLASS, refrescaTot);
+      bar.appendChild(tots);
+    }
+    if(sense){
+      const rep=el('button','btn btn-ghost'); rep.type='button';
+      rep.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg>'
+        +(sense===1 ? 'Un de diferent al que falta' : 'Un de diferent a cada un dels '+sense+' que falten');
+      rep.title='Dona un llibre DIFERENT a cada un dels que no en tenen, sense repetir-los cap que ja hagin tingut';
+      rep.onclick=async()=>{
+        rep.disabled=true;
+        const canvis=llibReparteix(ara(), LLIB_CLASS);
+        for(const x of canvis) await api.llibAlumne(cicle.id, stKey(LLIB_CLASS,x.nom), {llibre:x.llibre});
+        refrescaTot();
+        toast(canvis.length+' '+plural(canvis.length,'llibre repartit','llibres repartits'));
+      };
+      bar.appendChild(rep);
+    }
+    bar.appendChild(copia);
+  }
+
   roster.forEach(nom=>{
     const clau=stKey(LLIB_CLASS,nom);
     const fila=el('div','aut-fila');
     const n=el('div','aut-nom'); n.textContent=stMostra(LLIB_CLASS,nom); fila.appendChild(n);
 
     const lb=el('button','llib-pick'); lb.type='button';
-    const pintaLb=()=>{
-      const a=llibAlu(llibCicle(cicle.id)||cicle, LLIB_CLASS, nom);
+    const chk=el('button','llib-check r'); chk.type='button';
+    chk.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+    const pinta=()=>{
+      const a=llibAlu(ara(), LLIB_CLASS, nom);
       lb.classList.toggle('buit', !a.llibre);
       lb.textContent=a.llibre ? llibTitol(a.llibre) : 'Tria un llibre…';
       lb.title=a.llibre ? 'Toca per canviar-lo' : 'Toca per assignar-ne un';
       lb.setAttribute('aria-label', stMostra(LLIB_CLASS,nom)+' · '+(a.llibre?llibTitol(a.llibre):'sense llibre'));
+      chk.disabled=!a.llibre;
+      chk.classList.toggle('on', !!a.tornat);
+      chk.setAttribute('aria-pressed', a.tornat?'true':'false');
+      chk.setAttribute('aria-label', stMostra(LLIB_CLASS,nom)+' · tornat');
+      chk.title=a.tornat ? 'Tornat el '+llibFmtDia(a.tornat) : 'Marca’l com a tornat';
     };
-    pintaLb();
-    lb.onclick=()=>llibTriaLlibre(cicle, LLIB_CLASS, nom, repinta);
-    fila.appendChild(lb);
+    pinta(); files.push(pinta);
 
-    const a0=llibAlu(cicle, LLIB_CLASS, nom);
-    const b=el('button','llib-check r'+(a0.tornat?' on':'')); b.type='button';
-    b.disabled=!a0.llibre;
-    b.title=a0.tornat ? 'Tornat el '+llibFmtDia(a0.tornat) : 'Marca’l com a tornat';
-    b.setAttribute('aria-pressed', a0.tornat?'true':'false');
-    b.setAttribute('aria-label', stMostra(LLIB_CLASS,nom)+' · tornat');
-    b.innerHTML='<svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-    b.onclick=async()=>{
-      const ara=!b.classList.contains('on');
-      b.classList.toggle('on', ara); b.setAttribute('aria-pressed', ara?'true':'false');
-      await api.llibAlumne(cicle.id, clau, {tornat: ara ? llibAvui() : null});
-      b.title=ara ? 'Tornat el '+llibFmtDia(llibAvui()) : 'Marca’l com a tornat';
-      /* comptadors, sense repintar (no perdre el punt on ets) */
-      const c2=llibComptaCicle(llibCicle(cicle.id)||cicle);
-      const sp=S.querySelectorAll('.aut-resum span');
-      if(sp[0]) sp[0].textContent=c2.assignats+'/'+c2.total;
-      if(sp[1]) sp[1].textContent=c2.tornats+'/'+c2.assignats;
-      const tab=[...selRow.querySelectorAll('.att-tab')].find(x=>x.textContent.indexOf(LLIB_CLASS)===0);
-      if(tab){ const cc=llibCicle(cicle.id)||cicle;
-        const tor=roster.filter(x=>{ const y=llibAlu(cc,LLIB_CLASS,x); return y.llibre && y.tornat; }).length;
-        const asg=roster.filter(x=>llibAlu(cc,LLIB_CLASS,x).llibre).length;
-        tab.textContent=LLIB_CLASS+' ('+tor+'/'+asg+')'; }
+    lb.onclick=()=>llibTriaLlibre(cicle, LLIB_CLASS, nom, ()=>{ pinta(); refrescaCaps(); pintaBarra(); });
+    chk.onclick=async()=>{
+      const posa=!chk.classList.contains('on');
+      chk.classList.toggle('on', posa); chk.setAttribute('aria-pressed', posa?'true':'false');
+      await api.llibAlumne(cicle.id, clau, {tornat: posa ? llibAvui() : null});
+      pinta(); refrescaCaps();
     };
-    fila.appendChild(b);
+
+    fila.appendChild(lb); fila.appendChild(chk);
     taula.appendChild(fila);
   });
-  S.appendChild(taula);
+
+  refrescaCaps(); pintaBarra();
 }
 /* ---- La llista de títols ---- */
 function renderLlibresConfig(S){

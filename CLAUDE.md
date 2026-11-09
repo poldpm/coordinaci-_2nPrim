@@ -444,10 +444,23 @@ nom estandarditzat.
   el que té ara, i permet treure'l) i la casella ✅ de tornat (desactivada si no té llibre).
   Marcar tornat **no repinta la secció**: actualitza els comptadors i la pestanya a mà, per no
   perdre el punt on ets.
-  **«Reparteix els N que falten»**: `llibReparteix(cicle, classe)` dona un llibre a qui no en té,
-  **sense repetir-li cap que ja hagi tingut en un altre cicle** (`llibJaTingut`) i repartint les
-  còpies el més igualades possible dins la classe. **No toca els que ja en tenen** i no surt si no
-  falta ningú. Si ja els ha tingut tots, repeteix (val més això que deixar-lo sense).
+  **Dues maneres de repartir** (botons de `pintaBarra`):
+  - **«El mateix per a tota la classe»** (`llibTriaPerTots`, el DESTACAT): sovint tota una classe
+    llegeix el mateix llibre, i aquest és el cas normal. Posa el títol triat a **tots** els alumnes
+    de la classe; si algú ja en té un altre en aquest cicle, ho diu i ho pregunta abans.
+  - **«Un de diferent a cada un dels N que falten»** (`llibReparteix`): dona un llibre a qui no en
+    té, **sense repetir-li cap que ja hagi tingut en un altre cicle** (`llibJaTingut`) i repartint
+    les còpies el més igualades possible. **No toca els que ja en tenen** i no surt si no falta
+    ningú. Si ja els ha tingut tots, repeteix (val més això que deixar-lo sense).
+  Els dos modals de tria són el mateix codi: `llibModalTria(opts)`.
+  ⚠️ **RES de repintar la secció quan s'assigna o es treu un llibre.** `openSection` crida
+  `animateIn`, que fa un **scroll suau a dalt de tot** i torna a fer el fos d'entrada de tota la
+  secció. Amb una classe de 25, cada llibre et tornava a dalt, la pantalla pampalluguejava i al
+  cap d'uns quants es feia inservible (bug real, 09-11-2026). Ara cada fila es refresca sola
+  (`pinta()`) i hi ha `refrescaCaps()` per als comptadors, les pestanyes de classe i el text del
+  selector de cicle. `repinta()` (= `openSection('eines')`) **només** per canviar de classe o de
+  cicle, que és quan de debò canvia el que mires. La prova del repositori ho vigila: marca
+  `.aut-taula` amb un `dataset` i comprova que segueixi sent la mateixa després d'assignar.
   **Avís a la portada** (`buildLlibresPanel`, dins `renderDash`), amb tres motius per ordre:
   (1) **vençut** — ja tocava recollir-los i en falten → insisteix cada dia, amb els dies de retard;
   (2) **toca** — avui és el dia de donar-los o de recollir-los; (3) **per repartir** — el dia de
@@ -463,10 +476,13 @@ nom estandarditzat.
   **El cicle «d'ara»** (`llibCicleActual`) és el primer que encara té llibres sense tornar i, si
   tots estan tancats, l'últim. Així un llibre que no torna mai no deixa que el cicle vell
   desaparegui de la vista.
-  Funcions: `renderLlibres` + `renderLlibres{Buit,Cicle,Config}`, `llibCicleNou`, `llibTriaLlibre`,
+  Funcions: `renderLlibres` + `renderLlibres{Buit,Cicle,Config}`, `llibCicleNou`,
+  `llibModalTria/llibTriaLlibre/llibTriaPerTots`,
   `llibDades/llibTitols/llibTitol/llibClasses/llibAvui/llibDies/llibFmtDia/llibCicles/llibCicle/
   llibCicleActual/llibAlu/llibFalten/llibComptaCicle/llibJaTingut/llibDiesDeRetard/llibTextFalten/
   llibReparteix`. Estat: `LLIB_CICLE`, `LLIB_CLASS`, `LLIB_CONFIG`, `LLIB_NAV`.
+  `askConfirm` accepta `icon` i `danger:false` (per defecte, paperera i botó vermell): el modal de
+  confirmació és UN element compartit, i per això es torna a posar a cada crida.
   ⚠️ `llibAvui()` fa servir l'hora **LOCAL**: amb `toISOString()` a la nit la data sortia del dia
   abans. Casos `llibTitols`, `llibCicleSet`, `llibAlumne` i `llibCicleDelete` al `doPost`: cal el
   `.gs` actualitzat i **un desplegament nou del Web App** (§11). El `llibSet` d'abans ja no hi és;
@@ -543,10 +559,15 @@ nom estandarditzat.
      **Contestar sense sortir de la portada** (`avisComposer`): el compositor s'obre dins de
      la mateixa targeta i desa amb `api.commentAdd` — és el **mateix fil** que el panell de
      comentaris de dins de la secció. Contestar un avís també el marca com a llegit.
-     ⚠️ `renderAvisosHome(focusComp)` **no repinta si el focus és dins del compositor** (una
-     sincronització s'enduria el que s'està escrivint); i `AVIS_DRAFT` guarda l'esborrany a
-     cada tecla, així un repintat sense focus el torna a posar. `AVIS_REPLY` diu quin avís el
-     té obert.
+     ⚠️ `renderAvisosHome(focusComp)` **no repinta si el focus és en un CAMP DE TEXT** d'aquí
+     dins (una sincronització s'enduria el que s'està escrivint); i `AVIS_DRAFT` guarda
+     l'esborrany a cada tecla, així un repintat sense focus el torna a posar. `AVIS_REPLY` diu
+     quin avís el té obert. **Ha de ser només un camp de text, no qualsevol element**: en clicar
+     un botó el navegador li dona el focus, i amb la comprovació ampla el repintat que ve just
+     després del clic no es feia MAI — el compositor es quedava obert després de publicar i la
+     targeta es quedava amb l'avís que acabaves de marcar com a llegit (bug real, 09-11-2026; el
+     va enxampar la prova en Chromium, no les de taula). `send()` també fa `ta.blur()` abans de
+     repintar, perquè amb ⌘/Ctrl+Enter el focus és al textarea.
   2. **El botó de la barra de dalt** (`#avisBtn`): **obre la pàgina d'avisos**
      (`openSection('avisos')`), amb tots els que s'han escrit i els seus comentaris. El
      comptador `.avis-badge` i el punt `.t-alerta` ja diuen si hi ha res per llegir o

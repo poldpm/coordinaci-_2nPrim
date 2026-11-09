@@ -289,6 +289,40 @@ const igual = (a, b, q) => { const x=JSON.stringify(a), y=JSON.stringify(b);
   await page.waitForTimeout(600);
   igual(await page.locator('.aut-resum span').allTextContents(), ['4/6', '3/4'], 'el comptador de tornats puja');
   cal(/^2nC \(3\/3\)/.test(await page.locator('.att-tab.on').textContent()), 'i la pestanya de classe també');
+
+  /* ⚠️ La comprovació que importa: assignar un llibre NO ha de repintar la secció.
+     Quan ho feia (openSection), la pàgina saltava a dalt de tot amb un scroll suau,
+     tot tornava a fer el fos d'entrada i, amb una classe de 25, al cap d'uns quants
+     es feia inservible. Marquem la taula i mirem que segueixi sent la MATEIXA. */
+  await page.evaluate(() => { document.querySelector('.aut-taula').dataset.marca = 'viva'; });
+  await page.locator('.llib-pick').first().click();
+  await page.waitForTimeout(400);
+  await page.locator('.llib-tria-op').nth(8).click();
+  await page.waitForTimeout(800);
+  igual(await page.evaluate(() => document.querySelector('.aut-taula').dataset.marca || '(repintada)'),
+    'viva', 'assignar un llibre NO repinta la secció');
+  cal(/Ai, Terri/.test(await page.locator('.llib-pick').first().textContent()), 'però la fila sí que s’actualitza');
+
+  console.log('\n9b. El mateix llibre per a tota la classe');
+  const btnTots = page.locator('.att-actions .btn').filter({ hasText:'El mateix per a tota la classe' });
+  igual(await btnTots.count(), 1, 'hi ha el botó');
+  await btnTots.click();
+  await page.waitForTimeout(400);
+  cal(/3 alumnes/.test(await page.locator('.llib-tria p').textContent()), 'diu a quants afecta: '
+    + (await page.locator('.llib-tria p').textContent()));
+  await page.locator('.llib-tria-op').nth(3).click();        // Plou
+  await page.waitForTimeout(500);
+  cal(/ja tenen un altre llibre/.test(await page.locator('#confirm').textContent()), 'avisa que ja en tenien');
+  await page.locator('#confirmYes').click();
+  await page.waitForTimeout(1200);
+  igual(await page.locator('.llib-pick').allTextContents(), ['Plou','Plou','Plou'], 'tots tres amb el mateix llibre');
+  cal(await page.evaluate(c => {
+    const s = JSON.parse(localStorage.getItem(c));
+    const al = s.llibres.cicles[0].alumnes;
+    return ['2nC|Dídac Roca','2nC|Emma Vila','2nC|Anna Puig'].every(k => (al[k] || {}).llibre === 'l04');
+  }, CLAU), 'i ha quedat desat');
+  igual(await page.evaluate(() => document.querySelector('.aut-taula').dataset.marca || '(repintada)'),
+    'viva', 'tampoc repinta la secció');
   await page.locator('#section').screenshot({ path: path.join(QA, 'llibres-cicle.png') });
 
   console.log('\n10. Gestió de grups');
